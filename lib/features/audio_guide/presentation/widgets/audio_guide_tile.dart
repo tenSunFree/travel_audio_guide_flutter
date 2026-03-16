@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/audio_guide.dart';
 
 class AudioGuideTile extends StatelessWidget {
@@ -19,7 +20,7 @@ class AudioGuideTile extends StatelessWidget {
 
     return Container(
       height: 84,
-      color: Colors.white,
+      color: AppColors.surface,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
@@ -28,10 +29,10 @@ class AudioGuideTile extends StatelessWidget {
               guide.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
-                color: Color(0xFF333333),
+                color: AppColors.textPrimary,
               ),
             ),
           ),
@@ -52,16 +53,18 @@ class AudioGuideTile extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       : Icon(
-                          showPlay ? Icons.play_arrow_rounded : Icons.download_rounded,
+                          showPlay
+                              ? Icons.play_arrow_rounded
+                              : Icons.download_rounded,
                           size: 16,
                         ),
                   label: Text(isDownloading ? '下載中' : (showPlay ? '播放' : '下載')),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
-                    backgroundColor: Colors.white,
-                    foregroundColor: const Color(0xFF555555),
+                    backgroundColor: AppColors.surface,
+                    foregroundColor: AppColors.textSecondary,
                     textStyle: const TextStyle(fontSize: 13),
-                    side: const BorderSide(color: Color(0xFFD9D9D9)),
+                    side: const BorderSide(color: AppColors.border),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -71,10 +74,7 @@ class AudioGuideTile extends StatelessWidget {
               const SizedBox(height: 8),
               Text(
                 guide.modified,
-                style: const TextStyle(
-                  fontSize: 11,
-                  color: Color(0xFF999999),
-                ),
+                style: TextStyle(fontSize: 11, color: AppColors.textHint),
               ),
             ],
           ),

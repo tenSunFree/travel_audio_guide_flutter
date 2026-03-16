@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
+import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/audio_guide.dart';
 import '../controllers/audio_player_controller.dart';
+import '../widgets/common_app_bar.dart';
 
 class AudioGuideDetailPage extends ConsumerWidget {
   const AudioGuideDetailPage({super.key, required this.guide});
@@ -12,26 +14,18 @@ class AudioGuideDetailPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final localPath = guide.localFilePath;
-
     if (localPath == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('FUNDAY')),
         body: const Center(child: Text('找不到本地音訊檔')),
       );
     }
-
     final state = ref.watch(audioPlayerControllerProvider(localPath));
     final controller = ref.read(
       audioPlayerControllerProvider(localPath).notifier,
     );
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'FUNDAY',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-      ),
+      appBar: const CommonAppBar(),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -44,7 +38,7 @@ class AudioGuideDetailPage extends ConsumerWidget {
                 style: const TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w800,
-                  color: Color(0xFF333333),
+                  color: AppColors.textPrimary,
                 ),
               ),
               const SizedBox(height: 32),
@@ -54,7 +48,7 @@ class AudioGuideDetailPage extends ConsumerWidget {
                   width: 72,
                   height: 72,
                   decoration: const BoxDecoration(
-                    color: Color(0xFFEEEEEE),
+                    color: AppColors.surfaceMuted,
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -62,14 +56,14 @@ class AudioGuideDetailPage extends ConsumerWidget {
                         ? Icons.pause_rounded
                         : Icons.play_arrow_rounded,
                     size: 40,
-                    color: const Color(0xFF444444),
+                    color: AppColors.iconPrimary,
                   ),
                 ),
               ),
               const SizedBox(height: 20),
               Text(
                 '${_formatDuration(state.position)} / ${_formatDuration(state.duration)}',
-                style: const TextStyle(fontSize: 14, color: Color(0xFF666666)),
+                style: const TextStyle(fontSize: 14, color: AppColors.textCaption),
               ),
               const SizedBox(height: 12),
               if (state.duration > Duration.zero)

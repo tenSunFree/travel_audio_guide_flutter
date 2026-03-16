@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/constants/app_colors.dart';
 import '../../domain/entities/audio_guide.dart';
 import '../controllers/audio_guide_list_controller.dart';
 import '../widgets/audio_guide_tile.dart';
+import '../widgets/common_app_bar.dart';
 import 'audio_guide_detail_page.dart';
 
 class AudioGuideListPage extends ConsumerStatefulWidget {
@@ -46,12 +48,7 @@ class _AudioGuideListPageState extends ConsumerState<AudioGuideListPage> {
     final state = ref.watch(audioGuideListControllerProvider);
     final controller = ref.read(audioGuideListControllerProvider.notifier);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'FUNDAY',
-          style: TextStyle(fontWeight: FontWeight.w800),
-        ),
-      ),
+      appBar: const CommonAppBar(),
       body: Builder(
         builder: (context) {
           if (state.isInitialLoading && state.items.isEmpty) {
@@ -105,7 +102,7 @@ class _AudioGuideListPageState extends ConsumerState<AudioGuideListPage> {
                 if (state.errorMessage != null && state.items.isNotEmpty)
                   Container(
                     width: double.infinity,
-                    color: const Color(0xFFFFF3F3),
+                    color: AppColors.errorSurface,
                     padding: const EdgeInsets.all(12),
                     child: Text(
                       state.errorMessage!,
