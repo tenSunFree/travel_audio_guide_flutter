@@ -1,129 +1,63 @@
 import 'dart:async';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/services/audio_playback_service_impl.dart';
+import '../../domain/services/audio_playback_service.dart';
 
-final audioPlayerControllerProvider = StateNotifierProvider.autoDispose
-    .family<AudioPlayerController, AudioPlayerUiState, String>((ref, filePath) {
-      return AudioPlayerController(filePath);
+final audioPlaybackServiceProvider = Provider.autoDispose
+    .family<AudioPlaybackService, String>((ref, path) {
+      final service = AudioPlaybackServiceImpl();
+      ref.onDispose(() {
+        service.dispose();
+      });
+      return service;
     });
 
-class AudioPlayerUiState {
-  const AudioPlayerUiState({
-    required this.playerState,
-    required this.position,
-    required this.duration,
-    required this.isReady,
-    required this.errorMessage,
-  });
+final audioPlayerControllerProvider = StateNotifierProvider.autoDispose
+    .family<AudioPlayerController, AudioPlaybackState, String>((ref, path) {
+      final service = ref.watch(audioPlaybackServiceProvider(path));
+      return AudioPlayerController(service, path);
+    });
 
-  factory AudioPlayerUiState.initial() {
-    return const AudioPlayerUiState(
-      playerState: PlayerState.stopped,
-      position: Duration.zero,
-      duration: Duration.zero,
-      isReady: false,
-      errorMessage: null,
-    );
-  }
-
-  final PlayerState playerState;
-  final Duration position;
-  final Duration duration;
-  final bool isReady;
-  final String? errorMessage;
-
-  bool get isPlaying => playerState == PlayerState.playing;
-
-  AudioPlayerUiState copyWith({
-    PlayerState? playerState,
-    Duration? position,
-    Duration? duration,
-    bool? isReady,
-    String? errorMessage,
-    bool clearError = false,
-  }) {
-    return AudioPlayerUiState(
-      playerState: playerState ?? this.playerState,
-      position: position ?? this.position,
-      duration: duration ?? this.duration,
-      isReady: isReady ?? this.isReady,
-      errorMessage: clearError ? null : (errorMessage ?? this.errorMessage),
-    );
-  }
-}
-
-class AudioPlayerController extends StateNotifier<AudioPlayerUiState> {
-  AudioPlayerController(this._filePath) : super(AudioPlayerUiState.initial()) {
+class AudioPlayerController extends StateNotifier<AudioPlaybackState> {
+  AudioPlayerController(this._service, this._path)
+    : super(const AudioPlaybackState()) {
     _init();
   }
 
-  final String _filePath;
-  final AudioPlayer _player = AudioPlayer();
-  final List<StreamSubscription<dynamic>> _subscriptions = [];
+  final AudioPlaybackService _service;
+  final String _path;
+
+  StreamSubscription<AudioPlaybackState>? _subscription;
 
   Future<void> _init() async {
-    _subscriptions.add(
-      _player.onDurationChanged.listen((duration) {
-        state = state.copyWith(duration: duration);
-      }),
-    );
-    _subscriptions.add(
-      _player.onPositionChanged.listen((position) {
-        state = state.copyWith(position: position);
-      }),
-    );
-    _subscriptions.add(
-      _player.onPlayerStateChanged.listen((playerState) {
-        state = state.copyWith(playerState: playerState);
-      }),
-    );
-    _subscriptions.add(
-      _player.onPlayerComplete.listen((_) {
-        state = state.copyWith(
-          playerState: PlayerState.stopped,
-          position: state.duration,
-        );
-      }),
-    );
-    try {
-      await _player.setReleaseMode(ReleaseMode.stop);
-      await _player.setSource(DeviceFileSource(_filePath));
-      state = state.copyWith(isReady: true, clearError: true);
-    } catch (e) {
-      state = state.copyWith(errorMessage: '播放器初始化失敗：$e');
-    }
+    _subscription = _service.stateStream.listen((playbackState) {
+      state = playbackState;
+    });
+    await _service.initialize(_path);
   }
 
   Future<void> togglePlayPause() async {
     if (!state.isReady) return;
-    try {
-      if (state.isPlaying) {
-        await _player.pause();
-        return;
-      }
-      if (state.duration > Duration.zero && state.position >= state.duration) {
-        await _player.seek(Duration.zero);
-      }
-      await _player.resume();
-    } catch (e) {
-      state = state.copyWith(errorMessage: '播放失敗：$e');
+    if (state.isPlaying) {
+      await _service.pause();
+      return;
     }
+    if (state.status == AudioPlaybackStatus.stopped &&
+        state.duration > Duration.zero &&
+        state.position >= state.duration) {
+      await _service.seek(Duration.zero);
+    }
+    await _service.play();
   }
 
   Future<void> seek(Duration position) async {
-    try {
-      await _player.seek(position);
-    } catch (e) {
-      state = state.copyWith(errorMessage: '跳轉失敗：$e');
-    }
+    if (!state.isReady) return;
+    await _service.seek(position);
   }
 
   @override
   void dispose() {
-    for (final subscription in _subscriptions) {
-      subscription.cancel();
-    }
-    unawaited(_player.dispose());
+    _subscription?.cancel();
     super.dispose();
   }
 }
