@@ -43,7 +43,9 @@ This project is for learning and technical practice.
 - audioplayers  
   Audio playback library (Manages local audio playback, playback state streams, and media controls)
 - path_provider  
-  File system utility (Provides application-specific directories for storing and retrieving downloaded `.mp3` files)
+  File system utility (Provides application-specific directories for storing and retrieving downloaded `.mp3` files)  
+- Pigeon  
+  Type-safe platform interop code generation (Bridges Flutter and native Android APIs with strongly typed messages, minimizes platform channel boilerplate, and improves reliability for Health Connect integration)
 
 ---
 
