@@ -4,8 +4,8 @@
 [![CD](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/cd.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/cd.yml)
 [![Staging Distribution](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-staging.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-staging.yml)
 [![RC Distribution](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-rc.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-rc.yml)
-[![Flutter](https://img.shields.io/badge/Flutter-3.38.10-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.10.9-0175C2?logo=dart&logoColor=white)](https://dart.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.41.9-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.11.5-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Feature--First-4CAF50)](#architecture)
 [![State](https://img.shields.io/badge/State-Riverpod-1565C0)](https://riverpod.dev)
 [![Data](https://img.shields.io/badge/Data-Offline--First%20%2B%20Drift-009688)](#offline-first-experience)
@@ -140,7 +140,7 @@ It handles JWT verification and user profile management.
 
 ### Developer Experience
 
-- Local CI check script (`scripts/check.sh`) mirrors the GitHub Actions pipeline: dependency installation, format check with auto-fix, static analysis, unit tests, and debug APK build
+- Local CI check script (`scripts/check.sh`) mirrors the GitHub Actions pipeline: dependency installation, format check with auto-fix, static analysis, unit tests, and staging flavor debug APK build
 - Code generation script (`scripts/codegen.sh`) runs `build_runner` for Drift, Freezed, and Riverpod Generator in a single command
 - Development runner (`scripts/run_dev.sh`) injects environment config via `--dart-define-from-file` and supports optional device targeting
 - Release build script (`scripts/build_release.sh`) validates that `env/release.json` exists before producing the release APK, with clear setup instructions on failure
@@ -158,6 +158,7 @@ It handles JWT verification and user profile management.
 - Automated Release Candidate build distribution via Firebase App Distribution on `v*.*.*-rc.*` tag pushes
 - Separated RC distribution from official production release tags to prevent accidental production releases
 - Restored per-flavor Firebase configuration files, service account credentials, and the Android signing keystore from GitHub Secrets in CI, keeping sensitive files out of the repository
+- Organized per-flavor Firebase Dart configuration files under `lib/config/firebase/` for a cleaner project structure
 
 ### Observability and Analytics
 
@@ -256,8 +257,8 @@ It handles JWT verification and user profile management.
 
 ## Environment
 
-- Flutter SDK: `3.38.10`
-- Dart SDK: `3.10.9`
+- Flutter SDK: `3.41.9`
+- Dart SDK: `3.11.5`
 
 ---
 
@@ -309,6 +310,14 @@ travel_audio_guide_flutter
 │  ├─ ...
 ├─ lib
 │  ├─ app.dart
+│  ├─ bootstrap.dart
+│  ├─ main.dart
+│  ├─ main_staging.dart
+│  ├─ main_production.dart
+│  ├─ config
+│  │  └─ firebase
+│  │     ├─ firebase_options_staging.dart
+│  │     └─ firebase_options_production.dart
 │  ├─ core
 │  │  ├─ constants
 │  │  │  ├─ api_constants.dart
@@ -471,7 +480,6 @@ travel_audio_guide_flutter
 │  │        │  └─ step_tracking_source.dart
 │  │        └─ widgets
 │  │           └─ session_summary_card.dart
-│  └─ main.dart
 ├─ linux
 │  ...
 ├─ macos
