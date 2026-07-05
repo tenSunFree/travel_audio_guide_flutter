@@ -140,7 +140,10 @@ It handles JWT verification and user profile management.
 
 ### Developer Experience
 
-- Local CI check script (`scripts/check.sh`) mirrors the GitHub Actions pipeline: dependency installation, format check with auto-fix, static analysis, unit tests, and staging flavor debug APK build
+- Local CI check script (`scripts/check.sh`) mirrors the GitHub Actions pipeline: dependency installation, format check, static analysis, unit tests, and staging flavor debug APK build
+- Git hook automation (`scripts/setup-hooks.sh`) installs local quality gates in one command:
+  - `pre-commit`: Dart format check and a staged-changes secret scan (uses [gitleaks](https://github.com/gitleaks/gitleaks) when available, falling back to a built-in regex scanner otherwise)
+  - `pre-push`: runs `scripts/check.sh` to mirror CI locally before code is pushed
 - Code generation script (`scripts/codegen.sh`) runs `build_runner` for Drift, Freezed, and Riverpod Generator in a single command
 - Development runner (`scripts/run_dev.sh`) injects environment config via `--dart-define-from-file` and supports optional device targeting
 - Release build script (`scripts/build_release.sh`) validates that `env/release.json` exists before producing the release APK, with clear setup instructions on failure
@@ -259,6 +262,62 @@ It handles JWT verification and user profile management.
 
 - Flutter SDK: `3.41.9`
 - Dart SDK: `3.11.5`
+
+---
+
+## Local Git Hooks
+
+After cloning the repository, install the local Git hooks once:
+
+```bash
+bash scripts/setup-hooks.sh
+```
+
+This installs the following hooks:
+
+**`pre-commit`**
+
+Runs fast, staged-only checks before every commit:
+
+- Dart format validation for `lib`, `test`, and `pigeons`
+- Secret scan on staged changes:
+  - Uses `gitleaks` when it is installed
+  - Falls back to a lightweight built-in regex-based scanner with a warning when `gitleaks` is not available
+
+The regex-based fallback is intended as a basic local guard. For stronger secret detection, install `gitleaks`.
+
+**`pre-push`**
+
+Runs the local check script before every push:
+
+```bash
+bash scripts/check.sh
+```
+
+The local check script validates:
+
+- Dependency installation / resolution
+- Dart format validation
+- Static analysis
+- Unit tests
+- Staging flavor debug APK build
+
+This mirrors the main GitHub Actions CI checks locally, so common issues can be caught before pushing.
+
+**Optional: Install `gitleaks`**
+
+For stronger local secret detection:
+
+```bash
+brew install gitleaks                         # macOS
+winget install --id Gitleaks.Gitleaks -e      # Windows
+```
+
+If you already use Scoop on Windows:
+
+```bash
+scoop install gitleaks
+```
 
 ---
 
