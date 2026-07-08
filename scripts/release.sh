@@ -8,6 +8,7 @@
 
 set -e
 cd "$(dirname "$0")/.."
+source "scripts/_fvm.sh"
 
 run_step() {
     local name="$1"
@@ -19,7 +20,7 @@ run_step() {
 }
 
 run_step "CI checks"                   bash scripts/check.sh
-run_step "flutter build apk --release" flutter build apk --release
+run_step "flutter build apk --release" $FLUTTER_CMD build apk --release
 
 echo ""
 echo "Release APK built successfully!"

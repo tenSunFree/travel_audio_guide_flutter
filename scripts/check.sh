@@ -5,6 +5,7 @@
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
+source "scripts/_fvm.sh"
 
 run_step() {
     local name="$1"
@@ -15,22 +16,22 @@ run_step() {
     echo "Passed: $name"
 }
 
-run_step "flutter pub get" flutter pub get
+run_step "flutter pub get" $FLUTTER_CMD pub get
 
 echo ""
 echo "==> dart format check"
-if dart format --output=none --set-exit-if-changed lib test pigeons; then
+if $DART_CMD format --output=none --set-exit-if-changed lib test pigeons; then
     echo "Passed: dart format check"
 else
     echo ""
     echo "An unformatted file was found. Please execute:"
-    echo "dart format lib test pigeons"
-    echo "Then re-git add and commit, and then push again."
+    echo "  bash scripts/format.sh"
+    echo "After confirming that the git diff is correct, then add, commit, or push."
     exit 1
 fi
 
-run_step "flutter analyze" flutter analyze
-run_step "flutter test"    flutter test --reporter compact
+run_step "flutter analyze" $FLUTTER_CMD analyze
+run_step "flutter test"    $FLUTTER_CMD test --reporter compact
 
 # This project sets two flavors in android/app/build.gradle.kts: staging and production.
 # Therefore, you cannot directly run `flutter build apk --debug` without the `--flavor` option.
@@ -41,7 +42,7 @@ run_step "flutter test"    flutter test --reporter compact
 # Local pre-push only builds staging (daily development environment), thereby achieving faster inspection speed;
 # The complete build and verification of production flavors is handled by .github/workflows/ci.yml after push;
 # The two do not replace each other, they just have different functions.
-run_step "flutter build staging debug apk" flutter build apk --debug --flavor staging -t lib/main_staging.dart
+run_step "flutter build staging debug apk" $FLUTTER_CMD build apk --debug --flavor staging -t lib/main_staging.dart
 
 echo ""
 echo "All checks passed!"

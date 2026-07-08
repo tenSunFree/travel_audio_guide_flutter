@@ -6,6 +6,8 @@
 # # CI/CD environment: Use --dart-define to directly inject secrets (see cd.yml instructions)
 
 set -e
+cd "$(dirname "$0")/.."
+source "scripts/_fvm.sh"
 
 ENV_FILE="env/release.json"
 
@@ -25,7 +27,7 @@ echo "Building release APK..."
 echo "    env file : $ENV_FILE"
 echo ""
 
-flutter build apk --release \
+$FLUTTER_CMD build apk --release \
   --dart-define-from-file="$ENV_FILE"
 
 echo ""
