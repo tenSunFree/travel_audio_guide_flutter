@@ -82,3 +82,6 @@ travel-audio-guide-flutter-*.json
 *.jks
 *.keystore
 key.properties
+
+# FVM Version Cache
+.fvm/

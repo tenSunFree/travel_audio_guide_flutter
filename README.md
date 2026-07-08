@@ -140,13 +140,20 @@ It handles JWT verification and user profile management.
 
 ### Developer Experience
 
-- Local CI check script (`scripts/check.sh`) mirrors the GitHub Actions pipeline: dependency installation, format check, static analysis, unit tests, and staging flavor debug APK build
-- Git hook automation (`scripts/setup-hooks.sh`) installs local quality gates in one command:
+- Local CI check script (`scripts/check.sh`) mirrors the GitHub Actions pipeline: dependency installation, format check, static analysis, unit tests, and staging flavor debug APK build — validates only, never modifies files
+- Auto-formatting script (`scripts/format.sh`) runs `dart format` and writes changes directly, kept as a separate command from `check.sh` so CI can never silently rewrite source code
+- Environment health check script (`scripts/doctor.sh`) verifies required tooling (Git, Flutter, Dart), optional tooling (Java, FVM, gitleaks), `env/` configuration files, FVM version pinning, and installed Git hooks before development starts
+- One-command onboarding script (`scripts/bootstrap.sh`) runs the environment check, installs Flutter dependencies, creates `env/dev.json` from the template if missing, and installs Git hooks
+- Full-repository secret scan script (`scripts/secret-scan.sh`) runs `gitleaks detect` across the entire working tree and Git history, complementing the staged-only scan in the pre-commit hook
+- Git hook automation (`scripts/setup-hooks.sh`) installs local quality gates in one command; hook templates live under `scripts/hooks/` and are copied into `.git/hooks/`:
   - `pre-commit`: Dart format check and a staged-changes secret scan (uses [gitleaks](https://github.com/gitleaks/gitleaks) when available, falling back to a built-in regex scanner otherwise)
+  - `commit-msg`: validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) format
   - `pre-push`: runs `scripts/check.sh` to mirror CI locally before code is pushed
 - Code generation script (`scripts/codegen.sh`) runs `build_runner` for Drift, Freezed, and Riverpod Generator in a single command
 - Development runner (`scripts/run_dev.sh`) injects environment config via `--dart-define-from-file` and supports optional device targeting
 - Release build script (`scripts/build_release.sh`) validates that `env/release.json` exists before producing the release APK, with clear setup instructions on failure
+- Optional Flutter version pinning via [FVM](https://fvm.app/): a shared helper (`scripts/_fvm.sh`) is sourced by every script under `scripts/`, so they all automatically switch from `flutter`/`dart` to `fvm flutter`/`fvm dart` once `.fvmrc` is present
+- `Makefile` wraps the most common scripts (`make setup`, `make format`, `make check`, `make secret-scan`, `make doctor`) for a shorter command surface
 
 ### Git Workflow & CI/CD
 
@@ -262,18 +269,55 @@ It handles JWT verification and user profile management.
 
 - Flutter SDK: `3.41.9`
 - Dart SDK: `3.11.5`
+- Flutter version pinning is optional via [FVM](https://fvm.app/); see [Local Development](#local-development) below
 
 ---
 
-## Local Git Hooks
+## Local Development
 
-After cloning the repository, install the local Git hooks once:
+After cloning the repository, run one command to set up everything:
+
+```bash
+bash scripts/bootstrap.sh
+```
+
+This checks your local environment, installs Flutter dependencies, creates `env/dev.json` from `env/example.json` if missing, and installs Git hooks.
+
+### Useful commands
+
+```bash
+bash scripts/format.sh       # auto-format Dart files (modifies files)
+bash scripts/check.sh        # local CI checks — never modifies files
+bash scripts/secret-scan.sh  # full repo + git-history secret scan
+bash scripts/doctor.sh       # check local environment
+```
+
+Or via `Makefile`:
+
+```bash
+make setup
+make format
+make check
+make secret-scan
+make doctor
+```
+
+### Formatting Policy
+
+- `format.sh` modifies files — run it locally whenever you want to auto-fix formatting
+- `check.sh` only validates and never modifies files — used in `pre-push` and CI
+
+This mirrors how CI should behave: CI passes or fails, it never silently rewrites source code.
+
+### Git Hooks
+
+Hook templates live under `scripts/hooks/` and are installed into `.git/hooks/` with:
 
 ```bash
 bash scripts/setup-hooks.sh
 ```
 
-This installs the following hooks:
+Installed hooks:
 
 **`pre-commit`**
 
@@ -285,6 +329,10 @@ Runs fast, staged-only checks before every commit:
   - Falls back to a lightweight built-in regex-based scanner with a warning when `gitleaks` is not available
 
 The regex-based fallback is intended as a basic local guard. For stronger secret detection, install `gitleaks`.
+
+**`commit-msg`**
+
+Validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) format (`feat:`, `fix:`, `docs:`, `refactor:`, ...), so history stays readable and changelogs can be generated automatically. Merge and revert commits are exempt.
 
 **`pre-push`**
 
@@ -304,6 +352,8 @@ The local check script validates:
 
 This mirrors the main GitHub Actions CI checks locally, so common issues can be caught before pushing.
 
+Bypass any hook (not recommended): `git commit --no-verify` / `git push --no-verify`.
+
 **Optional: Install `gitleaks`**
 
 For stronger local secret detection:
@@ -318,6 +368,18 @@ If you already use Scoop on Windows:
 ```bash
 scoop install gitleaks
 ```
+
+### Flutter Version Pinning (FVM)
+
+This project can optionally pin its Flutter version with [FVM](https://fvm.app/) to keep local dev, teammates, and CI on the same version:
+
+```bash
+dart pub global activate fvm
+fvm install <version>      # e.g. the version matching pubspec.yaml's sdk constraint
+fvm use <version> --pin    # creates .fvmrc
+```
+
+Once `.fvmrc` exists and `fvm` is installed, every script under `scripts/` automatically switches from `flutter`/`dart` to `fvm flutter`/`fvm dart` (see `scripts/_fvm.sh`). No other configuration is needed.
 
 ---
 
@@ -347,7 +409,7 @@ If you plan to open-source it, please choose a license and confirm third-party a
 ## Project Structure
 
 ```
-travel_audio_guide_flutter
+travel-audio-guide-flutter
 ...
 ├─ android
 │  ...
@@ -543,11 +605,28 @@ travel_audio_guide_flutter
 │  ...
 ├─ macos
 │  ...
+├─ Makefile
 ├─ pigeons
 │  └─ health_connect_api.dart
 ├─ pubspec.lock
 ├─ pubspec.yaml
 ├─ README.md
+├─ scripts
+│  ├─ hooks
+│  │  ├─ commit-msg
+│  │  ├─ pre-commit
+│  │  └─ pre-push
+│  ├─ _fvm.sh
+│  ├─ bootstrap.sh
+│  ├─ build_release.sh
+│  ├─ check.sh
+│  ├─ codegen.sh
+│  ├─ doctor.sh
+│  ├─ format.sh
+│  ├─ release.sh
+│  ├─ run_dev.sh
+│  ├─ secret-scan.sh
+│  └─ setup-hooks.sh
 ├─ test
 │  ├─ app
 │  │  └─ app_smoke_test.dart
