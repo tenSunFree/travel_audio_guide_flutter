@@ -23,6 +23,8 @@ Travel audio guide app with local content caching, offline browsing, audio downl
 
 This project is for learning and technical practice.
 
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
+
 ---
 
 ## Related Backend
