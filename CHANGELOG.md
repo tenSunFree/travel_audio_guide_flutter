@@ -2,6 +2,18 @@
 
 ---
 
+## v1.0.7 - 2026-07-10
+
+### Internal
+- Added pre-commit hook with Dart format check and gitleaks-backed staged secret scan
+- Added fallback regex-based secret scanner for environments without gitleaks installed
+- Added commit-msg hook to enforce Conventional Commits format
+- Added bootstrap, doctor, format, codegen, secret-scan, and release scripts for local development workflow
+- Added FVM support for consistent Flutter/Dart command execution across local scripts and hooks
+- Updated README with pre-commit hook setup and gitleaks integration instructions
+
+No user-facing features or fixes in this release.
+
 ## v1.0.6 - 2026-07-02
 
 ### Internal
