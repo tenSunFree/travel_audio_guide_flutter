@@ -269,7 +269,7 @@ It handles JWT verification and user profile management.
 
 - Flutter SDK: `3.41.9`
 - Dart SDK: `3.11.5`
-- Flutter version pinning is optional via [FVM](https://fvm.app/); see [Local Development](#local-development) below
+- Flutter version pinning is optional via [FVM](https://fvm.app/). See [Local Development](#local-development) below.
 
 ---
 
