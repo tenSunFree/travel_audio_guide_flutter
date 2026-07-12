@@ -19,10 +19,10 @@ hooks:
 	bash scripts/setup-hooks.sh
 
 test:
-	flutter test --reporter compact
+	@source scripts/_fvm.sh && $$FLUTTER_CMD test --reporter compact
 
 analyze:
-	flutter analyze
+	@source scripts/_fvm.sh && $$FLUTTER_CMD analyze
 
 build-staging:
-	flutter build apk --debug --flavor staging -t lib/main_staging.dart
+	@source scripts/_fvm.sh && $$FLUTTER_CMD build apk --debug --flavor staging -t lib/main_staging.dart

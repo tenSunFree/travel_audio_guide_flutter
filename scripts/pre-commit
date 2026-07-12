@@ -13,6 +13,7 @@
 
 set -uo pipefail
 cd "$(git rev-parse --show-toplevel)" || exit 1
+source "scripts/_fvm.sh"
 
 echo ""
 echo "pre-commit: running checks..."
@@ -23,12 +24,12 @@ echo "pre-commit: running checks..."
 echo ""
 echo "==> dart format check"
 
-if dart format --output=none --set-exit-if-changed lib test pigeons; then
+if $DART_CMD format --output=none --set-exit-if-changed lib test pigeons; then
     echo "Passed: dart format check"
 else
     echo ""
     echo "Unformatted file found, commit aborted. Please continue:"
-    echo "dart format lib test pigeons"
+    echo "bash scripts/format.sh"
     echo "git add -u"
     echo "git commit"
     exit 1

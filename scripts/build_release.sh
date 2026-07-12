@@ -5,7 +5,7 @@
 # Usage: bash scripts/build_release.sh
 # # CI/CD environment: Use --dart-define to directly inject secrets (see cd.yml instructions)
 
-set -e
+set -euo pipefail
 cd "$(dirname "$0")/.."
 source "scripts/_fvm.sh"
 
