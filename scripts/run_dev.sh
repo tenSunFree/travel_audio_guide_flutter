@@ -8,6 +8,8 @@
 # bash scripts/run_dev.sh emulator-5554
 
 set -e
+cd "$(dirname "$0")/.."
+source "scripts/_fvm.sh"
 
 ENV_FILE="env/dev.json"
 
@@ -35,10 +37,10 @@ fi
 echo ""
 
 if [ -n "$DEVICE" ]; then
-  flutter run \
+  $FLUTTER_CMD run \
     --dart-define-from-file="$ENV_FILE" \
     --device-id="$DEVICE"
 else
-  flutter run \
+  $FLUTTER_CMD run \
     --dart-define-from-file="$ENV_FILE"
 fi

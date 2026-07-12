@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# scripts/pre-push
+# scripts/hooks/pre-push
 #
 # Runs local CI checks before every push.
 # Install: bash scripts/setup-hooks.sh
