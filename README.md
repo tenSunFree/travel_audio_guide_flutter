@@ -4,6 +4,7 @@
 [![CD](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/cd.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/cd.yml)
 [![Staging Distribution](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-staging.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-staging.yml)
 [![RC Distribution](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-rc.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-rc.yml)
+[![codecov](https://codecov.io/gh/tenSunFree/travel-audio-guide-flutter/graph/badge.svg)](https://codecov.io/gh/tenSunFree/travel-audio-guide-flutter)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41.9-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.11.5-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Feature--First-4CAF50)](#architecture)
@@ -140,6 +141,7 @@ It handles JWT verification and user profile management.
 - Widget tests for `AudioGuideTile` and `ConditionSummaryBar` covering display states, label rendering, reset button visibility, and tap callback behavior
 - Shared test infrastructure in `test/test_helpers` with reusable entity fixtures, fake remote data sources, in-memory Drift database setup with provider overrides, and a fake playback service for isolating audio controller tests
 - Local CI check script for formatting, static analysis, unit tests, and debug APK build validation
+- Test coverage tracked via Codecov, uploaded automatically from CI (`flutter test --coverage` → `coverage/lcov.info`)
 
 ### Developer Experience
 
