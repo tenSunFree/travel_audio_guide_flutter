@@ -14,6 +14,7 @@
 [![Monitoring](https://img.shields.io/badge/Monitoring-Sentry-362D59?logo=sentry&logoColor=white)](#observability-and-analytics)
 [![Analytics](https://img.shields.io/badge/Analytics-Firebase-FFCA28?logo=firebase&logoColor=black)](#observability-and-analytics)
 [![Distribution](https://img.shields.io/badge/Distribution-Firebase%20App%20Distribution-FFCA28?logo=firebase&logoColor=black)](#git-workflow--cicd)
+[![CodeRabbit Reviews](https://img.shields.io/badge/Code%20Review-CodeRabbit-FF6B35)](https://coderabbit.ai)
 
 ---
 
@@ -22,6 +23,8 @@
 Travel audio guide app with local content caching, offline browsing, audio download, offline playback, and a built-in media player, built using Riverpod, Drift, and Clean Architecture.
 
 This project is for learning and technical practice.
+
+See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ---
 
@@ -159,6 +162,7 @@ It handles JWT verification and user profile management.
 
 - Adopted a feature branch workflow with `develop`, `main`, and `release/*` protected branches
 - Enforced branch protection rules on `develop`, `main`, and `release/*`, blocking direct pushes and requiring Pull Requests with passing CI checks before merge
+- Automated AI-assisted code review via CodeRabbit on every Pull Request to identify potential bugs, security concerns, maintainability issues, and consistency violations before merging
 - Configured GitHub Actions CI for Pull Requests, including Dart format checks, static analysis, unit tests, and debug APK builds for both `staging` and `production` flavors
 - Configured merge requirements so CI checks must pass and branches must be up to date before merging
 - Built a release flow using `release/x.x.x` branches, version tags, automated release APK builds, and GitHub Releases
@@ -269,7 +273,7 @@ It handles JWT verification and user profile management.
 
 - Flutter SDK: `3.41.9`
 - Dart SDK: `3.11.5`
-- Flutter version pinning is optional via [FVM](https://fvm.app/); see [Local Development](#local-development) below
+- Flutter version pinning is optional via [FVM](https://fvm.app/). See [Local Development](#local-development) below.
 
 ---
 
