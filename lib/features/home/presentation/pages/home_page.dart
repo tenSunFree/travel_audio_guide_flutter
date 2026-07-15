@@ -15,6 +15,7 @@ import '../widgets/home_empty_card.dart';
 import '../widgets/home_section_title.dart';
 import '../widgets/home_skeleton.dart';
 import '../widgets/home_subtitle.dart';
+import '../widgets/nearby_attraction_tile.dart';
 import '../widgets/period_chips.dart';
 import '../widgets/rainy_mode_card.dart';
 import '../widgets/recommend_list_tile.dart';
@@ -304,7 +305,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         );
                         distLabel = NearbyUtils.formatDistance(m);
                       }
-                      return _NearbyAttractionTile(
+                      return NearbyAttractionTile(
                         name: item.name,
                         distric: item.distric,
                         distanceLabel: distLabel,
@@ -322,98 +323,6 @@ class _HomePageState extends ConsumerState<HomePage> {
               ],
               const SliverToBoxAdapter(child: SizedBox(height: 120)),
             ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// Private tile widgets — lightweight, home-screen only
-class _NearbyAttractionTile extends StatelessWidget {
-  const _NearbyAttractionTile({
-    required this.name,
-    required this.distric,
-    required this.distanceLabel,
-    required this.imageUrl,
-    required this.onTap,
-  });
-
-  final String name;
-  final String distric;
-  final String? distanceLabel;
-  final String? imageUrl;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final meta = <String>[
-      ?distanceLabel,
-      if (distric.trim().isNotEmpty) distric.trim(),
-    ].join('  ·  ');
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        color: AppColors.surface,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        child: Row(
-          children: [
-            // Leading icon / image
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.surfaceMuted,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: imageUrl != null
-                  ? Image.network(
-                      imageUrl!,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => const Icon(
-                        Icons.place_outlined,
-                        color: AppColors.textHint,
-                      ),
-                    )
-                  : const Icon(Icons.place_outlined, color: AppColors.textHint),
-            ),
-            const SizedBox(width: 12),
-            // Text
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  if (meta.isNotEmpty) ...[
-                    const SizedBox(height: 2),
-                    Text(
-                      meta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textCaption,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            const Icon(
-              Icons.chevron_right,
-              size: 18,
-              color: AppColors.textHint,
-            ),
           ],
         ),
       ),
