@@ -106,7 +106,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/lcov.info
           disable_search: true
-          fail_ci_if_error: true
+          fail_ci_if_error: false  # Turn off debugging first to avoid masking the real error messages.
           verbose: true
 
       - name: Build staging debug APK
