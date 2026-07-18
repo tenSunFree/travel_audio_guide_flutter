@@ -7,6 +7,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../reminder/presentation/utils/detail_schedule_actions.dart';
 import '../../domain/entities/activity.dart';
 import '../../../../core/widgets/detail_action_buttons.dart';
+import '../widgets/activity_link_row.dart';
 
 class ActivityDetailPage extends ConsumerStatefulWidget {
   const ActivityDetailPage({super.key, required this.activity});
@@ -327,8 +328,10 @@ class _ActivityDetailPageState extends ConsumerState<ActivityDetailPage> {
               ),
               const SizedBox(height: 8),
               ...activity.links.map(
-                (link) =>
-                    _LinkRow(link: link, onTap: () => _openLink(link.src)),
+                (link) => ActivityLinkRow(
+                  link: link,
+                  onTap: () => _openLink(link.src),
+                ),
               ),
             ],
             const SizedBox(height: 32),
@@ -406,39 +409,5 @@ class _InfoRow extends StatelessWidget {
       );
     }
     return content;
-  }
-}
-
-class _LinkRow extends StatelessWidget {
-  const _LinkRow({required this.link, required this.onTap});
-
-  final ActivityLink link;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final title = link.subject.isNotEmpty ? link.subject : link.src;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: InkWell(
-        onTap: onTap,
-        child: Row(
-          children: [
-            Icon(Icons.link, size: 16, color: AppColors.textCaption),
-            const SizedBox(width: 6),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Theme.of(context).colorScheme.primary,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
