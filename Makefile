@@ -1,4 +1,4 @@
-.PHONY: setup doctor format check secret-scan hooks test analyze build-staging
+.PHONY: setup doctor format check coverage secret-scan hooks test analyze build-staging
 
 setup:
 	bash scripts/bootstrap.sh
@@ -11,6 +11,9 @@ format:
 
 check:
 	bash scripts/check.sh
+
+coverage:
+	bash scripts/coverage.sh
 
 secret-scan:
 	bash scripts/secret-scan.sh

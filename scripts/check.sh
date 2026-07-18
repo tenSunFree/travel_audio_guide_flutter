@@ -31,7 +31,34 @@ else
 fi
 
 run_step "flutter analyze" $FLUTTER_CMD analyze
-run_step "flutter test"    $FLUTTER_CMD test --reporter compact
+
+# Run the test suite once, with coverage enabled, so a single test run both
+# validates the code and refreshes the local coverage/lcov.info file.
+# (Do NOT also run scripts/coverage.sh here — that would run the whole
+# test suite a second time for no benefit.)
+run_step "flutter test with coverage" \
+  $FLUTTER_CMD test --coverage --reporter compact
+
+# Verify that Flutter actually generated a usable LCOV report.
+# Mirrors the same check used in .github/workflows/ci.yml so local and CI
+# behavior stay consistent.
+echo ""
+echo "==> verify coverage report"
+
+if [[ ! -s coverage/lcov.info ]]; then
+    echo "ERROR: coverage/lcov.info was not generated or is empty."
+    exit 1
+fi
+
+source_count=$(grep -c '^SF:' coverage/lcov.info || true)
+
+if [[ "$source_count" -eq 0 ]]; then
+    echo "ERROR: coverage/lcov.info contains no source-file records."
+    exit 1
+fi
+
+echo "Passed: coverage report"
+echo "Coverage report: coverage/lcov.info ($source_count source files)"
 
 # This project sets two flavors in android/app/build.gradle.kts: staging and production.
 # Therefore, you cannot directly run `flutter build apk --debug` without the `--flavor` option.
