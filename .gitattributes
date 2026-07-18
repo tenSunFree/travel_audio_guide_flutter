@@ -1,0 +1,16 @@
+# Force LF line endings for shell scripts and other files that must remain
+# POSIX-compatible, regardless of each contributor's local core.autocrlf
+# setting. This prevents errors like:
+#   scripts/_fvm.sh: line 17: $'\r': command not found
+# which happen when bash tries to execute a script that was checked out
+# with Windows (CRLF) line endings.
+
+* text=auto eol=lf
+
+*.sh          text eol=lf
+scripts/hooks/* text eol=lf
+Makefile      text eol=lf
+
+# Keep Windows-specific files as CRLF if you ever add any (none currently).
+# *.bat       text eol=crlf
+# *.cmd       text eol=crlf
