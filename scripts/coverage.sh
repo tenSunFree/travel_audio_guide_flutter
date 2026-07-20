@@ -25,8 +25,31 @@ fi
 source_count=$(grep -c '^SF:' coverage/lcov.info || true)
 echo ""
 echo "Coverage report generated: coverage/lcov.info ($source_count source files)"
-echo "Note: generated files (.g.dart / .freezed.dart / firebase_options_*) are"
-echo "excluded on Codecov via codecov.yml, not filtered locally."
+
+echo ""
+echo "==> filtering generated files for local HTML coverage"
+
+awk '
+{
+  record = record $0 ORS
+
+  if ($0 ~ /^SF:/) {
+    path = substr($0, 4)
+    gsub(/\\/, "/", path)
+
+    skip = (path ~ /\.g\.dart$/ || path ~ /\.freezed\.dart$/ || path ~ /(^|\/)lib\/config\/firebase\/firebase_options_[^\/]*\.dart$/)
+  }
+
+  if ($0 == "end_of_record") {
+    if (!skip) {
+      printf "%s", record
+    }
+
+    record = ""
+    skip = 0
+  }
+}
+' coverage/lcov.info > coverage/lcov.filtered.info
 
 # ------------------------------------------------------------
 # Generate the HTML report.
@@ -37,10 +60,10 @@ echo "excluded on Codecov via codecov.yml, not filtered locally."
 REPORT_PATH="$(pwd)/coverage/html/index.html"
 
 if command -v genhtml >/dev/null 2>&1; then
-  genhtml coverage/lcov.info -o coverage/html
+  genhtml coverage/lcov.filtered.info -o coverage/html
   echo "HTML report: $REPORT_PATH"
 elif command -v lcov-viewer >/dev/null 2>&1; then
-  lcov-viewer lcov -o coverage/html coverage/lcov.info
+  lcov-viewer lcov -o coverage/html coverage/lcov.filtered.info
   echo "HTML report: $REPORT_PATH"
 else
   echo ""
