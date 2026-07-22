@@ -54,7 +54,7 @@ class NotificationServiceImpl implements NotificationService {
     await initialize();
     final scheduledDate = tz.TZDateTime.from(reminder.notifyTime, tz.local);
     if (scheduledDate.isBefore(tz.TZDateTime.now(tz.local))) return;
-    // 動態決定排程模式，避免 exact_alarms_not_permitted crash
+    // Dynamically decide the scheduling mode to avoid exact_alarms_not_permitted crash
     final scheduleMode = await _resolveScheduleMode();
     await _plugin.zonedSchedule(
       id: reminder.notificationId,
@@ -87,7 +87,7 @@ class NotificationServiceImpl implements NotificationService {
         return AndroidScheduleMode.exactAllowWhileIdle;
       }
     } catch (e) {
-      debugPrint('canScheduleExactNotifications 查詢失敗：$e');
+      debugPrint('canScheduleExactNotifications query failed: $e');
     }
     return AndroidScheduleMode.inexactAllowWhileIdle;
   }
