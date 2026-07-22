@@ -281,7 +281,7 @@ class ActivityListController extends StateNotifier<ActivityListState> {
         await ref.read(appSyncServiceProvider).syncAllIfNeeded();
       } catch (_) {
       } finally {
-        if (mounted) state = state.copyWith(isLoadingMore: false);
+        if (mounted) state = state.copyWith(isSyncing: false);
       }
     });
   }

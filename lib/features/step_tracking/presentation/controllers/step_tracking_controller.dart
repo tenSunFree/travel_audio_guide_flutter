@@ -23,7 +23,8 @@ class StepTrackingState {
   final double distance;
   final bool isTracking;
 
-  // 方便外部判斷當前 source 是否已就緒
+  // Convenience for external callers to determine whether the current
+  // source is ready
   bool get isReady => source == StepTrackingSource.sensor
       ? isAvailable && hasSensorPermission
       : isAvailable && hasHealthConnectPermission;
@@ -63,11 +64,11 @@ class StepTrackingController extends StateNotifier<StepTrackingState> {
   Future<void> _init() async {
     final available = await _service.checkAvailability();
     state = state.copyWith(isAvailable: available);
-    // Health Connect 權限
+    // Health Connect permission
     var hcGranted = await _service.hasPermissions();
     if (!hcGranted) hcGranted = await _service.requestPermissions();
     state = state.copyWith(hasHealthConnectPermission: hcGranted);
-    // Sensor 權限
+    // Sensor permission
     var sensorGranted = await _service.hasActivityRecognitionPermission();
     if (!sensorGranted) {
       sensorGranted = await _service.requestActivityRecognitionPermission();
@@ -81,12 +82,12 @@ class StepTrackingController extends StateNotifier<StepTrackingState> {
     _guideName = guideName;
     if (state.source == StepTrackingSource.sensor) {
       if (_sessionStart == null) {
-        _service.startStepSensorTracking(); // 新 session
+        _service.startStepSensorTracking(); // start a new session
       } else {
         _service
-            .resumeStepSensorTracking(); // pause 後 resume → 但 Pigeon 沒有 resume
-        // 實際上 startStepSensorTracking 每次都從 0 開始，
-        // pause/resume 應改呼叫對應方法（見下方說明）
+            .resumeStepSensorTracking(); // pause then resume — Pigeon does not support resume
+        // In practice startStepSensorTracking resets counts to zero on each call.
+        // pause/resume should call the corresponding methods instead (see note below).
       }
     }
     _sessionStart ??= DateTime.now();
@@ -116,7 +117,7 @@ class StepTrackingController extends StateNotifier<StepTrackingState> {
     double distance;
     if (state.source == StepTrackingSource.sensor) {
       steps = await _service.stopStepSensorTracking();
-      distance = steps * 0.78; // 平均步幅估算
+      distance = steps * 0.78; // estimated average stride length
     } else {
       steps = await _service.getStepsBetween(start, end);
       distance = await _service.getDistanceBetween(start, end);
@@ -160,7 +161,7 @@ class StepTrackingController extends StateNotifier<StepTrackingState> {
         if (mounted) state = state.copyWith(steps: steps, distance: distance);
       } catch (_) {}
     } else {
-      // 原本 Health Connect 邏輯不變
+      // Health Connect logic remains unchanged
       final start = _sessionStart;
       if (start == null) return;
       final now = DateTime.now();

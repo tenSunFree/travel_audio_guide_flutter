@@ -34,7 +34,7 @@ class NearbyUtils {
 
   static double _rad(double deg) => deg * math.pi / 180.0;
 
-  /// Returns 你附近 / 850m / 1.2km / 10km+
+  /// Returns distance label: '你附近' / '850m' / '1.2km' / '10km+'
   static String formatDistance(double meters) {
     if (meters < 100) return '你附近';
     if (meters < 1000) return '${meters.round()}m';
