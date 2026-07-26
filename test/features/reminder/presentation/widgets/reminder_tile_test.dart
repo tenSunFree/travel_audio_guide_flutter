@@ -58,11 +58,11 @@ void main() {
       routes: [
         GoRoute(
           path: '/',
-          builder: (_, __) => Scaffold(body: ReminderTile(reminder: reminder)),
+          builder: (_, _) => Scaffold(body: ReminderTile(reminder: reminder)),
         ),
         GoRoute(
           path: '/attraction/1',
-          builder: (_, __) => const Scaffold(body: Text('景點詳細頁')),
+          builder: (_, _) => const Scaffold(body: Text('景點詳細頁')),
         ),
       ],
     );
