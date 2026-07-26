@@ -4,7 +4,9 @@
 # Checks before every commit:
 #   1. dart format check — lib/test/pigeons (same scope as scripts/check.sh)
 #      does NOT auto-fix; tells you exactly what to run
-#   2. Secret scan on staged changes
+#   2. flutter analyze — static analysis (catches lint issues like
+#      unnecessary_underscores before they reach pre-push)
+#   3. Secret scan on staged changes
 #        - gitleaks installed  -> gitleaks protect --staged --verbose
 #        - gitleaks NOT installed -> warn + fallback to built-in regex scanner
 #
@@ -36,7 +38,22 @@ else
 fi
 
 # ============================================================
-# 2. secret scan (staged changes)
+# 2. flutter analyze (static analysis)
+# ============================================================
+echo ""
+echo "==> flutter analyze"
+
+if $FLUTTER_CMD analyze; then
+    echo "Passed: flutter analyze"
+else
+    echo ""
+    echo "Analyze issues found, commit aborted. Please fix them before committing:"
+    echo "fvm flutter analyze"
+    exit 1
+fi
+
+# ============================================================
+# 3. secret scan (staged changes)
 # ============================================================
 echo ""
 echo "==> secret scan (staged changes)"
