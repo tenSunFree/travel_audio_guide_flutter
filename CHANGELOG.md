@@ -2,6 +2,23 @@
 
 ---
 
+## v1.0.8 - 2026-07-28
+
+### Internal
+- Integrated Codecov coverage reporting into CI pipeline, and strengthened Codecov coverage policy with stricter project/patch thresholds
+- Decoupled Codecov status check from overall CI completion
+- Added `flutter analyze` to the pre-commit hook (previously only ran at pre-push), catching lint issues before commit instead of after push
+- Added coverage run on pre-push with local HTML report tooling for easier local inspection
+- Extracted `NearbyAttractionTile` and `ActivityLinkRow` into standalone widgets, with accompanying widget tests
+- Added `NotificationServiceImpl` unit tests
+- Added `path_provider_platform_interface` and `plugin_platform_interface` as explicit dev dependencies
+- Fixed `unnecessary_underscores` lint violations in test files
+- Increased overall unit/widget test line coverage from 10% to 70.5% across multiple incremental batches (DI provider wiring, location controller, reminder/activity/attraction/audio_guide/home features, etc.)
+
+No user-facing features or fixes in this release.
+
+---
+
 ## v1.0.7 - 2026-07-10
 
 ### Internal
