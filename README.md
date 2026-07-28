@@ -152,6 +152,7 @@ It handles JWT verification and user profile management.
 - Auto-formatting script (`scripts/format.sh`) runs `dart format` and writes changes directly, kept as a separate command from `check.sh` so CI can never silently rewrite source code
 - Environment health check script (`scripts/doctor.sh`) verifies required tooling (Git, Flutter, Dart), optional tooling (Java, FVM, gitleaks), `env/` configuration files, FVM version pinning, and installed Git hooks before development starts
 - One-command onboarding script (`scripts/bootstrap.sh`) runs the environment check, installs Flutter dependencies, creates `env/dev.json` from the template if missing, and installs Git hooks
+- Deterministic Android version code calculation (`scripts/compute_android_version.sh`) derives both `versionName` and `versionCode` from the git tag (e.g. `v1.0.8-rc.2` → version `1.0.8`, code `1000802`), shared by both `deploy-rc.yml` and `cd.yml` so RC and production builds never produce a lower version code than a previously distributed build
 - Full-repository secret scan script (`scripts/secret-scan.sh`) runs `gitleaks detect` across the entire working tree and Git history, complementing the staged-only scan in the pre-commit hook
 - Git hook automation (`scripts/setup-hooks.sh`) installs local quality gates in one command; hook templates live under `scripts/hooks/` and are copied into `.git/hooks/`:
   - `pre-commit`: Dart format check and a staged-changes secret scan (uses [gitleaks](https://github.com/gitleaks/gitleaks) when available, falling back to a built-in regex scanner otherwise)
@@ -176,6 +177,7 @@ It handles JWT verification and user profile management.
 - Automated staging build distribution via Firebase App Distribution on every push to `develop`
 - Automated Release Candidate build distribution via Firebase App Distribution on `v*.*.*-rc.*` tag pushes
 - Separated RC distribution from official production release tags to prevent accidental production releases
+- Android `versionCode` is deterministically derived from the release tag (`scripts/compute_android_version.sh`) rather than the CI workflow run number, ensuring RC and production builds always compare correctly for in-place upgrades regardless of which workflow produced them
 - Restored per-flavor Firebase configuration files, service account credentials, and the Android signing keystore from GitHub Secrets in CI, keeping sensitive files out of the repository
 - Organized per-flavor Firebase Dart configuration files under `lib/config/firebase/` for a cleaner project structure
 
