@@ -81,8 +81,33 @@ jobs:
       - name: Static analysis
         run: flutter analyze
 
-      - name: Run tests
-        run: flutter test
+      - name: Run tests with coverage
+        run: flutter test --coverage
+
+      - name: Verify coverage report
+        shell: bash
+        run: |
+          if [[ ! -s coverage/lcov.info ]]; then
+            echo "::error::coverage/lcov.info was not generated or is empty."
+            exit 1
+          fi
+          
+          source_count=$(grep -c '^SF:' coverage/lcov.info || true)
+          if [[ "$source_count" -eq 0 ]]; then
+            echo "::error::coverage/lcov.info contains no source-file records."
+            exit 1
+          fi
+          
+          echo "Coverage report OK — $source_count source files, $(wc -c < coverage/lcov.info) bytes."
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage/lcov.info
+          disable_search: true
+          fail_ci_if_error: false  # Turn off debugging first to avoid masking the real error messages.
+          verbose: true
 
       - name: Build staging debug APK
         run: |

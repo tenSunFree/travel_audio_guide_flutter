@@ -4,6 +4,7 @@
 [![CD](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/cd.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/cd.yml)
 [![Staging Distribution](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-staging.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-staging.yml)
 [![RC Distribution](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-rc.yml/badge.svg)](https://github.com/tenSunFree/travel-audio-guide-flutter/actions/workflows/deploy-rc.yml)
+[![codecov](https://codecov.io/gh/tenSunFree/travel-audio-guide-flutter/graph/badge.svg)](https://codecov.io/gh/tenSunFree/travel-audio-guide-flutter)
 [![Flutter](https://img.shields.io/badge/Flutter-3.41.9-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.11.5-0175C2?logo=dart&logoColor=white)](https://dart.dev)
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Feature--First-4CAF50)](#architecture)
@@ -139,24 +140,29 @@ It handles JWT verification and user profile management.
 - Widget tests for `AudioGuideListPage` covering loading state, populated list, empty state, error state, download/play button rendering, AppBar display, and reactive stream updates
 - Widget tests for `AudioGuideTile` and `ConditionSummaryBar` covering display states, label rendering, reset button visibility, and tap callback behavior
 - Shared test infrastructure in `test/test_helpers` with reusable entity fixtures, fake remote data sources, in-memory Drift database setup with provider overrides, and a fake playback service for isolating audio controller tests
-- Local CI check script for formatting, static analysis, unit tests, and debug APK build validation
+- Local CI check script (`scripts/check.sh`) — run automatically via the `pre-push` hook — validates formatting, static analysis, tests with coverage enabled, and a staging debug APK build, and verifies that `coverage/lcov.info` is generated and contains valid source-file records
+- Local coverage tooling (`scripts/coverage.sh`) generates LCOV coverage data and an HTML coverage report via `genhtml` or `lcov-viewer` for file-by-file and line-by-line inspection
+- Test coverage is tracked via Codecov and uploaded automatically from CI (`flutter test --coverage` → `coverage/lcov.info`)
 
 ### Developer Experience
 
-- Local CI check script (`scripts/check.sh`) mirrors the GitHub Actions pipeline: dependency installation, format check, static analysis, unit tests, and staging flavor debug APK build — validates only, never modifies files
+- Local CI check script (`scripts/check.sh`) mirrors the main GitHub Actions validation pipeline: dependency installation, format check, static analysis, tests with coverage, LCOV report validation, and staging flavor debug APK build — validates only and never rewrites source files
+- Local coverage tooling (`scripts/coverage.sh`) runs `flutter test --coverage`, verifies that `coverage/lcov.info` was generated, and produces an HTML coverage report via `genhtml` (lcov) or `lcov-viewer` (npm) when available; the report opens automatically in the default browser unless `NO_OPEN=1` is set
+- Coverage exclusions reported to Codecov are maintained centrally in `codecov.yml`. Locally, `coverage/lcov.info` stays unfiltered (used by `scripts/check.sh` and uploaded as-is to Codecov); `scripts/coverage.sh` additionally produces a filtered `coverage/lcov.filtered.info`, used only for the local HTML report, to exclude generated files (`*.g.dart`, `*.freezed.dart`, `firebase_options_*.dart`) from local viewing
 - Auto-formatting script (`scripts/format.sh`) runs `dart format` and writes changes directly, kept as a separate command from `check.sh` so CI can never silently rewrite source code
 - Environment health check script (`scripts/doctor.sh`) verifies required tooling (Git, Flutter, Dart), optional tooling (Java, FVM, gitleaks), `env/` configuration files, FVM version pinning, and installed Git hooks before development starts
 - One-command onboarding script (`scripts/bootstrap.sh`) runs the environment check, installs Flutter dependencies, creates `env/dev.json` from the template if missing, and installs Git hooks
+- Deterministic Android version code calculation (`scripts/compute_android_version.sh`) derives both `versionName` and `versionCode` from the git tag (e.g. `v1.0.8-rc.2` → version `1.0.8`, code `1000802`), shared by both `deploy-rc.yml` and `cd.yml` so RC and production builds never produce a lower version code than a previously distributed build
 - Full-repository secret scan script (`scripts/secret-scan.sh`) runs `gitleaks detect` across the entire working tree and Git history, complementing the staged-only scan in the pre-commit hook
 - Git hook automation (`scripts/setup-hooks.sh`) installs local quality gates in one command; hook templates live under `scripts/hooks/` and are copied into `.git/hooks/`:
   - `pre-commit`: Dart format check and a staged-changes secret scan (uses [gitleaks](https://github.com/gitleaks/gitleaks) when available, falling back to a built-in regex scanner otherwise)
   - `commit-msg`: validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) format
-  - `pre-push`: runs `scripts/check.sh` to mirror CI locally before code is pushed
+  - `pre-push`: runs `scripts/check.sh`, including tests with coverage and LCOV validation, before code is pushed
 - Code generation script (`scripts/codegen.sh`) runs `build_runner` for Drift, Freezed, and Riverpod Generator in a single command
 - Development runner (`scripts/run_dev.sh`) injects environment config via `--dart-define-from-file` and supports optional device targeting
 - Release build script (`scripts/build_release.sh`) validates that `env/release.json` exists before producing the release APK, with clear setup instructions on failure
 - Optional Flutter version pinning via [FVM](https://fvm.app/): a shared helper (`scripts/_fvm.sh`) is sourced by every script under `scripts/`, so they all automatically switch from `flutter`/`dart` to `fvm flutter`/`fvm dart` once `.fvmrc` is present
-- `Makefile` wraps the most common scripts (`make setup`, `make format`, `make check`, `make secret-scan`, `make doctor`) for a shorter command surface
+- `Makefile` wraps the most common scripts (`make setup`, `make format`, `make check`, `make coverage`, `make secret-scan`, `make doctor`) for a shorter command surface
 
 ### Git Workflow & CI/CD
 
@@ -171,6 +177,7 @@ It handles JWT verification and user profile management.
 - Automated staging build distribution via Firebase App Distribution on every push to `develop`
 - Automated Release Candidate build distribution via Firebase App Distribution on `v*.*.*-rc.*` tag pushes
 - Separated RC distribution from official production release tags to prevent accidental production releases
+- Android `versionCode` is deterministically derived from the release tag (`scripts/compute_android_version.sh`) rather than the CI workflow run number, ensuring RC and production builds always compare correctly for in-place upgrades regardless of which workflow produced them
 - Restored per-flavor Firebase configuration files, service account credentials, and the Android signing keystore from GitHub Secrets in CI, keeping sensitive files out of the repository
 - Organized per-flavor Firebase Dart configuration files under `lib/config/firebase/` for a cleaner project structure
 
@@ -291,7 +298,8 @@ This checks your local environment, installs Flutter dependencies, creates `env/
 
 ```bash
 bash scripts/format.sh       # auto-format Dart files (modifies files)
-bash scripts/check.sh        # local CI checks — never modifies files
+bash scripts/check.sh        # local CI checks with coverage validation — never modifies files
+bash scripts/coverage.sh     # generate coverage + local HTML report when tooling is available
 bash scripts/secret-scan.sh  # full repo + git-history secret scan
 bash scripts/doctor.sh       # check local environment
 ```
@@ -302,9 +310,43 @@ Or via `Makefile`:
 make setup
 make format
 make check
+make coverage
 make secret-scan
 make doctor
 ```
+
+### Local Coverage Report
+
+Run the coverage helper to generate an LCOV report and inspect coverage locally:
+
+```bash
+make coverage
+```
+
+or:
+
+```bash
+bash scripts/coverage.sh
+```
+
+The script:
+
+- Runs `flutter test --coverage`
+- Verifies that `coverage/lcov.info` was generated and contains source records
+- Filters out generated files (`*.g.dart`, `*.freezed.dart`, `firebase_options_*.dart`) into `coverage/lcov.filtered.info`, for local HTML viewing only
+- Generates `coverage/html/index.html` from the filtered report using `genhtml` (lcov) when available
+- Falls back to `lcov-viewer` when `genhtml` is not installed
+- Opens the HTML report automatically in the default browser
+
+To generate the report without opening the browser:
+
+```bash
+NO_OPEN=1 make coverage
+```
+
+`coverage/lcov.info` itself stays unfiltered — it's what `scripts/check.sh` validates and what gets uploaded to Codecov. `codecov.yml` remains the single source of truth for exclusions reported on the Codecov dashboard; the local filtering only affects what you see in the local HTML report.
+
+> `scripts/check.sh` already runs the test suite with coverage and validates the generated LCOV report during pre-push checks. `scripts/coverage.sh` is intended for interactive local coverage inspection and is not called by the pre-push hook, avoiding a duplicate full test run.
 
 ### Formatting Policy
 
@@ -312,6 +354,18 @@ make doctor
 - `check.sh` only validates and never modifies files — used in `pre-push` and CI
 
 This mirrors how CI should behave: CI passes or fails, it never silently rewrites source code.
+
+### Line Endings
+
+This repository includes a `.gitattributes` configuration that enforces LF line endings for shell scripts, Git hook scripts, and the `Makefile`, regardless of the local Git `core.autocrlf` setting.
+
+This keeps executable scripts consistent across operating systems and prevents Bash failures caused by CRLF line endings, such as:
+
+```text
+scripts/_fvm.sh: line 17: $'\r': command not found
+```
+
+This is especially useful when the repository is checked out or edited in Windows environments while scripts are executed through Bash, Git Bash, WSL, macOS, or Linux.
 
 ### Git Hooks
 
@@ -336,7 +390,9 @@ The regex-based fallback is intended as a basic local guard. For stronger secret
 
 **`commit-msg`**
 
-Validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) format (`feat:`, `fix:`, `docs:`, `refactor:`, ...), so history stays readable and changelogs can be generated automatically. Merge and revert commits are exempt.
+Validates commit messages against the [Conventional Commits](https://www.conventionalcommits.org/) format (`feat:`, `fix:`, `docs:`, `refactor:`, ...), so history stays readable and changelogs can be generated automatically.
+
+Merge and revert commits are exempt.
 
 **`pre-push`**
 

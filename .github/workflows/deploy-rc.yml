@@ -37,28 +37,24 @@ jobs:
       - name: Show Flutter & Dart version
         run: flutter --version
 
-      # TAG = 1.0.5-rc.1 (from git tag, remove the leading 'v')
-      # BASE_VERSION = 1.0.5 (remove '-rc.x', this is the value written into the app's internal versionName)
-      # The reason why TAG cannot be directly used as --build-name is because Android versionName
-      # Once it contains informal semantic strings like "-rc.1", it will mix into the version number seen on the user's device,
-      # and the version number will be inconsistent when it is converted from RC to official release, making it difficult to track.
-      # The file name (APK file name) retains complete rc information, but the app's internal version maintains a clean X.Y.Z.
-      - name: Extract version from tag
+      # Computes:
+      #   APP_VERSION  = version name shown to users, e.g. "1.0.8" (no "v", no "-rc.N")
+      #   BUILD_NUMBER = Android versionCode, deterministically derived from the tag
+      #                  (see scripts/compute_android_version.sh for the formula)
+      #   RELEASE_TYPE = "rc" or "release"
+      # This replaces --build-number=${{ github.run_number }}, which is unsafe across
+      # multiple workflow files (each has its own independent run_number counter) and
+      # could produce a NEWER release with a SMALLER versionCode than an older one,
+      # causing Android to reject the install as a downgrade.
+      # This step also validates the tag format (script exits non-zero on failure),
+      # replacing the old separate "Validate tag format" step.
+      - name: Compute Android version
+        shell: bash
         run: |
-          TAG=${GITHUB_REF#refs/tags/v}
-          BASE_VERSION=$(echo "$TAG" | sed 's/-rc\..*//')
-
+          TAG="${GITHUB_REF_NAME#v}"
           echo "TAG=$TAG" >> "$GITHUB_ENV"
-          echo "BASE_VERSION=$BASE_VERSION" >> "$GITHUB_ENV"
           echo "APK_NAME=travel-audio-guide-${TAG}.apk" >> "$GITHUB_ENV"
-
-      - name: Validate tag format
-        run: |
-          if [[ ! "${{ env.TAG }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+-rc\.[0-9]+$ ]]; then
-            echo "Invalid RC tag: ${{ env.TAG }}"
-            echo "Expected format: v1.0.5-rc.1"
-            exit 1
-          fi
+          bash scripts/compute_android_version.sh "${GITHUB_REF_NAME}"
 
       - name: Restore Firebase config files
         run: |
@@ -118,8 +114,8 @@ jobs:
         run: |
           flutter build apk --release \
             --flavor production \
-            --build-name=${{ env.BASE_VERSION }} \
-            --build-number=${{ github.run_number }} \
+            --build-name="${{ env.APP_VERSION }}" \
+            --build-number="${{ env.BUILD_NUMBER }}" \
             --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} \
             --dart-define=APP_ENV=rc \
             --dart-define=APP_RELEASE=flutter-travel-audio-guide@${{ env.TAG }} \
@@ -137,9 +133,10 @@ jobs:
           Release Candidate
 
           Tag: v${{ env.TAG }}
-          Version Name: ${{ env.BASE_VERSION }}
-          Build Number: ${{ github.run_number }}
+          Version name: ${{ env.APP_VERSION }}
+          Version code: ${{ env.BUILD_NUMBER }}
           Commit: ${{ github.sha }}
+          Workflow run: ${{ github.run_number }} (attempt ${{ github.run_attempt }})
           APK: ${{ env.APK_NAME }}
           EOF
 

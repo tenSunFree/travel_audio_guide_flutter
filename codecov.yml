@@ -1,0 +1,36 @@
+codecov:
+  require_ci_to_pass: false
+
+coverage:
+  precision: 2
+  round: down
+  range: "10...50"
+
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+
+    patch:
+      default:
+        target: 70%
+        threshold: 0%
+        only_pulls: true
+
+comment:
+  layout: "reach,diff,files"
+  behavior: default
+  require_changes: false
+
+ignore:
+  # build_runner / json_serializable / Drift / Riverpod Generator
+  - "**/*.g.dart"
+  # Freezed generated implementation
+  - "**/*.freezed.dart"
+  # Firebase options restored by CI from secrets — env config, not hand-written logic
+  - "lib/config/firebase/firebase_options_*.dart"
+
+  # Not needed now, leaving a note for now. Will open it only after confirming that the project actually has this type of file.
+  # - "**/*.gr.dart"
+  # - "**/*.mocks.dart"
