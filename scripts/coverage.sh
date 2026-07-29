@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 # scripts/coverage.sh
-# Generates the raw Flutter LCOV report locally.
-# Exclusions are maintained solely in codecov.yml — this script no longer
-# filters the report, to avoid two divergent sources of truth.
+# Generates the raw Flutter LCOV report locally (coverage/lcov.info), which
+# stays unfiltered and is what scripts/check.sh validates and what gets
+# uploaded to Codecov — codecov.yml is the single source of truth for
+# Codecov-facing exclusions.
+#
+# For local HTML viewing only, this script additionally produces a filtered
+# copy (coverage/lcov.filtered.info) that strips generated files (*.g.dart,
+# *.freezed.dart, firebase_options_*.dart) so the local report isn't cluttered
+# with code nobody hand-writes or reviews. This filtering is local-only and
+# does not affect coverage/lcov.info or the Codecov-reported percentage.
 # Usage: bash scripts/coverage.sh
 
 set -euo pipefail
@@ -23,6 +30,12 @@ if [[ ! -s coverage/lcov.info ]]; then
 fi
 
 source_count=$(grep -c '^SF:' coverage/lcov.info || true)
+
+if [[ "$source_count" -eq 0 ]]; then
+  echo "ERROR: coverage/lcov.info contains no source file records."
+  exit 1
+fi
+
 echo ""
 echo "Coverage report generated: coverage/lcov.info ($source_count source files)"
 
