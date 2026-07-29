@@ -16,7 +16,11 @@ SEQUENCE=""
 APP_VERSION=""
 RELEASE_TYPE=""
 
-if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)-rc\.([0-9]+)$ ]]; then
+# Numeric components must not have leading zeros (e.g. "08"), otherwise
+# distinct tags like v1.08.1 and v1.8.1 would collide on the same versionCode.
+NUM='(0|[1-9][0-9]*)'
+
+if [[ "$TAG" =~ ^v${NUM}\.${NUM}\.${NUM}-rc\.${NUM}$ ]]; then
   MAJOR="${BASH_REMATCH[1]}"
   MINOR="${BASH_REMATCH[2]}"
   PATCH="${BASH_REMATCH[3]}"
@@ -30,7 +34,7 @@ if [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)-rc\.([0-9]+)$ ]]; then
     exit 1
   fi
 
-elif [[ "$TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+elif [[ "$TAG" =~ ^v${NUM}\.${NUM}\.${NUM}$ ]]; then
   MAJOR="${BASH_REMATCH[1]}"
   MINOR="${BASH_REMATCH[2]}"
   PATCH="${BASH_REMATCH[3]}"
@@ -44,6 +48,7 @@ else
   echo "Expected:"
   echo "  v1.0.8-rc.2"
   echo "  v1.0.8"
+  echo "Numeric components must not have leading zeros (e.g. use v1.8.1, not v1.08.1)."
   exit 1
 fi
 
