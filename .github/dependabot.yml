@@ -1,0 +1,101 @@
+# https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Important Restrictions (Easily Misunderstood, Listed Here):
+# 1. `target-branch` only affects the target branch of a PR for "general version updates".
+# Security updates always target only the "default branch" (in this repo, it's `main`), and are unaffected by `target-branch`.
+# 2. `ignore / update-types` also only affect version updates.
+# As long as there's a vulnerability, the security update PR will always be opened, even if `ignore semver-major` is set.
+# 3. This file itself must exist on the "default branch" (`main`) for Dependabot to read the settings.
+# The changes will only take effect after the merge process follows: develop → release → main.
+version: 2
+
+updates:
+  # Flutter / Dart packages (pubspec.yaml)
+  - package-ecosystem: "pub"
+    directory: "/"
+    target-branch: "develop"   # Only applies to general version updates; security fixes still open PRs to main
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Taipei"
+
+    open-pull-requests-limit: 5
+
+    labels:
+      - "dependencies"
+      - "flutter"
+
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+    groups:
+      flutter-minor-and-patch:
+        patterns:
+          - "*"          # Must be explicitly listed, otherwise grouping may not work reliably (known GitHub issue)
+        update-types:
+          - "minor"
+          - "patch"
+
+    # Only affects general version updates; major upgrades should be reviewed manually
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions (action versions used in .github/workflows)
+  - package-ecosystem: "github-actions"
+    directory: "/"          # 官方規定固定寫 "/"
+    target-branch: "develop"
+
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:30"
+      timezone: "Asia/Taipei"
+
+    open-pull-requests-limit: 3
+
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+
+    groups:
+      github-actions-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # (Phase 2 - enable after 1-2 weeks of stability) Android native Gradle dependencies
+  # Currently Flutter 3.41.9 + Gradle 8.14 + Java 17 have interdependencies.
+  # It's recommended to wait until pub / github-actions updates are stable before enabling this.
+  #
+  # - package-ecosystem: "gradle"
+  #   directory: "/android"
+  #   target-branch: "develop"
+  #   schedule:
+  #     interval: "monthly"
+  #     day: "monday"
+  #     time: "10:00"
+  #     timezone: "Asia/Taipei"
+  #   open-pull-requests-limit: 2
+  #   labels:
+  #     - "dependencies"
+  #     - "android"
+  #   commit-message:
+  #     prefix: "build"
+  #     include: "scope"
+  #   ignore:
+  #     - dependency-name: "*"
+  #       update-types: ["version-update:semver-major"]
