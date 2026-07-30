@@ -16,6 +16,7 @@
 [![Analytics](https://img.shields.io/badge/Analytics-Firebase-FFCA28?logo=firebase&logoColor=black)](#observability-and-analytics)
 [![Distribution](https://img.shields.io/badge/Distribution-Firebase%20App%20Distribution-FFCA28?logo=firebase&logoColor=black)](#git-workflow--cicd)
 [![CodeRabbit Reviews](https://img.shields.io/badge/Code%20Review-CodeRabbit-FF6B35)](https://coderabbit.ai)
+[![Dependabot](https://img.shields.io/badge/Dependencies-Dependabot-025E8C?logo=dependabot&logoColor=white)](https://github.com/tenSunFree/travel-audio-guide-flutter/security/dependabot)
 
 ---
 
@@ -169,6 +170,8 @@ It handles JWT verification and user profile management.
 - Adopted a feature branch workflow with `develop`, `main`, and `release/*` protected branches
 - Enforced branch protection rules on `develop`, `main`, and `release/*`, blocking direct pushes and requiring Pull Requests with passing CI checks before merge
 - Automated AI-assisted code review via CodeRabbit on every Pull Request to identify potential bugs, security concerns, maintainability issues, and consistency violations before merging
+- Automated dependency updates via Dependabot for Flutter/Dart packages (`pub`) and GitHub Actions, with minor/patch updates grouped into a single PR, major version bumps deferred for manual review, and all updates gated behind the same required CI checks as manual PRs
+  (security advisories always target `main` directly, per Dependabot's default behavior, while routine version updates target `develop`)
 - Configured GitHub Actions CI for Pull Requests, including Dart format checks, static analysis, unit tests, and debug APK builds for both `staging` and `production` flavors
 - Configured merge requirements so CI checks must pass and branches must be up to date before merging
 - Built a release flow using `release/x.x.x` branches, version tags, automated release APK builds, and GitHub Releases
