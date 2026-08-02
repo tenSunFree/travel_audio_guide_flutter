@@ -1,5 +1,5 @@
-import '../repositories/reminder_repository.dart';
-import '../services/notification_service.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/repositories/reminder_repository.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/services/notification_service.dart';
 
 class ReschedulePendingRemindersUseCase {
   ReschedulePendingRemindersUseCase(

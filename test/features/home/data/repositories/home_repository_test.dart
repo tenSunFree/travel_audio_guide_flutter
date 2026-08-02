@@ -1,12 +1,13 @@
 import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/daos/activity_dao.dart';
 import 'package:flutter_travel_audio_guide/core/database/daos/attraction_dao.dart';
 import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 import 'package:flutter_travel_audio_guide/features/home/data/repositories/home_repository.dart';
 import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAttractionDao extends Mock implements AttractionDao {}
 
@@ -80,10 +81,10 @@ void main() {
   }
 
   Activity buildActivity({
-    int id = 1,
-    String title = '台北燈節',
     required String begin,
     required String end,
+    int id = 1,
+    String title = '台北燈節',
     String address = '台北市信義區',
     String distric = '信義區',
     String ticket = '',
@@ -132,7 +133,7 @@ void main() {
           .watchHomeState(period: HomePeriod.afternoon, isRainyMode: false)
           .first;
       attractionController.add([
-        buildAttraction(id: 1, name: '   '),
+        buildAttraction(name: '   '),
         buildAttraction(id: 2, name: '有效景點'),
       ]);
       activityController.add(const []);
@@ -150,11 +151,7 @@ void main() {
       attractionController.add([
         // Low score: no images, no coordinates, not matching the period
         buildAttraction(
-          id: 1,
           name: '普通景點',
-          categories: const [],
-          nlat: null,
-          elong: null,
         ),
         // High score: has images, has coordinates, matches morning period (outdoor/trekking), open all day
         buildAttraction(
@@ -185,13 +182,11 @@ void main() {
           .first;
       attractionController.add([
         buildAttraction(
-          id: 1,
           name: '戶外公園',
           categories: const [AttractionCategory(id: 1, name: '戶外踏青')],
         ),
         buildAttraction(
           id: 2,
-          name: '故宮博物院',
           categories: const [AttractionCategory(id: 2, name: '博物館')],
         ),
       ]);
@@ -207,7 +202,6 @@ void main() {
           .first;
       attractionController.add([
         buildAttraction(
-          id: 1,
           name: '免費博物館',
           ticket: '免費參觀',
           openTime: '00:00-23:59',
@@ -226,7 +220,7 @@ void main() {
           .first;
       attractionController.add(const []);
       activityController.add([
-        buildActivity(id: 1, title: '日期異常活動', begin: '不是日期', end: '也不是'),
+        buildActivity(title: '日期異常活動', begin: '不是日期', end: '也不是'),
       ]);
       final state = await future;
       expect(state.activityCards, isEmpty);
@@ -240,7 +234,6 @@ void main() {
       attractionController.add(const []);
       activityController.add([
         buildActivity(
-          id: 1,
           title: '進行中活動',
           begin: now.subtract(const Duration(days: 1)).toIso8601String(),
           end: now.add(const Duration(days: 1)).toIso8601String(),
@@ -271,7 +264,6 @@ void main() {
       attractionController.add(const []);
       activityController.add([
         buildActivity(
-          id: 1,
           begin: now.subtract(const Duration(hours: 1)).toIso8601String(),
           end: now.add(const Duration(days: 1)).toIso8601String(),
           ticket: '免費入場',
@@ -297,7 +289,6 @@ void main() {
       attractionController.add(const []);
       activityController.add([
         buildActivity(
-          id: 1,
           title: 'API格式活動',
           begin: toApiFormat(begin),
           end: toApiFormat(end),

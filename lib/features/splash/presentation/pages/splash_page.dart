@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/features/onboarding/di/onboarding_providers.dart';
+import 'package:flutter_travel_audio_guide/features/splash/presentation/widgets/animated_travel_logo.dart';
+import 'package:flutter_travel_audio_guide/features/splash/presentation/widgets/city_particles_background.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/router/app_router.dart';
-import '../../../onboarding/di/onboarding_providers.dart';
-import '../widgets/animated_travel_logo.dart';
-import '../widgets/city_particles_background.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
@@ -53,23 +53,23 @@ class _SplashPageState extends ConsumerState<SplashPage>
         .animate(
           CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
         );
-    _logoScale = Tween<double>(begin: 0.72, end: 1.0).animate(
+    _logoScale = Tween<double>(begin: 0.72, end: 1).animate(
       CurvedAnimation(parent: _logoController, curve: Curves.easeOutBack),
     );
     _titleFade = CurvedAnimation(
       parent: _textController,
-      curve: const Interval(0.0, 0.65, curve: Curves.easeOut),
+      curve: const Interval(0, 0.65, curve: Curves.easeOut),
     );
     _titleSlide = Tween<Offset>(begin: const Offset(0, 0.22), end: Offset.zero)
         .animate(
           CurvedAnimation(
             parent: _textController,
-            curve: const Interval(0.0, 0.65, curve: Curves.easeOut),
+            curve: const Interval(0, 0.65, curve: Curves.easeOut),
           ),
         );
     _subtitleFade = CurvedAnimation(
       parent: _textController,
-      curve: const Interval(0.40, 1.0, curve: Curves.easeOut),
+      curve: const Interval(0.40, 1, curve: Curves.easeOut),
     );
   }
 

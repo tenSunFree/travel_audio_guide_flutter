@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/database/database_provider.dart';
-import '../data/repositories/home_repository.dart';
-import '../presentation/controllers/nearby_home_controller.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/features/home/data/repositories/home_repository.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/controllers/nearby_home_controller.dart';
 
 final homeRepositoryProvider = Provider<HomeRepository>((ref) {
   final db = ref.watch(appDatabaseProvider);
@@ -13,5 +13,5 @@ final homeRepositoryProvider = Provider<HomeRepository>((ref) {
 
 final nearbyHomeControllerProvider =
     StateNotifierProvider<NearbyHomeController, NearbyHomeState>(
-      (ref) => NearbyHomeController(ref),
+      NearbyHomeController.new,
     );

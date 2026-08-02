@@ -1,8 +1,7 @@
-import 'package:drift/native.dart';
 import 'package:dio/dio.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
 import 'package:flutter_travel_audio_guide/core/network/network_providers.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_travel_audio_guide/features/attraction/data/datasources/
 import 'package:flutter_travel_audio_guide/features/attraction/data/repositories/attraction_repository_impl.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/di/attraction_providers.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/usecases/get_attractions_usecase.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAppSyncService extends Mock implements AppSyncService {}
 

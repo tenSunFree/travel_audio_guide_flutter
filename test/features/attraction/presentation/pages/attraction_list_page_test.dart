@@ -1,9 +1,9 @@
 import 'dart:async';
+
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
 import 'package:flutter_travel_audio_guide/core/sync/app_sync_service.dart';
@@ -11,6 +11,7 @@ import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
 import 'package:flutter_travel_audio_guide/core/widgets/list_skeleton.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_model.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/presentation/pages/attraction_list_page.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// This test follows the same pattern used in `activity_list_page_test.dart`:
 /// an in-memory Drift database combined with overriding `AppSyncService`
@@ -47,7 +48,7 @@ Widget buildTestApp({
 
 AppSyncService _buildInstantSyncService() {
   final mock = MockAppSyncService();
-  when(() => mock.syncAllIfNeeded()).thenAnswer((_) async {});
+  when(mock.syncAllIfNeeded).thenAnswer((_) async {});
   when(() => mock.forceSync(any())).thenAnswer((_) async {});
   return mock;
 }
@@ -62,21 +63,10 @@ Future<void> insertAttraction(
     AttractionModel(
       id: id,
       name: name,
-      introduction: '',
       openTime: openTime,
       distric: '士林區',
       address: '台北市士林區',
-      tel: '',
-      officialSite: '',
-      facebook: '',
-      ticket: '',
-      remind: '',
       modified: '2026-01-01',
-      url: '',
-      categories: const [],
-      targets: const [],
-      friendlies: const [],
-      images: const [],
     ),
   ]);
 }
@@ -106,7 +96,7 @@ void main() {
       final completer = Completer<void>();
       final mockSync = MockAppSyncService();
       when(
-        () => mockSync.syncAllIfNeeded(),
+        mockSync.syncAllIfNeeded,
       ).thenAnswer((_) => completer.future);
       when(() => mockSync.forceSync(any())).thenAnswer((_) async {});
       await tester.pumpWidget(buildTestApp(db: db, syncService: mockSync));
@@ -120,7 +110,7 @@ void main() {
 
   group('有景點資料', () {
     testWidgets('DB 有資料時顯示 AttractionTile 列表', (tester) async {
-      await insertAttraction(db, id: 1, name: '故宮博物院');
+      await insertAttraction(db);
       await insertAttraction(db, id: 2, name: '台北101');
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
@@ -153,7 +143,6 @@ void main() {
     testWidgets('帶入 initialOpenNow=true 時，只顯示目前開放中的景點', (tester) async {
       await insertAttraction(
         db,
-        id: 1,
         name: '全天開放景點',
         openTime: '00:00-23:59',
       );
@@ -171,7 +160,7 @@ void main() {
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
       expect(find.text('暫無景點資料'), findsOneWidget);
-      await insertAttraction(db, id: 1, name: '動態新增景點');
+      await insertAttraction(db, name: '動態新增景點');
       await tester.pumpAndSettle();
       expect(find.text('動態新增景點'), findsOneWidget);
       expect(find.text('暫無景點資料'), findsNothing);

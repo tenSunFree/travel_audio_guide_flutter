@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
-import 'package:flutter_travel_audio_guide/features/attraction/presentation/widgets/attraction_sort_filter_bottom_sheet.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/presentation/enums/attraction_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/widgets/attraction_sort_filter_bottom_sheet.dart';
 
 class _Harness extends StatelessWidget {
   const _Harness({required this.onResult});

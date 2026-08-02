@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/reminder_table.dart';
+import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
+import 'package:flutter_travel_audio_guide/core/database/tables/reminder_table.dart';
 
 part 'reminder_dao.g.dart';
 
@@ -11,7 +11,7 @@ class ReminderDao extends DatabaseAccessor<AppDatabase>
 
   Stream<List<ReminderTableData>> watchAllReminders() {
     return (select(reminderTable)..orderBy([
-          (t) => OrderingTerm(expression: t.notifyTime, mode: OrderingMode.asc),
+          (t) => OrderingTerm(expression: t.notifyTime),
         ]))
         .watch();
   }
@@ -25,8 +25,7 @@ class ReminderDao extends DatabaseAccessor<AppDatabase>
                 t.notifyTime.isBiggerThanValue(now),
           )
           ..orderBy([
-            (t) =>
-                OrderingTerm(expression: t.notifyTime, mode: OrderingMode.asc),
+            (t) => OrderingTerm(expression: t.notifyTime),
           ]))
         .get();
   }

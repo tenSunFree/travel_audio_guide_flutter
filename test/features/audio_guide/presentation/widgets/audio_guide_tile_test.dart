@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/audio_guide_tile.dart';
+import 'package:mocktail/mocktail.dart';
 
 class _MockCallback extends Mock {
   void call();
@@ -57,7 +57,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           AudioGuideTile(
-            guide: _buildGuide(isDownloaded: false),
+            guide: _buildGuide(),
             isDownloading: false,
             onActionPressed: () {},
           ),
@@ -109,7 +109,7 @@ void main() {
       );
       await tester.tap(find.byType(OutlinedButton));
       await tester.pump();
-      verify(() => cb()).called(1);
+      verify(cb.call).called(1);
     });
     testWidgets('isDownloading=true 時點擊按鈕不觸發 onActionPressed', (tester) async {
       final cb = _MockCallback();
@@ -125,7 +125,7 @@ void main() {
       // OutlinedButton.onPressed is null, so it cannot be triggered.
       await tester.tap(find.byType(OutlinedButton), warnIfMissed: false);
       await tester.pump();
-      verifyNever(() => cb());
+      verifyNever(cb.call);
     });
     testWidgets('點擊整個 InkWell 區域（正常狀態）也觸發 onActionPressed', (tester) async {
       final cb = _MockCallback();
@@ -140,7 +140,7 @@ void main() {
       );
       await tester.tap(find.byType(InkWell).first);
       await tester.pump();
-      verify(() => cb()).called(1);
+      verify(cb.call).called(1);
     });
     testWidgets('isDownloading=true 時 InkWell tap 不觸發 onActionPressed', (
       tester,
@@ -157,7 +157,7 @@ void main() {
       );
       await tester.tap(find.byType(InkWell).first, warnIfMissed: false);
       await tester.pump();
-      verifyNever(() => cb());
+      verifyNever(cb.call);
     });
   });
   group('AudioGuideTile — Layout', () {

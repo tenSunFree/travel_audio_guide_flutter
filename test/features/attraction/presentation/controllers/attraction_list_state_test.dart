@@ -72,7 +72,7 @@ void main() {
 
   group('AttractionListState.computeDisplayItems — 目前開放篩選', () {
     test('openNowOnly 只保留目前有開放的景點', () {
-      final open = buildAttraction(id: 1, name: '開放中', openTime: '00:00-23:59');
+      final open = buildAttraction(name: '開放中', openTime: '00:00-23:59');
       final closed = buildAttraction(id: 2, name: '已打烊', openTime: '以現場公告為準');
       final result = displayAll([open, closed], openNowOnly: true);
       expect(result.map((a) => a.name), ['開放中']);
@@ -82,7 +82,6 @@ void main() {
   group('AttractionListState.computeDisplayItems — 時段推薦篩選', () {
     test('早上時段：內容需符合早上關鍵字，且在早上取樣時間點需為開放中', () {
       final morningGood = buildAttraction(
-        id: 1,
         name: '象山步道',
         introduction: '熱門登山步道',
         openTime: '00:00-23:59', // Open at any time
@@ -111,7 +110,6 @@ void main() {
   group('AttractionListState.computeDisplayItems — 分類/行政區/對象/友善設施篩選', () {
     test('selectedCategoryIds 只保留符合任一分類的景點', () {
       final a = buildAttraction(
-        id: 1,
         name: '博物館',
         categories: const [AttractionCategory(id: 10, name: '藝文館所')],
       );
@@ -125,7 +123,7 @@ void main() {
     });
 
     test('distric 篩選只保留完全相符（trim 後）的景點', () {
-      final a = buildAttraction(id: 1, name: '信義景點', distric: '信義區');
+      final a = buildAttraction(name: '信義景點', distric: '信義區');
       final b = buildAttraction(id: 2, name: '士林景點', distric: '士林區');
       final result = displayAll([a, b], distric: '信義區');
       expect(result.map((x) => x.name), ['信義景點']);
@@ -133,11 +131,10 @@ void main() {
 
     test('selectedTargets 依 target apiId 比對', () {
       final hikerSpot = buildAttraction(
-        id: 1,
         name: '登山口',
         targets: const [AttractionTag(id: 66, name: '健行族')],
       );
-      final other = buildAttraction(id: 2, name: '一般景點', targets: const []);
+      final other = buildAttraction(id: 2, name: '一般景點');
       final result = displayAll(
         [hikerSpot, other],
         selectedTargets: {AttractionTargetFilter.hiker},
@@ -147,11 +144,10 @@ void main() {
 
     test('selectedFacilities 依 friendly apiId 比對', () {
       final accessible = buildAttraction(
-        id: 1,
         name: '無障礙景點',
         friendlies: const [AttractionTag(id: 392, name: '無障礙')],
       );
-      final other = buildAttraction(id: 2, name: '一般景點', friendlies: const []);
+      final other = buildAttraction(id: 2, name: '一般景點');
       final result = displayAll(
         [accessible, other],
         selectedFacilities: {AttractionFacilityFilter.accessible},
@@ -166,7 +162,6 @@ void main() {
 
     test('未提供使用者座標時，只要設定距離篩選就整批排除', () {
       final a = buildAttraction(
-        id: 1,
         name: 'A',
         nlat: 25.0330,
         elong: 121.5654,
@@ -176,7 +171,7 @@ void main() {
     });
 
     test('沒有座標的景點在距離篩選啟用時一律被排除', () {
-      final noCoord = buildAttraction(id: 1, name: '無座標');
+      final noCoord = buildAttraction(name: '無座標');
       final result = displayAll(
         [noCoord],
         distanceFilter: DistanceFilter.km1,
@@ -188,12 +183,11 @@ void main() {
 
     test('在門檻內保留、超過門檻排除', () {
       final near = buildAttraction(
-        id: 1,
         name: '附近',
         nlat: 25.0330,
         elong: 121.5654,
       );
-      final far = buildAttraction(id: 2, name: '很遠', nlat: 10.0, elong: 10.0);
+      final far = buildAttraction(id: 2, name: '很遠', nlat: 10, elong: 10);
       final result = displayAll(
         [near, far],
         distanceFilter: DistanceFilter.km1,
@@ -206,21 +200,21 @@ void main() {
 
   group('AttractionListState.computeDisplayItems — 排序', () {
     test('apiOrder 維持原始順序', () {
-      final a = buildAttraction(id: 1, name: 'B');
+      final a = buildAttraction(name: 'B');
       final b = buildAttraction(id: 2, name: 'A');
       final result = displayAll([a, b]);
       expect(result.map((x) => x.name), ['B', 'A']);
     });
 
     test('nameAZ 依名稱字典序排序', () {
-      final a = buildAttraction(id: 1, name: 'Zebra');
+      final a = buildAttraction(name: 'Zebra');
       final b = buildAttraction(id: 2, name: 'Apple');
       final result = displayAll([a, b], sortOrder: AttractionSortOrder.nameAZ);
       expect(result.map((x) => x.name), ['Apple', 'Zebra']);
     });
 
     test('modifiedNewest 依 modified 字串降冪排序', () {
-      final older = buildAttraction(id: 1, name: '舊', modified: '2026-01-01');
+      final older = buildAttraction(name: '舊');
       final newer = buildAttraction(id: 2, name: '新', modified: '2026-06-01');
       final result = displayAll([
         older,
@@ -233,12 +227,11 @@ void main() {
       const userLat = 25.0330;
       const userLng = 121.5654;
       final near = buildAttraction(
-        id: 1,
         name: '近',
         nlat: 25.0330,
         elong: 121.5654,
       );
-      final far = buildAttraction(id: 2, name: '遠', nlat: 10.0, elong: 10.0);
+      final far = buildAttraction(id: 2, name: '遠', nlat: 10, elong: 10);
       final noCoord = buildAttraction(id: 3, name: '無座標');
       final result = displayAll(
         [far, noCoord, near],
@@ -250,7 +243,7 @@ void main() {
     });
 
     test('distanceAsc 在沒有使用者座標時維持篩選後的原始順序', () {
-      final a = buildAttraction(id: 1, name: 'A');
+      final a = buildAttraction(name: 'A');
       final b = buildAttraction(id: 2, name: 'B');
       final result = displayAll([
         a,
@@ -266,7 +259,7 @@ void main() {
       test('availableDistrics 去重、排除空白並排序', () {
         final state = const AttractionListState().copyWith(
           allItems: [
-            buildAttraction(id: 1, distric: '信義區'),
+            buildAttraction(distric: '信義區'),
             buildAttraction(id: 2, distric: '士林區'),
             buildAttraction(id: 3, distric: '信義區'),
             buildAttraction(id: 4, distric: '  '),
@@ -279,7 +272,6 @@ void main() {
         final state = const AttractionListState().copyWith(
           allItems: [
             buildAttraction(
-              id: 1,
               categories: const [
                 AttractionCategory(id: 1, name: '博物館'),
                 AttractionCategory(id: 0, name: '忽略我'),

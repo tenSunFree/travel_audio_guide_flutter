@@ -1,9 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:flutter_travel_audio_guide/features/reminder/data/services/notification_service_impl.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 class MockFlutterLocalNotificationsPlugin extends Mock
     implements FlutterLocalNotificationsPlugin {}
@@ -72,9 +72,9 @@ void main() {
   });
 
   Reminder buildReminder({
+    required DateTime notifyTime,
     int id = 1,
     String title = '測試提醒',
-    required DateTime notifyTime,
     int remindBeforeSeconds = 3600,
     int notificationId = 100,
     bool isEnabled = true,
@@ -288,7 +288,6 @@ void main() {
     test('只有未過期、未啟用完成、且啟用中的提醒會被重新排程', () async {
       final now = DateTime.now();
       final valid = buildReminder(
-        id: 1,
         notifyTime: now.add(const Duration(hours: 1)),
       );
       final expired = buildReminder(

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../database/database_provider.dart';
-import '../../widgets/route_error_page.dart';
-import '../../../features/audio_guide/domain/entities/audio_guide.dart';
-import '../../../features/audio_guide/presentation/pages/audio_guide_detail_page.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/route_error_page.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/pages/audio_guide_detail_page.dart';
 
 class AudioGuideDetailLoader extends ConsumerWidget {
   const AudioGuideDetailLoader({
-    super.key,
     required this.idText,
     required this.initialGuide,
+    super.key,
   });
 
   final String? idText;

@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
-import '../image/app_image_cache_manager.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/image/app_image_cache_manager.dart';
 
 /// A globally unified network image element
 ///
@@ -23,8 +23,8 @@ import '../image/app_image_cache_manager.dart';
 /// ```
 class AppCachedNetworkImage extends StatelessWidget {
   const AppCachedNetworkImage({
-    super.key,
     required this.imageUrl,
+    super.key,
     this.width,
     this.height,
     this.fit = BoxFit.cover,
@@ -41,10 +41,12 @@ class AppCachedNetworkImage extends StatelessWidget {
   /// Rounded corners, automatically wrapped when passed in ClipRRect
   final BorderRadius? borderRadius;
 
-  /// Widgets displayed during loading; if not provided, use the default spinning circle.
+  /// Widgets displayed during loading; if not provided,
+  /// use the default spinning circle.
   final Widget? placeholder;
 
-  /// Widget to display if loading fails; otherwise, use the default broken icon.
+  /// Widget to display if loading fails;
+  /// otherwise, use the default broken icon.
   final Widget? errorWidget;
 
   @override

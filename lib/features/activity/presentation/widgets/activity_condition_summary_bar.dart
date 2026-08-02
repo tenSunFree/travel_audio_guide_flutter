@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../enums/activity_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/enums/activity_sort_filter_enums.dart';
 
 class ActivityConditionSummaryBar extends StatelessWidget {
   const ActivityConditionSummaryBar({
-    super.key,
     required this.sortOrder,
     required this.statusFilter,
     required this.feeFilter,
     required this.distric,
     required this.isNonDefault,
     required this.onReset,
+    super.key,
   });
 
   final ActivitySortOrder sortOrder;

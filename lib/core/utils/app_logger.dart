@@ -7,7 +7,7 @@ class AppLogger {
   AppLogger._();
 
   static final Talker talker = TalkerFlutter.init(
-    settings: TalkerSettings(enabled: true, useConsoleLogs: true),
+    settings: TalkerSettings(),
   );
 
   static void debug(Object? message) {

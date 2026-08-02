@@ -19,22 +19,22 @@ class AppColors {
   static const _red50 = Color(0xFFFFF3F3);
 
   // Text & Icon (content)
-  static const textPrimary = _grey900;
-  static const textSecondary = _grey700;
-  static const textCaption = _grey600;
-  static const textHint = _grey500;
-  static const textError = _red600;
+  static const Color textPrimary = _grey900;
+  static const Color textSecondary = _grey700;
+  static const Color textCaption = _grey600;
+  static const Color textHint = _grey500;
+  static const Color textError = _red600;
 
-  static const iconPrimary = _grey800;
+  static const Color iconPrimary = _grey800;
 
   // Surface / Background (containers)
-  static const pageBackground = _white;
-  static const scaffoldBackground = _grey100;
-  static const surface = _white;
-  static const surfaceMuted = _grey200;
-  static const errorSurface = _red50;
+  static const Color pageBackground = _white;
+  static const Color scaffoldBackground = _grey100;
+  static const Color surface = _white;
+  static const Color surfaceMuted = _grey200;
+  static const Color errorSurface = _red50;
 
   // Border / Divider (separators)
-  static const border = _grey400;
-  static const divider = _grey300;
+  static const Color border = _grey400;
+  static const Color divider = _grey300;
 }

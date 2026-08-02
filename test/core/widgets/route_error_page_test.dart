@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_travel_audio_guide/core/widgets/route_error_page.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   testWidgets('displays error title and message', (tester) async {

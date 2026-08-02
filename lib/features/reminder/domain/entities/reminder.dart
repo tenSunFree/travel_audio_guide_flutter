@@ -1,12 +1,8 @@
 class Reminder {
   const Reminder({
-    this.id,
     required this.sourceType,
     required this.sourceId,
     required this.title,
-    this.subtitle,
-    this.imageUrl,
-    this.address,
     required this.targetTime,
     required this.remindBeforeSeconds,
     required this.notifyTime,
@@ -16,6 +12,10 @@ class Reminder {
     required this.isEnabled,
     required this.isDone,
     required this.createdAt,
+    this.id,
+    this.subtitle,
+    this.imageUrl,
+    this.address,
     this.updatedAt,
   });
 

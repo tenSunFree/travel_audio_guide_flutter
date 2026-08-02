@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/analytics/analytics_service.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../attraction/di/attraction_providers.dart';
-import '../../../attraction/domain/entities/attraction.dart';
-import '../../../reminder/presentation/utils/detail_schedule_actions.dart';
-import '../../../step_tracking/di/step_tracking_providers.dart';
-import '../../../step_tracking/presentation/widgets/session_summary_card.dart';
-import '../../domain/entities/audio_guide.dart';
-import '../../domain/entities/audio_playback_state.dart';
-import '../controllers/audio_player_controller.dart';
-import '../../../../core/widgets/common_app_bar.dart';
-import '../widgets/guide_image_section.dart';
-import '../widgets/playback_card.dart';
-import '../widgets/practical_info_section.dart';
-import '../widgets/introduction_section.dart';
-import '../widgets/step_count_badge.dart';
-import '../../../../core/widgets/detail_action_buttons.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/common_app_bar.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/detail_action_buttons.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/di/attraction_providers.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_playback_state.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/controllers/audio_player_controller.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/guide_image_section.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/introduction_section.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/playback_card.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/practical_info_section.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/step_count_badge.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/presentation/utils/detail_schedule_actions.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/di/step_tracking_providers.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/presentation/widgets/session_summary_card.dart';
 
 class AudioGuideDetailPage extends ConsumerStatefulWidget {
-  const AudioGuideDetailPage({super.key, required this.guide});
+  const AudioGuideDetailPage({required this.guide, super.key});
 
   final AudioGuide guide;
 
@@ -30,7 +30,8 @@ class AudioGuideDetailPage extends ConsumerStatefulWidget {
 
 class _AudioGuideDetailPageState extends ConsumerState<AudioGuideDetailPage> {
   // guide.url is an MP3 file link, not suitable for external sharing;
-  // Prioritize using the official website of the matched attraction, and omit links if necessary.
+  // Prioritize using the official website of the matched attraction,
+  // and omit links if necessary.
   String _buildGuideShareText(String pageTitle, Attraction? attraction) {
     return [
       pageTitle,
@@ -60,7 +61,7 @@ class _AudioGuideDetailPageState extends ConsumerState<AudioGuideDetailPage> {
       );
     }
     final attractionAsync = ref.watch(attractionsStreamProvider);
-    final Attraction? attraction = _resolveAttraction(attractionAsync);
+    final attraction = _resolveAttraction(attractionAsync);
     final pageTitle = attraction?.name ?? widget.guide.title;
     final scheduleItem = DetailScheduleItem(
       sourceType: 'audioGuide',
@@ -73,7 +74,6 @@ class _AudioGuideDetailPageState extends ConsumerState<AudioGuideDetailPage> {
       address: attraction?.address,
       description: _resolveIntroduction(attraction, widget.guide),
       location: attraction?.address,
-      allDay: false,
     );
     final playerState = ref.watch(audioPlayerControllerProvider(localPath));
     final controller = ref.read(

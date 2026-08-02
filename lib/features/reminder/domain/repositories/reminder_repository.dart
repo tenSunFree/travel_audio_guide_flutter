@@ -1,4 +1,4 @@
-import '../entities/reminder.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 
 abstract class ReminderRepository {
   Stream<List<Reminder>> watchAllReminders();

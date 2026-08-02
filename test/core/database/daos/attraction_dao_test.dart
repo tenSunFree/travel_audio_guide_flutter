@@ -35,13 +35,9 @@ void main() {
       nlat: nlat,
       elong: elong,
       officialSite: 'https://example.com',
-      facebook: '',
       ticket: '免費',
-      remind: '',
       modified: modified,
-      url: '',
       categories: categories,
-      targets: const [],
       friendlies: friendlies,
       images: images,
     );
@@ -49,7 +45,7 @@ void main() {
 
   group('AttractionDao.upsertAll / getAll', () {
     test('寫入後可以完整讀回基本欄位', () async {
-      await db.attractionDao.upsertAll([buildModel(id: 1, name: '故宮博物院')]);
+      await db.attractionDao.upsertAll([buildModel()]);
       final all = await db.attractionDao.getAll();
       expect(all, hasLength(1));
       expect(all.single.name, '故宮博物院');
@@ -59,7 +55,6 @@ void main() {
     test('categories / images / friendlies 會正確序列化並可還原', () async {
       await db.attractionDao.upsertAll([
         buildModel(
-          id: 1,
           categories: const [AttractionCategoryModel(id: 10, name: '博物館')],
           images: const [
             AttractionImageModel(src: 'https://example.com/a.png'),
@@ -77,10 +72,10 @@ void main() {
 
     test('相同 id 再次 upsert 會更新既有資料，而不是新增一筆', () async {
       await db.attractionDao.upsertAll([
-        buildModel(id: 1, name: '舊名稱', modified: '2026-01-01'),
+        buildModel(name: '舊名稱'),
       ]);
       await db.attractionDao.upsertAll([
-        buildModel(id: 1, name: '新名稱', modified: '2026-02-01'),
+        buildModel(name: '新名稱', modified: '2026-02-01'),
       ]);
       final all = await db.attractionDao.getAll();
       expect(all, hasLength(1));
@@ -89,7 +84,7 @@ void main() {
 
     test('nlat / elong 為 null 時可以正確寫入與讀出', () async {
       await db.attractionDao.upsertAll([
-        buildModel(id: 1, nlat: null, elong: null),
+        buildModel(),
       ]);
       final entity = await db.attractionDao.findById(1);
       expect(entity!.nlat, isNull);
@@ -100,7 +95,7 @@ void main() {
   group('AttractionDao.watchAll', () {
     test('依名稱字典序升冪排序', () async {
       await db.attractionDao.upsertAll([
-        buildModel(id: 1, name: 'Zebra'),
+        buildModel(name: 'Zebra'),
         buildModel(id: 2, name: 'Apple'),
       ]);
       final list = await db.attractionDao.watchAll().first;
@@ -111,7 +106,7 @@ void main() {
   group('AttractionDao.findByName', () {
     test('比對時會忽略全形/半形空白與大小寫', () async {
       await db.attractionDao.upsertAll([
-        buildModel(id: 1, name: 'Taipei　101 Tower'),
+        buildModel(name: 'Taipei　101 Tower'),
       ]);
       final found = await db.attractionDao.findByName('taipei101tower');
       expect(found, isNotNull);
@@ -119,7 +114,7 @@ void main() {
     });
 
     test('找不到對應名稱時回傳 null', () async {
-      await db.attractionDao.upsertAll([buildModel(id: 1, name: '故宮博物院')]);
+      await db.attractionDao.upsertAll([buildModel()]);
       final found = await db.attractionDao.findByName('不存在的景點');
       expect(found, isNull);
     });

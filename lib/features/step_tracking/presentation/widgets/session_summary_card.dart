@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../domain/entities/exercise_summary_data.dart';
-import '../../../../../core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/domain/entities/exercise_summary_data.dart';
 
 class SessionSummaryCard extends StatelessWidget {
-  const SessionSummaryCard({super.key, required this.summary});
+  const SessionSummaryCard({required this.summary, super.key});
 
   final ExerciseSummaryData summary;
 

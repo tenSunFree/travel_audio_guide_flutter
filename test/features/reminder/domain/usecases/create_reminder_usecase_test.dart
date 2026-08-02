@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/repositories/reminder_repository.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/services/notification_service.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/usecases/create_reminder_usecase.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockReminderRepository extends Mock implements ReminderRepository {}
 
@@ -129,7 +129,6 @@ void main() {
     test('提醒時間已經過了會拋出例外，且不會呼叫 repository', () async {
       final pastParams = buildParams(
         targetTime: DateTime.now().add(const Duration(seconds: 1)),
-        remindBeforeSeconds: 3600,
       );
       await expectLater(useCase(pastParams), throwsA(isA<Exception>()));
       verifyNever(() => repository.createReminder(any()));

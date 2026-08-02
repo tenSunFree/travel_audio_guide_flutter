@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../../../core/widgets/app_cached_network_image.dart';
-import '../../domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/app_cached_network_image.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 
 class AttractionTile extends StatelessWidget {
   const AttractionTile({
-    super.key,
     required this.attraction,
     required this.onTap,
+    super.key,
     this.userLat,
     this.userLng,
   });
@@ -55,7 +55,6 @@ class AttractionTile extends StatelessWidget {
                       imageUrl: imageUrl,
                       width: 96,
                       height: 96,
-                      fit: BoxFit.cover,
                       errorWidget: _Placeholder(
                         categories: attraction.categories,
                       ),

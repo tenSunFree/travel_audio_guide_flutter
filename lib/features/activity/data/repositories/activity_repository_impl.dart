@@ -1,7 +1,7 @@
-import '../../../../core/constants/api_constants.dart';
-import '../../domain/entities/activity_page.dart';
-import '../../domain/repositories/activity_repository.dart';
-import '../datasources/activity_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/core/constants/api_constants.dart';
+import 'package:flutter_travel_audio_guide/features/activity/data/datasources/activity_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity_page.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/repositories/activity_repository.dart';
 
 class ActivityRepositoryImpl implements ActivityRepository {
   const ActivityRepositoryImpl({

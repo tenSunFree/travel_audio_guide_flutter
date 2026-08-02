@@ -70,7 +70,6 @@ void main() {
     test('ongoing：目前時間介於精確的 begin/end 之間才算進行中', () {
       final now = DateTime.now();
       final ongoing = buildActivity(
-        id: 1,
         title: '進行中',
         begin: isoWithTime(now.subtract(const Duration(hours: 1))),
         end: isoWithTime(now.add(const Duration(hours: 1))),
@@ -93,7 +92,6 @@ void main() {
     test('upcoming：2 小時內即將開始才算即將開始', () {
       final now = DateTime.now();
       final soon = buildActivity(
-        id: 1,
         title: '即將開始',
         begin: isoWithTime(now.add(const Duration(hours: 1))),
         end: isoWithTime(now.add(const Duration(hours: 3))),
@@ -116,7 +114,6 @@ void main() {
     test('today：只有日期區間（無精確時間）且今天落在區間內才算今日活動', () {
       final now = DateTime.now();
       final todayEvent = buildActivity(
-        id: 1,
         title: '今日活動',
         begin: dateOnly(now),
         end: dateOnly(now.add(const Duration(days: 2))),
@@ -139,7 +136,6 @@ void main() {
     test('all：狀態篩選為 all 時，無法解析日期或已結束的活動也會被包含', () {
       final now = DateTime.now();
       final ended = buildActivity(
-        id: 1,
         title: '已結束',
         begin: isoWithTime(now.subtract(const Duration(days: 3))),
         end: isoWithTime(now.subtract(const Duration(days: 2))),
@@ -159,7 +155,6 @@ void main() {
     test('已結束或日期異常的活動在特定狀態篩選下會被排除', () {
       final now = DateTime.now();
       final ended = buildActivity(
-        id: 1,
         title: '已結束',
         begin: isoWithTime(now.subtract(const Duration(days: 3))),
         end: isoWithTime(now.subtract(const Duration(days: 2))),
@@ -184,7 +179,7 @@ void main() {
 
   group('ActivityListState.computeDisplayItems — 費用篩選', () {
     test('free 只保留 ticket 為空白的活動；paid 只保留 ticket 有內容的活動', () {
-      final free = buildActivity(id: 1, title: '免費活動', ticket: '  ');
+      final free = buildActivity(title: '免費活動', ticket: '  ');
       final paid = buildActivity(id: 2, title: '付費活動', ticket: '100元');
 
       expect(
@@ -206,7 +201,7 @@ void main() {
 
   group('ActivityListState.computeDisplayItems — 行政區篩選', () {
     test('只保留行政區完全相符（trim 後）的活動', () {
-      final a1 = buildActivity(id: 1, title: '信義區活動', distric: '信義區');
+      final a1 = buildActivity(title: '信義區活動', distric: '信義區');
       final a2 = buildActivity(id: 2, title: '士林區活動', distric: '士林區');
 
       final result = displayAll([a1, a2], distric: '信義區');
@@ -219,7 +214,7 @@ void main() {
     const userLat = 25.0330;
     const userLng = 121.5654;
     Activity nearby() =>
-        buildActivity(id: 1, title: '附近活動', nlat: '25.0330', elong: '121.5654');
+        buildActivity(title: '附近活動', nlat: '25.0330', elong: '121.5654');
     Activity far() =>
         buildActivity(id: 2, title: '很遠的活動', nlat: '10.0000', elong: '10.0000');
     Activity invalidCoord() =>
@@ -258,20 +253,20 @@ void main() {
         nearby(),
         far(),
         invalidCoord(),
-      ], distanceFilter: DistanceFilter.unlimited);
+      ]);
       expect(result.length, 3);
     });
   });
 
   group('ActivityListState.computeDisplayItems — 排序', () {
     test('beginAsc / beginDesc 依 begin 字串排序', () {
-      final a = buildActivity(id: 1, title: 'A', begin: '2026-01-01');
+      final a = buildActivity(title: 'A', begin: '2026-01-01');
       final b = buildActivity(id: 2, title: 'B', begin: '2026-06-01');
       expect(
         displayAll([
           b,
           a,
-        ], sort: ActivitySortOrder.beginAsc).map((x) => x.title),
+        ]).map((x) => x.title),
         ['A', 'B'],
       );
       expect(
@@ -284,7 +279,7 @@ void main() {
     });
 
     test('nameAZ 依 title 字典序排序', () {
-      final a = buildActivity(id: 1, title: 'Zebra');
+      final a = buildActivity(title: 'Zebra');
       final b = buildActivity(id: 2, title: 'Apple');
       final result = displayAll([a, b], sort: ActivitySortOrder.nameAZ);
       expect(result.map((x) => x.title), ['Apple', 'Zebra']);
@@ -294,7 +289,6 @@ void main() {
       const userLat = 25.0330;
       const userLng = 121.5654;
       final near = buildActivity(
-        id: 1,
         title: '近',
         nlat: '25.0330',
         elong: '121.5654',
@@ -310,7 +304,7 @@ void main() {
     });
 
     test('distanceAsc 在沒有使用者座標時維持原本篩選後的順序', () {
-      final a = buildActivity(id: 1, title: 'A');
+      final a = buildActivity(title: 'A');
       final b = buildActivity(id: 2, title: 'B');
       final result = displayAll([a, b], sort: ActivitySortOrder.distanceAsc);
       expect(result.map((x) => x.title), ['A', 'B']);
@@ -360,7 +354,7 @@ void main() {
       test('availableDistrics 會去重、忽略空白行政區並排序', () {
         final state = ActivityListState.initial().copyWith(
           allItems: [
-            buildActivity(id: 1, distric: '信義區'),
+            buildActivity(distric: '信義區'),
             buildActivity(id: 2, distric: '士林區'),
             buildActivity(id: 3, distric: '信義區'),
             buildActivity(id: 4, distric: '  '),

@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import '../../../../core/database/app_database.dart';
-import '../../domain/entities/reminder.dart';
-import '../../domain/repositories/reminder_repository.dart';
+import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/repositories/reminder_repository.dart';
 
 class ReminderRepositoryImpl implements ReminderRepository {
   ReminderRepositoryImpl(this._db);

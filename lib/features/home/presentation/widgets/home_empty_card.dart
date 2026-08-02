@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 /// A message card indicating an empty or error status
 class HomeEmptyCard extends StatelessWidget {
-  const HomeEmptyCard({super.key, required this.message});
+  const HomeEmptyCard({required this.message, super.key});
 
   final String message;
 

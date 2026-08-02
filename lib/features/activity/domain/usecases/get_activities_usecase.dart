@@ -1,5 +1,5 @@
-import '../entities/activity_page.dart';
-import '../repositories/activity_repository.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity_page.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/repositories/activity_repository.dart';
 
 class GetActivitiesUseCase {
   const GetActivitiesUseCase(this._repository);

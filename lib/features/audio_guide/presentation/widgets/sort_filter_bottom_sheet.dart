@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../enums/sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/enums/sort_filter_enums.dart';
 
 class SortFilterBottomSheet extends StatefulWidget {
   const SortFilterBottomSheet({
-    super.key,
     required this.initialSortOrder,
     required this.initialFilterType,
     required this.initialDistanceFilter,
+    super.key,
   });
 
   final SortOrder initialSortOrder;
@@ -82,7 +82,7 @@ class _SortFilterBottomSheetState extends State<SortFilterBottomSheet> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Download filter
-                  _SectionLabel(label: '下載狀態'),
+                  const _SectionLabel(label: '下載狀態'),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: Wrap(
@@ -99,7 +99,7 @@ class _SortFilterBottomSheetState extends State<SortFilterBottomSheet> {
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Distance
-                  _SectionLabel(label: '距離範圍'),
+                  const _SectionLabel(label: '距離範圍'),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: Wrap(
@@ -117,7 +117,7 @@ class _SortFilterBottomSheetState extends State<SortFilterBottomSheet> {
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Sort
-                  _SectionLabel(label: '排序'),
+                  const _SectionLabel(label: '排序'),
                   RadioGroup<SortOrder>(
                     groupValue: _sortOrder,
                     onChanged: (v) => setState(() => _sortOrder = v!),

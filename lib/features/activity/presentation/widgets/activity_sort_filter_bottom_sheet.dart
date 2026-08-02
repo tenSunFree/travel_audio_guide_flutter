@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../enums/activity_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/enums/activity_sort_filter_enums.dart';
 
 typedef ActivityFilterResult = ({
   ActivitySortOrder sortOrder,
@@ -12,13 +12,13 @@ typedef ActivityFilterResult = ({
 
 class ActivitySortFilterBottomSheet extends StatefulWidget {
   const ActivitySortFilterBottomSheet({
-    super.key,
     required this.initialSortOrder,
     required this.initialStatusFilter,
     required this.initialFeeFilter,
     required this.initialDistric,
     required this.initialDistanceFilter,
     required this.availableDistrics,
+    super.key,
   });
 
   final ActivitySortOrder initialSortOrder;
@@ -107,7 +107,7 @@ class _ActivitySortFilterBottomSheetState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Activity status
-                  _SectionLabel(label: '活動狀態'),
+                  const _SectionLabel(label: '活動狀態'),
                   _ChipWrap(
                     children: ActivityStatusFilter.values.map((f) {
                       return ChoiceChip(
@@ -119,7 +119,7 @@ class _ActivitySortFilterBottomSheetState
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Distance
-                  _SectionLabel(label: '距離範圍'),
+                  const _SectionLabel(label: '距離範圍'),
                   _ChipWrap(
                     children: DistanceFilter.values.map((f) {
                       return ChoiceChip(
@@ -131,7 +131,7 @@ class _ActivitySortFilterBottomSheetState
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Sort
-                  _SectionLabel(label: '排序'),
+                  const _SectionLabel(label: '排序'),
                   RadioGroup<ActivitySortOrder>(
                     groupValue: _sortOrder,
                     onChanged: (v) => setState(() => _sortOrder = v!),
@@ -152,7 +152,7 @@ class _ActivitySortFilterBottomSheetState
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Fee
-                  _SectionLabel(label: '費用'),
+                  const _SectionLabel(label: '費用'),
                   _ChipWrap(
                     children: ActivityFeeFilter.values.map((f) {
                       return ChoiceChip(
@@ -165,7 +165,7 @@ class _ActivitySortFilterBottomSheetState
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // District
                   if (widget.availableDistrics.isNotEmpty) ...[
-                    _SectionLabel(label: '行政區'),
+                    const _SectionLabel(label: '行政區'),
                     _ChipWrap(
                       children: [
                         ChoiceChip(

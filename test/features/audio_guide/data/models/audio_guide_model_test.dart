@@ -121,7 +121,10 @@ void main() {
       expect(page.data, isEmpty);
     });
     test('page number comes from the argument, not JSON', () {
-      final page = AudioGuidePageModel.fromJson({'total': 10, 'data': []}, 5);
+      final page = AudioGuidePageModel.fromJson({
+        'total': 10,
+        'data': <Map<String, dynamic>>[],
+      }, 5);
       expect(page.page, 5);
     });
     test('data items are correctly deserialized as AudioGuideModel', () {

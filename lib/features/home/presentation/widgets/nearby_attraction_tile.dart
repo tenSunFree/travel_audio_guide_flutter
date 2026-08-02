@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 class NearbyAttractionTile extends StatelessWidget {
   const NearbyAttractionTile({
-    super.key,
     required this.name,
     required this.distric,
     required this.distanceLabel,
     required this.imageUrl,
     required this.onTap,
+    super.key,
   });
 
   final String name;

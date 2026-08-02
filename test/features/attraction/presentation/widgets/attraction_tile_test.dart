@@ -89,7 +89,7 @@ void main() {
       await tester.pumpWidget(
         _wrap(
           AttractionTile(
-            attraction: _buildAttraction(nlat: 0.0, elong: 0.0),
+            attraction: _buildAttraction(nlat: 0, elong: 0),
             userLat: 25.0340,
             userLng: 121.5645,
             onTap: () {},

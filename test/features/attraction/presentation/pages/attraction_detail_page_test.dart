@@ -63,13 +63,13 @@ Future<void> settle(WidgetTester tester) async {
 void main() {
   group('AttractionDetailPage — 顯示', () {
     testWidgets('AppBar 與內文都顯示景點名稱', (tester) async {
-      await tester.pumpWidget(wrap(buildAttraction(name: '故宮博物院')));
+      await tester.pumpWidget(wrap(buildAttraction()));
       await settle(tester);
       expect(find.text('故宮博物院'), findsNWidgets(2)); // AppBar + content title
     });
 
     testWidgets('沒有圖片時顯示預設的無圖示', (tester) async {
-      await tester.pumpWidget(wrap(buildAttraction(images: const [])));
+      await tester.pumpWidget(wrap(buildAttraction()));
       await settle(tester);
       expect(find.byIcon(Icons.image_not_supported_outlined), findsOneWidget);
     });
@@ -139,7 +139,6 @@ void main() {
       await tester.pumpWidget(
         wrap(
           buildAttraction(
-            openTime: '09:00-17:00',
             tel: '02-1234-5678',
             ticket: '免費參觀',
             remind: '每週一休館',
@@ -155,7 +154,7 @@ void main() {
 
     testWidgets('開放時間/電話/票價/提醒事項都是空字串時，都不顯示', (tester) async {
       await tester.pumpWidget(
-        wrap(buildAttraction(openTime: '', tel: '', ticket: '', remind: '')),
+        wrap(buildAttraction(openTime: '')),
       );
       await settle(tester);
       expect(find.byIcon(Icons.access_time), findsNothing);
@@ -165,7 +164,7 @@ void main() {
     });
 
     testWidgets('景點介紹為空時顯示「目前沒有景點介紹」', (tester) async {
-      await tester.pumpWidget(wrap(buildAttraction(introduction: '')));
+      await tester.pumpWidget(wrap(buildAttraction()));
       await settle(tester);
       expect(find.text('目前沒有景點介紹'), findsOneWidget);
     });
@@ -181,7 +180,7 @@ void main() {
 
     testWidgets('官網與 Facebook 都沒有時，不顯示外部連結區塊', (tester) async {
       await tester.pumpWidget(
-        wrap(buildAttraction(officialSite: '', facebook: '')),
+        wrap(buildAttraction()),
       );
       await settle(tester);
       expect(find.text('官方網站'), findsNothing);
@@ -191,7 +190,7 @@ void main() {
     testWidgets('只有官網時只顯示官方網站連結列', (tester) async {
       await tester.pumpWidget(
         wrap(
-          buildAttraction(officialSite: 'https://example.com', facebook: ''),
+          buildAttraction(officialSite: 'https://example.com'),
         ),
       );
       await settle(tester);

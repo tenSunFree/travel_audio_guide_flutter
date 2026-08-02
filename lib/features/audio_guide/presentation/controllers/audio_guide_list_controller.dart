@@ -1,17 +1,17 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/analytics/analytics_service.dart';
-import '../../../../core/database/database_provider.dart';
-import '../../../../core/monitoring/monitoring_service.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../../../core/sync/app_sync_service.dart';
-import '../../../../core/sync/sync_providers.dart';
-import '../../../attraction/domain/entities/attraction.dart';
-import '../../di/audio_guide_providers.dart';
-import '../../domain/entities/audio_guide.dart';
-import '../../domain/usecases/download_audio_guide_usecase.dart';
-import '../enums/sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/core/monitoring/monitoring_service.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/core/sync/app_sync_service.dart';
+import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/di/audio_guide_providers.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/usecases/download_audio_guide_usecase.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/enums/sort_filter_enums.dart';
 
 // State
 class AudioGuideListState {

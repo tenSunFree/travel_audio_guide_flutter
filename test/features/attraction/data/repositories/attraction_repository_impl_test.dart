@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/data/datasources/attraction_remote_data_source.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_model.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_page_model.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/data/repositories/attraction_repository_impl.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAttractionRemoteDataSource extends Mock
     implements AttractionRemoteDataSource {}
@@ -38,9 +38,7 @@ void main() {
       nlat: nlat,
       elong: elong,
       officialSite: 'https://example.com',
-      facebook: '',
       ticket: '免費',
-      remind: '',
       modified: '2026-05-01',
       url: 'https://example.com/attraction/$id',
       categories: categories,
@@ -132,7 +130,7 @@ void main() {
             elong: any(named: 'elong'),
           ),
         ).thenAnswer(
-          (_) async => AttractionPageModel(total: 0, page: 1, data: []),
+          (_) async => const AttractionPageModel(total: 0, page: 1, data: []),
         );
 
         final result = await repository.getAttractions(lang: 'zh-tw', page: 1);

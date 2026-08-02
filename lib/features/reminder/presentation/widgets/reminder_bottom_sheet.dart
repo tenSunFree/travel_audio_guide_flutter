@@ -12,8 +12,8 @@ class ReminderBottomSheetResult {
 
 class ReminderBottomSheet extends StatefulWidget {
   const ReminderBottomSheet({
-    super.key,
     required this.initialTargetTime,
+    super.key,
     this.minTargetTime,
     this.maxTargetTime,
   });
@@ -34,7 +34,7 @@ class _ReminderBottomSheetState extends State<ReminderBottomSheet> {
   int _customMinutes = 0;
   int _customSeconds = 0;
 
-  static const _presets = [
+  static const List<(String, int)> _presets = [
     ('準時', 0),
     ('5 分鐘前', 5 * 60),
     ('15 分鐘前', 15 * 60),

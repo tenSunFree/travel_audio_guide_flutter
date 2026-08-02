@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/location_controller.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/location_fallback_card.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/common_app_bar.dart';
+import 'package:flutter_travel_audio_guide/features/home/di/home_providers.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/controllers/home_controller.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/hero_recommend_card.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_empty_card.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_section_title.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_skeleton.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_subtitle.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/nearby_attraction_tile.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/period_chips.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/rainy_mode_card.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/recommend_list_tile.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/nearby/location_controller.dart';
-import '../../../../core/nearby/location_fallback_card.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../../../core/router/app_router.dart';
-import '../../../../core/widgets/common_app_bar.dart';
-import '../../di/home_providers.dart';
-import '../../domain/entities/home_state.dart';
-import '../controllers/home_controller.dart';
-import '../widgets/hero_recommend_card.dart';
-import '../widgets/home_empty_card.dart';
-import '../widgets/home_section_title.dart';
-import '../widgets/home_skeleton.dart';
-import '../widgets/home_subtitle.dart';
-import '../widgets/nearby_attraction_tile.dart';
-import '../widgets/period_chips.dart';
-import '../widgets/rainy_mode_card.dart';
-import '../widgets/recommend_list_tile.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -66,7 +66,10 @@ class _HomePageState extends ConsumerState<HomePage> {
     };
   }
 
-  void _openRecommendDetail(BuildContext context, HomeRecommendCard card) {
+  Future<void> _openRecommendDetail(
+    BuildContext context,
+    HomeRecommendCard card,
+  ) async {
     switch (card.type) {
       case HomeRecommendType.attraction:
         final attraction = card.attraction;
@@ -74,7 +77,7 @@ class _HomePageState extends ConsumerState<HomePage> {
           _showError(context, '找不到景點詳細資料');
           return;
         }
-        context.push(
+        await context.push(
           AppRoutes.attractionDetailPath(attraction.id),
           extra: attraction,
         );
@@ -257,10 +260,9 @@ class _HomePageState extends ConsumerState<HomePage> {
                   child: LocationFallbackCard(
                     permissionState: locState.permissionState,
                     isLoading: nearbyState.isLoading,
-                    onRequestLocation: () => nearbyController.enableNearby(),
-                    onOpenSettings: () => locController.openAppSettings(),
-                    onOpenLocationService: () =>
-                        locController.openLocationSettings(),
+                    onRequestLocation: nearbyController.enableNearby,
+                    onOpenSettings: locController.openAppSettings,
+                    onOpenLocationService: locController.openLocationSettings,
                     onBrowseAll: () =>
                         context.push(AppRoutes.attractionsPath()),
                   ),

@@ -1,20 +1,20 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/router/loaders/activity_detail_loader.dart';
+import 'package:flutter_travel_audio_guide/core/router/loaders/attraction_detail_loader.dart';
+import 'package:flutter_travel_audio_guide/core/router/loaders/audio_guide_detail_loader.dart';
+import 'package:flutter_travel_audio_guide/core/utils/app_log_page.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/route_error_page.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/pages/main_tab_page.dart';
+import 'package:flutter_travel_audio_guide/features/onboarding/di/onboarding_providers.dart';
+import 'package:flutter_travel_audio_guide/features/onboarding/presentation/pages/welcome_page.dart';
+import 'package:flutter_travel_audio_guide/features/splash/presentation/pages/splash_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import '../../features/activity/domain/entities/activity.dart';
-import '../../features/attraction/domain/entities/attraction.dart';
-import '../../features/audio_guide/domain/entities/audio_guide.dart';
-import '../../features/home/presentation/pages/main_tab_page.dart';
-import '../../features/onboarding/di/onboarding_providers.dart';
-import '../../features/onboarding/presentation/pages/welcome_page.dart';
-import '../../features/splash/presentation/pages/splash_page.dart';
-import '../analytics/analytics_service.dart';
-import '../utils/app_log_page.dart';
-import '../widgets/route_error_page.dart';
-import 'loaders/activity_detail_loader.dart';
-import 'loaders/attraction_detail_loader.dart';
-import 'loaders/audio_guide_detail_loader.dart';
 
 class AppRoutes {
   const AppRoutes._();
@@ -144,7 +144,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => AttractionDetailLoader(
           idText: state.pathParameters['id'],
           initialAttraction: state.extra is Attraction
-              ? state.extra as Attraction
+              ? state.extra! as Attraction
               : null,
         ),
       ),
@@ -153,7 +153,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => ActivityDetailLoader(
           idText: state.pathParameters['id'],
           initialActivity: state.extra is Activity
-              ? state.extra as Activity
+              ? state.extra! as Activity
               : null,
         ),
       ),
@@ -162,7 +162,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => AudioGuideDetailLoader(
           idText: state.pathParameters['id'],
           initialGuide: state.extra is AudioGuide
-              ? state.extra as AudioGuide
+              ? state.extra! as AudioGuide
               : null,
         ),
       ),

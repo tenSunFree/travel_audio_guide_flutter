@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
-import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/sort_filter_bottom_sheet.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/enums/sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/sort_filter_bottom_sheet.dart';
 
 typedef _Result = (SortOrder, FilterType, DistanceFilter);
 

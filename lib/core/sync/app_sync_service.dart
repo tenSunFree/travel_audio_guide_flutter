@@ -1,13 +1,13 @@
-import '../../features/activity/data/models/activity_model.dart';
-import '../../features/attraction/data/models/attraction_model.dart';
-import '../../features/audio_guide/data/models/audio_guide_model.dart';
-import '../database/app_database.dart';
-import '../constants/api_constants.dart';
-import '../monitoring/monitoring_service.dart';
-import '../utils/app_logger.dart';
-import '../../features/attraction/data/datasources/attraction_remote_data_source.dart';
-import '../../features/audio_guide/data/datasources/audio_guide_remote_data_source.dart';
-import '../../features/activity/data/datasources/activity_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/core/constants/api_constants.dart';
+import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
+import 'package:flutter_travel_audio_guide/core/monitoring/monitoring_service.dart';
+import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
+import 'package:flutter_travel_audio_guide/features/activity/data/datasources/activity_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/activity/data/models/activity_model.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/data/datasources/attraction_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_model.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/data/datasources/audio_guide_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audio_guide_model.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 
 enum SyncTarget { attractions, audioGuides, activities }

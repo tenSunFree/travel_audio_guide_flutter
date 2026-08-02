@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/di/reminder_providers.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 import 'package:go_router/go_router.dart';
-import '../../di/reminder_providers.dart';
-import '../../domain/entities/reminder.dart';
 
 class ReminderTile extends ConsumerWidget {
-  const ReminderTile({super.key, required this.reminder});
+  const ReminderTile({required this.reminder, super.key});
 
   final Reminder reminder;
 

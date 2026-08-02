@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
 
 class ActivityLinkRow extends StatelessWidget {
-  const ActivityLinkRow({super.key, required this.link, required this.onTap});
+  const ActivityLinkRow({required this.link, required this.onTap, super.key});
 
   final ActivityLink link;
   final VoidCallback onTap;
@@ -17,7 +17,7 @@ class ActivityLinkRow extends StatelessWidget {
         onTap: onTap,
         child: Row(
           children: [
-            Icon(Icons.link, size: 16, color: AppColors.textCaption),
+            const Icon(Icons.link, size: 16, color: AppColors.textCaption),
             const SizedBox(width: 6),
             Expanded(
               child: Text(

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_travel_audio_guide/features/activity/presentation/pages/activity_detail_page.dart';
-import '../../../../test_helpers/activity_fixtures.dart';
 import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/pages/activity_detail_page.dart';
+
+import '../../../../test_helpers/activity_fixtures.dart';
 
 Widget buildSubject(Activity activity) {
   return ProviderScope(
@@ -46,12 +47,12 @@ void main() {
   });
 
   testWidgets('票價與電話存在時會顯示對應資訊列', (tester) async {
-    final activity = buildTestActivity(tel: '0223456789', ticket: 'NT\$100');
+    final activity = buildTestActivity(tel: '0223456789', ticket: r'NT$100');
     await tester.pumpWidget(buildSubject(activity));
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('電話'), findsOneWidget);
     expect(find.text('0223456789'), findsOneWidget);
     expect(find.text('票價'), findsOneWidget);
-    expect(find.text('NT\$100'), findsOneWidget);
+    expect(find.text(r'NT$100'), findsOneWidget);
   });
 }

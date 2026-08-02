@@ -23,7 +23,7 @@ class _AnimatedTravelLogoState extends State<AnimatedTravelLogo>
       vsync: this,
       duration: const Duration(milliseconds: 1500),
     )..repeat(reverse: true);
-    _pulseScale = Tween<double>(begin: 1.0, end: 1.10).animate(
+    _pulseScale = Tween<double>(begin: 1, end: 1.10).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     _pulseOpacity = Tween<double>(begin: 0.18, end: 0.05).animate(
@@ -139,7 +139,7 @@ class _AnimatedTravelLogoState extends State<AnimatedTravelLogo>
             child: Container(
               width: 7,
               height: 7,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: _lightTeal,
                 shape: BoxShape.circle,
               ),

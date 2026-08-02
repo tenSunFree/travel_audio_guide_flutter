@@ -11,7 +11,9 @@ void main() {
 
     test('shouldLogResponse 對一般路徑回傳 true', () {
       final options = RequestOptions(path: '/Home/Recommend');
-      final response = Response(requestOptions: options);
+      final response = Response<dynamic>(
+        requestOptions: options,
+      );
       expect(DioLogFilter.shouldLogResponse(response), true);
     });
 

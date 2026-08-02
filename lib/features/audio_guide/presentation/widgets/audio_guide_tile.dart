@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
 
 class AudioGuideTile extends StatelessWidget {
   const AudioGuideTile({
-    super.key,
     required this.guide,
     required this.isDownloading,
     required this.onActionPressed,
+    super.key,
     this.distanceLabel,
   });
 
@@ -19,7 +19,7 @@ class AudioGuideTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final showPlay = guide.isDownloaded;
-    final VoidCallback? action = isDownloading ? null : onActionPressed;
+    final action = isDownloading ? null : onActionPressed;
     return Material(
       color: AppColors.surface,
       child: InkWell(

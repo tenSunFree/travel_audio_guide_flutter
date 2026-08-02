@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
-import '../../../../core/error/exceptions.dart';
-import '../models/audio_guide_page_model.dart';
+import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audio_guide_page_model.dart';
 
 class DownloadedAudioBinary {
   const DownloadedAudioBinary({
@@ -53,7 +53,7 @@ class AudioGuideRemoteDataSource {
       );
       final bytes = response.data;
       if (bytes == null || bytes.isEmpty) {
-        throw DownloadException('下載內容為空');
+        throw const DownloadException('下載內容為空');
       }
       final contentTypeHeader =
           response.headers.value(Headers.contentTypeHeader) ?? '';

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class RouteErrorPage extends StatelessWidget {
-  const RouteErrorPage({super.key, required this.message, this.title = '資料錯誤'});
+  const RouteErrorPage({required this.message, super.key, this.title = '資料錯誤'});
 
   final String message;
   final String title;

@@ -1,6 +1,5 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/sync/app_sync_service.dart';
 import 'package:flutter_travel_audio_guide/features/activity/data/datasources/activity_remote_data_source.dart';
@@ -12,6 +11,7 @@ import 'package:flutter_travel_audio_guide/features/attraction/data/models/attra
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/datasources/audio_guide_remote_data_source.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audio_guide_model.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audio_guide_page_model.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAttractionRemoteDataSource extends Mock
     implements AttractionRemoteDataSource {}
@@ -194,8 +194,8 @@ void main() {
     test('modified 沒變的景點不會被覆蓋；modified 有變的才會更新', () async {
       // Insert initial local records first
       await db.attractionDao.upsertAll([
-        _buildAttractionModel(id: 1, name: '原始名稱A', modified: '2026-01-01'),
-        _buildAttractionModel(id: 2, name: '原始名稱B', modified: '2026-01-01'),
+        _buildAttractionModel(name: '原始名稱A'),
+        _buildAttractionModel(id: 2, name: '原始名稱B'),
       ]);
       // Remote response: #1 has same modified (should not overwrite),
       // #2 has different modified (should update)
@@ -208,9 +208,7 @@ void main() {
           page: 1,
           data: [
             _buildAttractionModel(
-              id: 1,
               name: '被改壞的名稱A',
-              modified: '2026-01-01',
             ),
             _buildAttractionModel(
               id: 2,
@@ -248,18 +246,16 @@ void main() {
     test('導覽標題與景點名稱（正規化後）相符時，會寫入 matchedAttractionId，且保留原本的下載狀態', () async {
       // Prepare an attraction first
       await db.attractionDao.upsertAll([
-        _buildAttractionModel(id: 1, name: '故宮博物院'),
+        _buildAttractionModel(name: '故宮博物院'),
       ]);
       // Prepare an existing downloaded audio guide record
       final oldModel = _buildAudioGuideModel(
         id: 1,
         title: '舊標題',
-        modified: '2026-01-01',
       );
       await db.audioGuideDao.upsertAll([
         db.audioGuideDao.toCompanion(
           oldModel,
-          matchedAttractionId: null,
           isDownloaded: true,
           localFilePath: '/tmp/old.mp3',
         ),
@@ -299,7 +295,7 @@ void main() {
 
     test('導覽標題找不到對應景點時，matchedAttractionId 為 null', () async {
       await db.attractionDao.upsertAll([
-        _buildAttractionModel(id: 1, name: '故宮博物院'),
+        _buildAttractionModel(name: '故宮博物院'),
       ]);
       when(
         () =>
@@ -326,7 +322,7 @@ void main() {
           total: 3,
           page: 1,
           data: [
-            _buildActivityModel(id: 1, title: 'A'),
+            _buildActivityModel(title: 'A'),
             _buildActivityModel(id: 2, title: 'B'),
           ],
         ),

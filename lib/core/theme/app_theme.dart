@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 class AppTheme {
   const AppTheme._();

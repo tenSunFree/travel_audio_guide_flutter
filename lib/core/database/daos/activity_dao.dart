@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../../../features/activity/data/models/activity_model.dart';
-import '../../../features/activity/domain/entities/activity.dart';
-import '../tables/activity_table.dart';
+import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
+import 'package:flutter_travel_audio_guide/core/database/tables/activity_table.dart';
+import 'package:flutter_travel_audio_guide/features/activity/data/models/activity_model.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
 
 part 'activity_dao.g.dart';
 
@@ -66,9 +66,13 @@ class ActivityDao extends DatabaseAccessor<AppDatabase>
       );
 
   Activity _toEntity(ActivityTableData r) {
-    final links = (jsonDecode(r.linksJson) as List)
-        .map((e) => ActivityLink(src: e['src'], subject: e['subject']))
-        .toList();
+    final links = (jsonDecode(r.linksJson) as List<dynamic>).map((item) {
+      final map = item as Map<String, dynamic>;
+      return ActivityLink(
+        src: map['src'] as String,
+        subject: map['subject'] as String,
+      );
+    }).toList();
     return Activity(
       id: r.id,
       title: r.title,
