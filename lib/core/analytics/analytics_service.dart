@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 class AnalyticsService {
   const AnalyticsService._();
 
-  static final _analytics = FirebaseAnalytics.instance;
+  static final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
 
   /// Observer instances provided for use by GoRouter observers
   static FirebaseAnalyticsObserver get observer =>

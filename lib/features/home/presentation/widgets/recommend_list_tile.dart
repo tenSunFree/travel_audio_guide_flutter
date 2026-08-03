@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/widgets/app_cached_network_image.dart';
-import '../../domain/entities/home_state.dart';
-import '../constants/home_ui_colors.dart';
-import 'home_fallback_image.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/app_cached_network_image.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/constants/home_ui_colors.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_fallback_image.dart';
 
 class RecommendListTile extends StatelessWidget {
-  const RecommendListTile({super.key, required this.card, this.onTap});
+  const RecommendListTile({required this.card, super.key, this.onTap});
 
   final HomeRecommendCard card;
   final VoidCallback? onTap;
@@ -69,9 +69,10 @@ class RecommendListTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Left thumbnail / date badge
-                isActivity
-                    ? _DateBadge(emoji: card.emoji)
-                    : _ImageThumb(card: card),
+                if (isActivity)
+                  _DateBadge(emoji: card.emoji)
+                else
+                  _ImageThumb(card: card),
                 const SizedBox(width: 14),
                 // Main content
                 Expanded(
@@ -203,7 +204,6 @@ class _ImageThumb extends StatelessWidget {
                 imageUrl: card.imageUrl!,
                 width: 64,
                 height: 64,
-                fit: BoxFit.cover,
                 errorWidget: HomeFallbackImage(card.emoji),
               )
             : HomeFallbackImage(card.emoji),

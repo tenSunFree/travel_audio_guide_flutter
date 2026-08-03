@@ -1,5 +1,5 @@
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'audio_guide.dart';
 
 part 'audio_guide_page.freezed.dart';
 

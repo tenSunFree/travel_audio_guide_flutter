@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
 
 class NearbyUtils {
   const NearbyUtils._();

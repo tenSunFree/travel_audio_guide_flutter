@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction_page.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/repositories/attraction_repository.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/usecases/get_attraction_categories_usecase.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/usecases/get_attractions_usecase.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAttractionRepository extends Mock implements AttractionRepository {}
 
@@ -61,7 +61,6 @@ void main() {
       ).thenAnswer((_) async => tPage);
 
       final result = await useCase(
-        lang: 'zh-tw',
         page: 1,
         categoryIds: '1,2',
         nlat: 25.033,
@@ -90,9 +89,6 @@ void main() {
         () => repository.getAttractions(
           lang: 'zh-tw',
           page: 1,
-          categoryIds: null,
-          nlat: null,
-          elong: null,
         ),
       ).thenAnswer(
         (_) async => const AttractionPage(total: 0, page: 1, data: []),
@@ -106,9 +102,6 @@ void main() {
         () => repository.getAttractions(
           lang: 'zh-tw',
           page: 1,
-          categoryIds: null,
-          nlat: null,
-          elong: null,
         ),
       ).called(1);
     });
@@ -124,7 +117,7 @@ void main() {
         ),
       ).thenThrow(Exception('network error'));
 
-      expect(() => useCase(lang: 'zh-tw', page: 1), throwsA(isA<Exception>()));
+      expect(() => useCase(page: 1), throwsA(isA<Exception>()));
     });
   });
 
@@ -138,7 +131,7 @@ void main() {
         () => repository.getAttractionCategories(lang: 'zh-tw'),
       ).thenAnswer((_) async => tCategories);
 
-      final result = await useCase(lang: 'zh-tw');
+      final result = await useCase();
 
       expect(result, tCategories);
       expect(result.length, 2);
@@ -154,7 +147,7 @@ void main() {
         () => repository.getAttractionCategories(lang: any(named: 'lang')),
       ).thenAnswer((_) async => []);
 
-      final result = await useCase(lang: 'zh-tw');
+      final result = await useCase();
 
       expect(result, isEmpty);
     });
@@ -164,7 +157,7 @@ void main() {
         () => repository.getAttractionCategories(lang: any(named: 'lang')),
       ).thenThrow(Exception('categories error'));
 
-      expect(() => useCase(lang: 'zh-tw'), throwsA(isA<Exception>()));
+      expect(() => useCase(), throwsA(isA<Exception>()));
     });
   });
 }

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/widgets/app_cached_network_image.dart';
-import '../../../attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/app_cached_network_image.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 
 class GuideImageSection extends StatefulWidget {
-  const GuideImageSection({super.key, required this.attraction});
+  const GuideImageSection({required this.attraction, super.key});
 
   final Attraction? attraction;
 
@@ -55,7 +55,6 @@ class _GuideImageSectionState extends State<GuideImageSection> {
                     imageUrl: images[i].src,
                     width: constraints.maxWidth,
                     height: 200,
-                    fit: BoxFit.cover,
                     errorWidget: Container(
                       color: AppColors.surfaceMuted,
                       alignment: Alignment.center,

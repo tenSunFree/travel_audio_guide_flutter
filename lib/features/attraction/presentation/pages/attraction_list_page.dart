@@ -1,20 +1,21 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/location_controller.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/common_app_bar.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/list_skeleton.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/di/attraction_providers.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/controllers/attraction_list_controller.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/enums/attraction_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/widgets/attraction_condition_summary_bar.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/widgets/attraction_sort_filter_bottom_sheet.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/widgets/attraction_tile.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/nearby/location_controller.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../../../core/router/app_router.dart';
-import '../../../../core/widgets/common_app_bar.dart';
-import '../../../../core/widgets/list_skeleton.dart';
-import '../../di/attraction_providers.dart';
-import '../../domain/entities/attraction.dart';
-import '../controllers/attraction_list_controller.dart';
-import '../enums/attraction_sort_filter_enums.dart';
-import '../widgets/attraction_condition_summary_bar.dart';
-import '../widgets/attraction_sort_filter_bottom_sheet.dart';
-import '../widgets/attraction_tile.dart';
 
 class AttractionListPage extends ConsumerStatefulWidget {
   const AttractionListPage({

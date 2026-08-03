@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../di/home_providers.dart';
-import '../../domain/entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/di/home_providers.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
 
 final homeControllerProvider = NotifierProvider<HomeController, HomeUiState>(
   HomeController.new,
@@ -55,7 +55,7 @@ class HomeController extends Notifier<HomeUiState> {
           (newState) {
             state = newState;
           },
-          onError: (error, stackTrace) {
+          onError: (Object error, StackTrace stackTrace) {
             state = state.copyWith(
               isLoading: false,
               errorMessage: error.toString(),

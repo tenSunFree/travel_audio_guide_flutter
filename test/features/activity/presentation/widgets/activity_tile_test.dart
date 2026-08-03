@@ -64,14 +64,14 @@ void main() {
 
     testWidgets('日期格式化為 yyyy/MM/dd', (tester) async {
       await tester.pumpWidget(
-        wrap(buildActivity(begin: '2026-07-20', end: '2026-07-30')),
+        wrap(buildActivity()),
       );
       expect(find.textContaining('2026/07/20'), findsOneWidget);
       expect(find.textContaining('2026/07/30'), findsOneWidget);
     });
 
     testWidgets('顯示主辦單位', (tester) async {
-      await tester.pumpWidget(wrap(buildActivity(organizer: '台北市文化局')));
+      await tester.pumpWidget(wrap(buildActivity()));
       expect(find.text('台北市文化局'), findsOneWidget);
     });
 
@@ -100,7 +100,7 @@ void main() {
     testWidgets('有使用者座標且景點座標有效時顯示距離', (tester) async {
       await tester.pumpWidget(
         wrap(
-          buildActivity(nlat: '25.0330', elong: '121.5654'),
+          buildActivity(),
           userLat: 25.0331,
           userLng: 121.5655,
         ),

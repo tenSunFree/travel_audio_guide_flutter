@@ -1,4 +1,4 @@
-import 'main_production.dart' as production;
+import 'package:flutter_travel_audio_guide/main_production.dart' as production;
 
 /// Default entrypoint, equivalent to a production flavor.
 /// This file is retained so that `flutter run` / `flutter analyze` will still have default behavior when `-t lib/main_xxx.dart` is not specified (directly clicking Run in the IDE will not cause problems).

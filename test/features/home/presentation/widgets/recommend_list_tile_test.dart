@@ -51,7 +51,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(_buildCard(type: HomeRecommendType.attraction, emoji: '🌳')),
+        _wrap(_buildCard()),
       );
       expect(find.text('🌳'), findsOneWidget);
       expect(find.text('景點'), findsOneWidget);
@@ -76,7 +76,7 @@ void main() {
     });
 
     testWidgets('subtitle 不為空時顯示', (tester) async {
-      await tester.pumpWidget(_wrap(_buildCard(subtitle: '大安區')));
+      await tester.pumpWidget(_wrap(_buildCard()));
       expect(find.text('大安區'), findsOneWidget);
     });
 

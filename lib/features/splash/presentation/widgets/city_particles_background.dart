@@ -12,7 +12,7 @@ class CityParticlesBackground extends StatefulWidget {
 class _CityParticlesBackgroundState extends State<CityParticlesBackground>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  static final _dots = _generateDots();
+  static final List<_MapDot> _dots = _generateDots();
 
   static List<_MapDot> _generateDots() {
     final rng = math.Random(10);
@@ -112,26 +112,27 @@ class _MapBackgroundPainter extends CustomPainter {
       );
     }
     _starPaint.color = const Color(0xFFFFD66B).withValues(alpha: 0.30);
-    canvas.drawCircle(
-      Offset(size.width * 0.80, size.height * 0.18),
-      5.5,
-      _starPaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.20, size.height * 0.80),
-      4.0,
-      _starPaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.88, size.height * 0.62),
-      3.5,
-      _starPaint,
-    );
-    canvas.drawCircle(
-      Offset(size.width * 0.10, size.height * 0.38),
-      3.0,
-      _starPaint,
-    );
+    canvas
+      ..drawCircle(
+        Offset(size.width * 0.80, size.height * 0.18),
+        5.5,
+        _starPaint,
+      )
+      ..drawCircle(
+        Offset(size.width * 0.20, size.height * 0.80),
+        4,
+        _starPaint,
+      )
+      ..drawCircle(
+        Offset(size.width * 0.88, size.height * 0.62),
+        3.5,
+        _starPaint,
+      )
+      ..drawCircle(
+        Offset(size.width * 0.10, size.height * 0.38),
+        3,
+        _starPaint,
+      );
   }
 
   @override

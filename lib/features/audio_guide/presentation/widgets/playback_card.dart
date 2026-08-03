@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../domain/entities/audio_playback_state.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_playback_state.dart';
 
 class PlaybackCard extends StatelessWidget {
   const PlaybackCard({
-    super.key,
     required this.title,
     required this.playerState,
     required this.onTogglePlayPause,
     required this.onSeek,
+    super.key,
   });
 
   final String title;
@@ -46,7 +46,6 @@ class PlaybackCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               GestureDetector(
                 onTap: onTogglePlayPause,
@@ -103,28 +102,29 @@ class PlaybackCard extends StatelessWidget {
                       ],
                     ),
                     const SizedBox(height: 2),
-                    durationMs > 0
-                        ? SliderTheme(
-                            data: SliderTheme.of(context).copyWith(
-                              trackHeight: 3,
-                              thumbShape: const RoundSliderThumbShape(
-                                enabledThumbRadius: 6,
-                              ),
-                              overlayShape: const RoundSliderOverlayShape(
-                                overlayRadius: 14,
-                              ),
-                            ),
-                            child: Slider(
-                              value: posMs.toDouble(),
-                              max: durationMs.toDouble(),
-                              onChanged: (v) =>
-                                  onSeek(Duration(milliseconds: v.toInt())),
-                            ),
-                          )
-                        : const SizedBox(
-                            height: 20,
-                            child: LinearProgressIndicator(),
+                    if (durationMs > 0)
+                      SliderTheme(
+                        data: SliderTheme.of(context).copyWith(
+                          trackHeight: 3,
+                          thumbShape: const RoundSliderThumbShape(
+                            enabledThumbRadius: 6,
                           ),
+                          overlayShape: const RoundSliderOverlayShape(
+                            overlayRadius: 14,
+                          ),
+                        ),
+                        child: Slider(
+                          value: posMs.toDouble(),
+                          max: durationMs.toDouble(),
+                          onChanged: (v) =>
+                              onSeek(Duration(milliseconds: v.toInt())),
+                        ),
+                      )
+                    else
+                      const SizedBox(
+                        height: 20,
+                        child: LinearProgressIndicator(),
+                      ),
                   ],
                 ),
               ),

@@ -4,8 +4,6 @@ part 'attraction.freezed.dart';
 
 @freezed
 abstract class Attraction with _$Attraction {
-  const Attraction._();
-
   const factory Attraction({
     required int id,
     required String name,
@@ -27,6 +25,7 @@ abstract class Attraction with _$Attraction {
     double? nlat,
     double? elong,
   }) = _Attraction;
+  const Attraction._();
 
   String get firstImageUrl => images.isNotEmpty ? images.first.src : '';
 

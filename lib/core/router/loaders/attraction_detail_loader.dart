@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../database/database_provider.dart';
-import '../../widgets/route_error_page.dart';
-import '../../../features/attraction/domain/entities/attraction.dart';
-import '../../../features/attraction/presentation/pages/attraction_detail_page.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/route_error_page.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/pages/attraction_detail_page.dart';
 
 class AttractionDetailLoader extends ConsumerWidget {
   const AttractionDetailLoader({
-    super.key,
     required this.idText,
     required this.initialAttraction,
+    super.key,
   });
 
   final String? idText;

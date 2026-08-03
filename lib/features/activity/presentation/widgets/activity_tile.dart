@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../domain/entities/activity.dart';
-import '../controllers/activity_list_controller.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/controllers/activity_list_controller.dart';
 
 class ActivityTile extends StatelessWidget {
   const ActivityTile({
-    super.key,
     required this.activity,
     required this.onTap,
+    super.key,
     this.userLat,
     this.userLng,
   });
@@ -34,7 +34,7 @@ class ActivityTile extends StatelessWidget {
   static String _htmlToPlainText(String html, {int maxLength = 100}) {
     final text = html
         .replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '\n')
-        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .replaceAll(RegExp('<[^>]*>'), '')
         .replaceAll('&nbsp;', ' ')
         .replaceAll('&mdash;', '—')
         .replaceAll('&ndash;', '–')

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/daos/activity_dao.dart';
 import 'package:flutter_travel_audio_guide/core/database/daos/attraction_dao.dart';
@@ -20,6 +19,7 @@ import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/con
 import 'package:flutter_travel_audio_guide/features/home/di/home_providers.dart';
 import 'package:flutter_travel_audio_guide/features/home/di/nearby_providers.dart';
 import 'package:flutter_travel_audio_guide/features/home/domain/repositories/nearby_repository.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAppDatabase extends Mock implements AppDatabase {}
 
@@ -119,9 +119,8 @@ void main() {
   late MockNearbyRepository nearbyRepository;
   late FakeLocationController locationController;
   late ProviderContainer container;
-
-  List<Attraction> attractionFixtures = const [];
-  List<AudioGuide> audioGuideFixtures = const [];
+  var attractionFixtures = const <Attraction>[];
+  var audioGuideFixtures = const <AudioGuide>[];
 
   setUpAll(() {
     registerFallbackValue(SyncTarget.attractions);
@@ -322,9 +321,10 @@ void main() {
       attractionFixtures = [
         _buildAttraction(id: 1, name: '近景點', distanceMeters: 1500),
       ];
-      locationController.setPermission(NearbyPermissionState.granted);
-      locationController.onGetCurrentLocation = () =>
-          const GeoPoint(latitude: _baseLat, longitude: _baseLng);
+      locationController
+        ..setPermission(NearbyPermissionState.granted)
+        ..onGetCurrentLocation = () =>
+            const GeoPoint(latitude: _baseLat, longitude: _baseLng);
       final notifier = container.read(nearbyHomeControllerProvider.notifier);
       await notifier.refresh();
       await flush();
@@ -334,8 +334,9 @@ void main() {
     });
 
     test('過程發生例外時只記錄錯誤，不會讓 state 陷入 loading 卡死', () async {
-      locationController.setPermission(NearbyPermissionState.granted);
-      locationController.errorOnGetCurrentLocation = Exception('刷新失敗');
+      locationController
+        ..setPermission(NearbyPermissionState.granted)
+        ..errorOnGetCurrentLocation = Exception('刷新失敗');
       final notifier = container.read(nearbyHomeControllerProvider.notifier);
       final before = container.read(nearbyHomeControllerProvider);
       await notifier.refresh();
@@ -444,12 +445,11 @@ void main() {
       ];
       audioGuideFixtures = [
         _buildAudioGuide(id: 1, title: '博物館導覽', matchedAttractionId: 1),
-        _buildAudioGuide(id: 2, title: '沒有對應景點的導覽', matchedAttractionId: null),
+        _buildAudioGuide(id: 2, title: '沒有對應景點的導覽'),
         _buildAudioGuide(id: 3, title: '對應景點不存在', matchedAttractionId: 999),
       ];
       locationController.onGetCurrentLocation = () =>
           const GeoPoint(latitude: _baseLat, longitude: _baseLng);
-
       final notifier = container.read(nearbyHomeControllerProvider.notifier);
       await notifier.enableNearby();
       await flush();

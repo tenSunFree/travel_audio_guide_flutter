@@ -121,8 +121,6 @@ void main() {
           service.emit(
             const AudioPlaybackState(
               status: AudioPlaybackStatus.stopped,
-              position: Duration.zero,
-              duration: Duration.zero,
             ),
           );
           await _flush();

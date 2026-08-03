@@ -1,4 +1,4 @@
-import 'activity_model.dart';
+import 'package:flutter_travel_audio_guide/features/activity/data/models/activity_model.dart';
 
 class ActivityPageModel {
   const ActivityPageModel({
@@ -6,10 +6,6 @@ class ActivityPageModel {
     required this.page,
     required this.data,
   });
-
-  final int total;
-  final int page;
-  final List<ActivityModel> data;
 
   factory ActivityPageModel.fromJson(Map<String, dynamic> json, int page) {
     final rawList = json['data'];
@@ -25,4 +21,8 @@ class ActivityPageModel {
       data: data,
     );
   }
+
+  final int total;
+  final int page;
+  final List<ActivityModel> data;
 }

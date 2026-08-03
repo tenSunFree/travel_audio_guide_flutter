@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
-import '../../domain/entities/audio_playback_state.dart';
-import '../../domain/services/audio_playback_service.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_playback_state.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/services/audio_playback_service.dart';
 
 class AudioPlaybackServiceImpl implements AudioPlaybackService {
   AudioPlaybackServiceImpl() {

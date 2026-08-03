@@ -1,14 +1,15 @@
 import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/analytics/analytics_service.dart';
-import '../../../../core/database/database_provider.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../../../core/sync/app_sync_service.dart';
-import '../../../../core/sync/sync_providers.dart';
-import '../../../home/domain/services/open_time_parser.dart';
-import '../../domain/entities/attraction.dart';
-import '../enums/attraction_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/core/sync/app_sync_service.dart';
+import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/enums/attraction_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/services/open_time_parser.dart';
 
 class AttractionListState {
   const AttractionListState({
@@ -252,7 +253,8 @@ class AttractionListState {
     return result.isOpenNow;
   }
 
-  /// Haversine distance in metres; returns [double.maxFinite] for invalid coords
+  /// Haversine distance in metres;
+  /// returns [double.maxFinite] for invalid coords
   /// so that items without coordinates sort to the end.
   static double _distance(
     double userLat,

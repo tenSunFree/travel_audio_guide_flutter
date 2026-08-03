@@ -1,18 +1,16 @@
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../domain/entities/activity.dart';
 
 part 'activity_model.freezed.dart';
-
 part 'activity_model.g.dart';
 
 @freezed
 abstract class ActivityLinkModel with _$ActivityLinkModel {
-  const ActivityLinkModel._();
-
   const factory ActivityLinkModel({
     @Default('') String src,
     @Default('') String subject,
   }) = _ActivityLinkModel;
+  const ActivityLinkModel._();
 
   factory ActivityLinkModel.fromJson(Map<String, dynamic> json) =>
       _$ActivityLinkModelFromJson(json);
@@ -22,8 +20,6 @@ abstract class ActivityLinkModel with _$ActivityLinkModel {
 
 @freezed
 abstract class ActivityModel with _$ActivityModel {
-  const ActivityModel._();
-
   const factory ActivityModel({
     @Default(0) int id,
     @Default('') String title,
@@ -46,6 +42,7 @@ abstract class ActivityModel with _$ActivityModel {
     @Default('') String parking,
     @Default([]) List<ActivityLinkModel> links,
   }) = _ActivityModel;
+  const ActivityModel._();
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) =>
       _activityModelFromJson(json);
@@ -78,7 +75,7 @@ abstract class ActivityModel with _$ActivityModel {
 
 ActivityModel _activityModelFromJson(Map<String, dynamic> json) {
   final rawLinks = json['links'];
-  List<Map<String, dynamic>> normalizedLinks = [];
+  final normalizedLinks = <Map<String, dynamic>>[];
   if (rawLinks is List) {
     for (final e in rawLinks) {
       if (e is Map<String, dynamic>) {

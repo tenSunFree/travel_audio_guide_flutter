@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../tables/sync_meta_table.dart';
+import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
+import 'package:flutter_travel_audio_guide/core/database/tables/sync_meta_table.dart';
 
 part 'sync_meta_dao.g.dart';
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 
 class PracticalInfoSection extends StatelessWidget {
-  const PracticalInfoSection({super.key, required this.attraction});
+  const PracticalInfoSection({required this.attraction, super.key});
 
   final Attraction? attraction;
 

@@ -56,7 +56,6 @@ const _guide = AudioGuide(
   fileExt: 'mp3',
   modified: '2026-05-01',
   isDownloaded: false,
-  localFilePath: null,
 );
 
 // Tests
@@ -95,12 +94,9 @@ void main() {
       const guide = AudioGuide(
         id: 2,
         title: 'Guide 2',
-        summary: null,
         url: 'https://example.com/2.mp3',
-        fileExt: null,
         modified: '2026-01-01',
         isDownloaded: false,
-        localFilePath: null,
       );
       expect(guide.summary, isNull);
       expect(guide.fileExt, isNull);
@@ -136,8 +132,6 @@ void main() {
     test('isCompleted is false when duration is zero even if stopped', () {
       const state = AudioPlaybackState(
         status: AudioPlaybackStatus.stopped,
-        position: Duration.zero,
-        duration: Duration.zero,
       );
       expect(state.isCompleted, isFalse);
     });
@@ -161,7 +155,7 @@ void main() {
     });
     test('isReady is false for initial, loading, error', () {
       expect(
-        const AudioPlaybackState(status: AudioPlaybackStatus.initial).isReady,
+        const AudioPlaybackState().isReady,
         isFalse,
       );
       expect(

@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/database/database_provider.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../../../core/sync/app_sync_service.dart';
-import '../../../../core/sync/sync_providers.dart';
-import '../../domain/entities/activity.dart';
-import '../enums/activity_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/core/sync/app_sync_service.dart';
+import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/enums/activity_sort_filter_enums.dart';
 
 enum _ActivityTimeState {
   ongoing, // has precise times, now is between begin and end

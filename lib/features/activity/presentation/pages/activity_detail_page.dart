@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/detail_action_buttons.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/widgets/activity_link_row.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/presentation/utils/detail_schedule_actions.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../../core/analytics/analytics_service.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../reminder/presentation/utils/detail_schedule_actions.dart';
-import '../../domain/entities/activity.dart';
-import '../../../../core/widgets/detail_action_buttons.dart';
-import '../widgets/activity_link_row.dart';
 
 class ActivityDetailPage extends ConsumerStatefulWidget {
-  const ActivityDetailPage({super.key, required this.activity});
+  const ActivityDetailPage({required this.activity, super.key});
 
   final Activity activity;
 
@@ -30,7 +30,6 @@ class _ActivityDetailPageState extends ConsumerState<ActivityDetailPage> {
     sourceId: activity.id.toString(),
     title: activity.title,
     subtitle: activity.address,
-    imageUrl: null,
     address: activity.address,
     description: activity.description,
     location: activity.address.isNotEmpty
@@ -220,8 +219,8 @@ class _ActivityDetailPageState extends ConsumerState<ActivityDetailPage> {
             ),
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
           child: Divider(height: 1, thickness: 1, color: AppColors.divider),
         ),
       ),
@@ -252,7 +251,7 @@ class _ActivityDetailPageState extends ConsumerState<ActivityDetailPage> {
                     for (int i = 0; i < infoRows.length; i++) ...[
                       _InfoRow(data: infoRows[i]),
                       if (i < infoRows.length - 1)
-                        Divider(
+                        const Divider(
                           height: 1,
                           thickness: 1,
                           color: AppColors.divider,
@@ -397,7 +396,11 @@ class _InfoRow extends StatelessWidget {
             ),
           ),
           if (data.isTappable)
-            Icon(Icons.chevron_right, size: 16, color: AppColors.textCaption),
+            const Icon(
+              Icons.chevron_right,
+              size: 16,
+              color: AppColors.textCaption,
+            ),
         ],
       ),
     );

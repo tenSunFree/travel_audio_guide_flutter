@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/pages/activity_list_page.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/pages/attraction_list_page.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/pages/audio_guide_list_page.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/pages/home_page.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/presentation/pages/my_journey_page.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/analytics/analytics_service.dart';
-import '../../../../core/router/app_router.dart';
-import '../../../activity/presentation/pages/activity_list_page.dart';
-import '../../../attraction/presentation/pages/attraction_list_page.dart';
-import '../../../audio_guide/presentation/pages/audio_guide_list_page.dart';
-import '../../../reminder/presentation/pages/my_journey_page.dart';
-import 'home_page.dart';
 
 /// MainTabPage accepts initial filter values from GoRouter query params.
 /// - After clicking "View All" on the homepage, GoRouter pushes a new route with the query,

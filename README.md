@@ -17,6 +17,7 @@
 [![Distribution](https://img.shields.io/badge/Distribution-Firebase%20App%20Distribution-FFCA28?logo=firebase&logoColor=black)](#git-workflow--cicd)
 [![CodeRabbit Reviews](https://img.shields.io/badge/Code%20Review-CodeRabbit-FF6B35)](https://coderabbit.ai)
 [![Dependabot](https://img.shields.io/badge/Dependencies-Dependabot-025E8C?logo=dependabot&logoColor=white)](https://github.com/tenSunFree/travel-audio-guide-flutter/security/dependabot)
+[![style: very good analysis](https://img.shields.io/badge/style-very_good_analysis-B22C89.svg)](https://pub.dev/packages/very_good_analysis)
 
 ---
 
@@ -145,6 +146,13 @@ It handles JWT verification and user profile management.
 - Local coverage tooling (`scripts/coverage.sh`) generates LCOV coverage data and an HTML coverage report via `genhtml` or `lcov-viewer` for file-by-file and line-by-line inspection
 - Test coverage is tracked via Codecov and uploaded automatically from CI (`flutter test --coverage` → `coverage/lcov.info`)
 
+### Code Quality
+
+- Static analysis baseline upgraded from `flutter_lints` to [`very_good_analysis`](https://pub.dev/packages/very_good_analysis) (10.2.0), a stricter, community-adopted Dart/Flutter lint set
+- Generated files (`*.g.dart`, `*.freezed.dart`, per-flavor Firebase config) are excluded from analysis to keep signal-to-noise high
+- Static analysis runs as part of the standard `flutter analyze` command — no additional tooling or CI step required
+- Lint violations are enforced in CI (`Static analysis` step in `ci.yml`) and locally via `scripts/check.sh` and the `pre-push` git hook
+
 ### Developer Experience
 
 - Local CI check script (`scripts/check.sh`) mirrors the main GitHub Actions validation pipeline: dependency installation, format check, static analysis, tests with coverage, LCOV report validation, and staging flavor debug APK build — validates only and never rewrites source files
@@ -266,6 +274,8 @@ It handles JWT verification and user profile management.
   Official Flutter testing framework (Provides unit and widget testing utilities for validating business logic, UI behavior, and regression scenarios)
 - mocktail  
   Mock library for Dart unit testing (Stubs repository and data source dependencies to isolate domain and data layer logic; verifies interaction behavior with `verify` and `verifyNever` without code generation)
+- very_good_analysis  
+  Stricter Dart/Flutter static analysis baseline, replacing the default `flutter_lints` set (Enforced through the standard `flutter analyze` command in CI and the `pre-push` hook; generated files are excluded from analysis)
 - shared_preferences  
   Lightweight local key-value storage (Persists onboarding completion state to control first-launch welcome flow and subsequent app startup routing)
 - geolocator  
@@ -317,6 +327,18 @@ make coverage
 make secret-scan
 make doctor
 ```
+
+### Static Analysis
+
+This project uses [`very_good_analysis`](https://pub.dev/packages/very_good_analysis) as its lint baseline (`analysis_options.yaml`), replacing the default `flutter_lints` set that ships with new Flutter projects.
+
+```bash
+flutter analyze
+```
+
+- Generated files (`*.g.dart`, `*.freezed.dart`, per-flavor Firebase config under `lib/config/firebase/`) are excluded from analysis
+- A small set of rules are temporarily relaxed while the codebase catches up with the stricter baseline (see comments in `analysis_options.yaml`); new code is still expected to stay clean
+- No separate command or CI step is required — `flutter analyze` covers this baseline directly, and it already runs in both the `Static analysis` CI step and `scripts/check.sh`
 
 ### Local Coverage Report
 
@@ -471,27 +493,21 @@ If you plan to open-source it, please choose a license and confirm third-party a
 
 ## Project Structure
 
+> This is a high-level overview, not an exhaustive file listing — each feature under `lib/features/` follows the same `data / di / domain / presentation` layering shown for `activity` below. Run `tree -L 4 --gitignore lib test` locally for the full, up-to-date tree.
+
 ```
 travel-audio-guide-flutter
-...
 ├─ android
-│  ...
-│  ├─ app
-│  │  ├─ build.gradle.kts
-│  │  └─ src
-│  │     ...
-│  │     │  ├─ kotlin
-│  │     │  │  └─ com
-│  │     │  │     └─ tensunfree
-│  │     │  │        └─ flutter_travel_audio_guide
-│  │     │  │           └─ flutter_travel_audio_guide
-│  │     │  │              ├─ HealthConnectApi.g.kt
-│  │     │  │              ├─ HealthConnectManager.kt
-│  │     │  │              ├─ MainActivity.kt
-│  │     │  │              └─ StepSensorManager.kt
-│  │  ...
+│  └─ app
+│     └─ src
+│        └─ main
+│           └─ kotlin/com/tensunfree/flutter_travel_audio_guide/flutter_travel_audio_guide
+│              ├─ HealthConnectApi.g.kt
+│              ├─ HealthConnectManager.kt
+│              ├─ MainActivity.kt
+│              └─ StepSensorManager.kt
 ├─ ios
-│  ├─ ...
+├─ linux / macos / web
 ├─ lib
 │  ├─ app.dart
 │  ├─ bootstrap.dart
@@ -502,178 +518,47 @@ travel-audio-guide-flutter
 │  │  └─ firebase
 │  │     ├─ firebase_options_staging.dart
 │  │     └─ firebase_options_production.dart
-│  ├─ core
-│  │  ├─ constants
-│  │  │  ├─ api_constants.dart
-│  │  │  └─ app_colors.dart
-│  │  ├─ database
-│  │  │  ├─ app_database.dart
-│  │  │  ├─ app_database.g.dart
-│  │  │  ├─ daos
-│  │  │  │  ├─ activity_dao.dart
-│  │  │  │  ├─ activity_dao.g.dart
-│  │  │  │  ├─ attraction_dao.dart
-│  │  │  │  ├─ attraction_dao.g.dart
-│  │  │  │  ├─ audio_guide_dao.dart
-│  │  │  │  ├─ audio_guide_dao.g.dart
-│  │  │  │  ├─ sync_meta_dao.dart
-│  │  │  │  └─ sync_meta_dao.g.dart
-│  │  │  ├─ database_provider.dart
-│  │  │  └─ tables
-│  │  │     ├─ activity_table.dart
-│  │  │     ├─ attraction_table.dart
-│  │  │     ├─ audio_guide_table.dart
-│  │  │     └─ sync_meta_table.dart
-│  │  ├─ error
-│  │  │  └─ exceptions.dart
-│  │  ├─ network
-│  │  │  ├─ dio_log_filter.dart
-│  │  │  └─ network_providers.dart
-│  │  ├─ sync
-│  │  │  ├─ app_sync_service.dart
-│  │  │  └─ sync_providers.dart
-│  │  ├─ theme
-│  │  │  └─ app_theme.dart
-│  │  └─ utils
-│  │     ├─ app_logger.dart
-│  │     └─ app_log_page.dart
-│  ├─ features
-│  │  ├─ activity
-│  │  │  ├─ data
-│  │  │  │  ├─ datasources
-│  │  │  │  │  └─ activity_remote_data_source.dart
-│  │  │  │  ├─ models
-│  │  │  │  │  ├─ activity_model.dart
-│  │  │  │  │  └─ activity_page_model.dart
-│  │  │  │  └─ repositories
-│  │  │  │     └─ activity_repository_impl.dart
-│  │  │  ├─ di
-│  │  │  │  └─ activity_providers.dart
-│  │  │  ├─ domain
-│  │  │  │  ├─ entities
-│  │  │  │  │  ├─ activity.dart
-│  │  │  │  │  └─ activity_page.dart
-│  │  │  │  ├─ repositories
-│  │  │  │  │  └─ activity_repository.dart
-│  │  │  │  └─ usecases
-│  │  │  │     └─ get_activities_usecase.dart
-│  │  │  └─ presentation
-│  │  │     ├─ controllers
-│  │  │     │  └─ activity_list_controller.dart
-│  │  │     ├─ enums
-│  │  │     │  └─ activity_sort_filter_enums.dart
-│  │  │     ├─ pages
-│  │  │     │  ├─ activity_detail_page.dart
-│  │  │     │  └─ activity_list_page.dart
-│  │  │     └─ widgets
-│  │  │        ├─ activity_condition_summary_bar.dart
-│  │  │        ├─ activity_sort_filter_bottom_sheet.dart
-│  │  │        └─ activity_tile.dart
-│  │  ├─ attraction
-│  │  │  ├─ data
-│  │  │  │  ├─ datasources
-│  │  │  │  │  └─ attraction_remote_data_source.dart
-│  │  │  │  ├─ models
-│  │  │  │  │  ├─ attraction_model.dart
-│  │  │  │  │  └─ attraction_page_model.dart
-│  │  │  │  └─ repositories
-│  │  │  │     └─ attraction_repository_impl.dart
-│  │  │  ├─ di
-│  │  │  │  └─ attraction_providers.dart
-│  │  │  ├─ domain
-│  │  │  │  ├─ entities
-│  │  │  │  │  ├─ attraction.dart
-│  │  │  │  │  └─ attraction_page.dart
-│  │  │  │  ├─ repositories
-│  │  │  │  │  └─ attraction_repository.dart
-│  │  │  │  └─ usecases
-│  │  │  │     ├─ get_attractions_usecase.dart
-│  │  │  │     └─ get_attraction_categories_usecase.dart
-│  │  │  └─ presentation
-│  │  │     ├─ controllers
-│  │  │     │  └─ attraction_list_controller.dart
-│  │  │     ├─ enums
-│  │  │     │  └─ attraction_sort_filter_enums.dart
-│  │  │     ├─ pages
-│  │  │     │  ├─ attraction_detail_page.dart
-│  │  │     │  └─ attraction_list_page.dart
-│  │  │     └─ widgets
-│  │  │        ├─ attraction_condition_summary_bar.dart
-│  │  │        ├─ attraction_sort_filter_bottom_sheet.dart
-│  │  │        └─ attraction_tile.dart
-│  │  ├─ audio_guide
-│  │  │  ├─ data
-│  │  │  │  ├─ datasources
-│  │  │  │  │  ├─ audio_guide_local_data_source.dart
-│  │  │  │  │  └─ audio_guide_remote_data_source.dart
-│  │  │  │  ├─ models
-│  │  │  │  │  ├─ audio_guide_model.dart
-│  │  │  │  │  └─ audio_guide_page_model.dart
-│  │  │  │  ├─ repositories
-│  │  │  │  │  └─ audio_guide_repository_impl.dart
-│  │  │  │  └─ services
-│  │  │  │     └─ audio_playback_service_impl.dart
-│  │  │  ├─ di
-│  │  │  │  └─ audio_guide_providers.dart
-│  │  │  ├─ domain
-│  │  │  │  ├─ entities
-│  │  │  │  │  ├─ audio_guide.dart
-│  │  │  │  │  ├─ audio_guide_page.dart
-│  │  │  │  │  └─ audio_playback_state.dart
-│  │  │  │  ├─ repositories
-│  │  │  │  │  └─ audio_guide_repository.dart
-│  │  │  │  ├─ services
-│  │  │  │  │  └─ audio_playback_service.dart
-│  │  │  │  └─ usecases
-│  │  │  │     ├─ download_audio_guide_usecase.dart
-│  │  │  │     └─ get_audio_guides_usecase.dart
-│  │  │  └─ presentation
-│  │  │     ├─ controllers
-│  │  │     │  ├─ audio_guide_list_controller.dart
-│  │  │     │  └─ audio_player_controller.dart
-│  │  │     ├─ enums
-│  │  │     │  └─ sort_filter_enums.dart
-│  │  │     ├─ pages
-│  │  │     │  ├─ audio_guide_detail_page.dart
-│  │  │     │  └─ audio_guide_list_page.dart
-│  │  │     └─ widgets
-│  │  │        ├─ audio_guide_tile.dart
-│  │  │        ├─ common_app_bar.dart
-│  │  │        ├─ condition_summary_bar.dart
-│  │  │        └─ sort_filter_bottom_sheet.dart
-│  │  ├─ home
-│  │  │  └─ presentation
-│  │  │     └─ pages
-│  │  │        └─ main_tab_page.dart
-│  │  └─ step_tracking
-│  │     ├─ data
-│  │     │  ├─ health_connect_api.g.dart
-│  │     │  └─ services
-│  │     │     └─ step_tracking_service_impl.dart
-│  │     ├─ di
-│  │     │  └─ step_tracking_providers.dart
-│  │     ├─ domain
-│  │     │  ├─ entities
-│  │     │  │  └─ exercise_summary_data.dart
-│  │     │  └─ services
-│  │     │     └─ step_tracking_service.dart
-│  │     └─ presentation
-│  │        ├─ controllers
-│  │        │  └─ step_tracking_controller.dart
-│  │        ├─ enums
-│  │        │  └─ step_tracking_source.dart
-│  │        └─ widgets
-│  │           └─ session_summary_card.dart
-├─ linux
-│  ...
-├─ macos
-│  ...
-├─ Makefile
+│  ├─ core                          # Cross-feature shared capabilities
+│  │  ├─ analytics                  # AnalyticsService (Firebase wrapper)
+│  │  ├─ constants                  # API constants, app colors
+│  │  ├─ database                   # Drift AppDatabase, DAOs, tables
+│  │  ├─ debug                      # Debug-only app options
+│  │  ├─ error                      # Shared exception types
+│  │  ├─ image                      # Cached network image manager
+│  │  ├─ monitoring                 # MonitoringService (Sentry wrapper)
+│  │  ├─ nearby                     # Location controller, nearby models/utils
+│  │  ├─ network                    # Dio client, log filter
+│  │  ├─ preferences                # SharedPreferences provider
+│  │  ├─ router                     # GoRouter config + route loaders
+│  │  ├─ sync                       # Cross-feature Drift sync service
+│  │  ├─ theme                      # AppTheme
+│  │  ├─ utils                      # AppLogger, in-app log viewer
+│  │  └─ widgets                    # Shared widgets (app bar, image, skeleton...)
+│  └─ features
+│     ├─ activity                   # Full data/di/domain/presentation layering
+│     │  ├─ data
+│     │  │  ├─ datasources
+│     │  │  ├─ models
+│     │  │  └─ repositories
+│     │  ├─ di
+│     │  ├─ domain
+│     │  │  ├─ entities
+│     │  │  ├─ repositories
+│     │  │  └─ usecases
+│     │  └─ presentation
+│     │     ├─ controllers
+│     │     ├─ enums
+│     │     ├─ pages
+│     │     └─ widgets
+│     ├─ attraction                 # Same layering as activity
+│     ├─ audio_guide                # Same layering, plus domain/services for playback
+│     ├─ home                       # Full layering: home feed + nearby recommendations
+│     ├─ onboarding                 # Splash → welcome → home redirect flow
+│     ├─ reminder                   # Journey reminders, local notifications
+│     ├─ splash                     # Animated splash screen widgets
+│     └─ step_tracking              # Android step sensor integration (Pigeon-based)
 ├─ pigeons
 │  └─ health_connect_api.dart
-├─ pubspec.lock
-├─ pubspec.yaml
-├─ README.md
 ├─ scripts
 │  ├─ hooks
 │  │  ├─ commit-msg
@@ -691,44 +576,21 @@ travel-audio-guide-flutter
 │  ├─ secret-scan.sh
 │  └─ setup-hooks.sh
 ├─ test
+│  ├─ core                          # Mirrors lib/core/ (database, network, nearby, sync, widgets...)
+│  ├─ features                      # Mirrors lib/features/, one subtree per feature
+│  │  ├─ activity
+│  │  ├─ attraction
+│  │  ├─ audio_guide
+│  │  ├─ home
+│  │  ├─ onboarding
+│  │  ├─ reminder
+│  │  └─ step_tracking
 │  ├─ app
 │  │  └─ app_smoke_test.dart
-│  ├─ features
-│  │  ├─ activity
-│  │  │  ├─ data
-│  │  │  │  └─ repositories
-│  │  │  │     └─ activity_repository_impl_test.dart
-│  │  │  └─ domain
-│  │  │     └─ get_activities_usecase_test.dart
-│  │  ├─ attraction
-│  │  │  ├─ data
-│  │  │  │  └─ repositories
-│  │  │  │     └─ attraction_repository_impl_test.dart
-│  │  │  └─ domain
-│  │  │     └─ get_attractions_usecase_test.dart
-│  │  └─ audio_guide
-│  │     ├─ data
-│  │     │  ├─ models
-│  │     │  │  └─ audio_guide_model_test.dart
-│  │     │  └─ repositories
-│  │     │     └─ audio_guide_repository_impl_test.dart
-│  │     ├─ domain
-│  │     │  ├─ audio_guide_domain_test.dart
-│  │     │  └─ audio_guide_usecase_test.dart
-│  │     └─ presentation
-│  │        ├─ controllers
-│  │        │  ├─ audio_guide_list_controller_test.dart
-│  │        │  ├─ audio_guide_list_state_test.dart
-│  │        │  └─ audio_player_controller_test.dart
-│  │        ├─ pages
-│  │        │  └─ audio_guide_list_page_test.dart
-│  │        └─ widgets
-│  │           ├─ audio_guide_tile_test.dart
-│  │           └─ condition_summary_bar_test.dart
-│  └─ test_helpers
-│     ├─ app_test_harness.dart
-│     ├─ audio_guide_fakes.dart
-│     └─ audio_guide_fixtures.dart
-├─ web
-│  ...
+│  └─ test_helpers                  # Shared fixtures, fakes, in-memory DB setup
+├─ Makefile
+├─ pubspec.lock
+├─ pubspec.yaml
+├─ analysis_options.yaml
+└─ README.md
 ```

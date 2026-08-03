@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../domain/entities/exercise_summary_data.dart';
-import '../../domain/services/step_tracking_service.dart';
-import '../enums/step_tracking_source.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/domain/entities/exercise_summary_data.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/domain/services/step_tracking_service.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/presentation/enums/step_tracking_source.dart';
 
 class StepTrackingState {
   const StepTrackingState({

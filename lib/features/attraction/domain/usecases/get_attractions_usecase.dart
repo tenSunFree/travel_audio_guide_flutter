@@ -1,5 +1,5 @@
-import '../entities/attraction_page.dart';
-import '../repositories/attraction_repository.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction_page.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/repositories/attraction_repository.dart';
 
 class GetAttractionsUseCase {
   const GetAttractionsUseCase(this._repository);
@@ -7,8 +7,8 @@ class GetAttractionsUseCase {
   final AttractionRepository _repository;
 
   Future<AttractionPage> call({
-    String lang = 'zh-tw',
     required int page,
+    String lang = 'zh-tw',
     String? categoryIds,
     double? nlat,
     double? elong,

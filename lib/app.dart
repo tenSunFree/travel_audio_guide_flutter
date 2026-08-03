@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'core/router/app_router.dart';
-import 'core/sync/sync_providers.dart';
-import 'core/theme/app_theme.dart';
-import 'features/reminder/di/reminder_providers.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
+import 'package:flutter_travel_audio_guide/core/theme/app_theme.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/di/reminder_providers.dart';
 
 class TravelAudioGuideApp extends ConsumerStatefulWidget {
   const TravelAudioGuideApp({super.key});

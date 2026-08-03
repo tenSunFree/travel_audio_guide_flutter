@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
 import 'package:flutter_travel_audio_guide/features/activity/data/datasources/activity_remote_data_source.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockDio extends Mock implements Dio {}
 
@@ -100,8 +100,13 @@ void main() {
           queryParameters: any(named: 'queryParameters'),
         ),
       ).thenAnswer(
-        (_) async =>
-            buildResponse(statusCode: 200, data: {'total': 0, 'data': []}),
+        (_) async => buildResponse(
+          statusCode: 200,
+          data: {
+            'total': 0,
+            'data': <Map<String, dynamic>>[],
+          },
+        ),
       );
       await dataSource.getActivities(
         lang: 'zh-tw',
@@ -129,8 +134,13 @@ void main() {
           queryParameters: any(named: 'queryParameters'),
         ),
       ).thenAnswer(
-        (_) async =>
-            buildResponse(statusCode: 200, data: {'total': 0, 'data': []}),
+        (_) async => buildResponse(
+          statusCode: 200,
+          data: {
+            'total': 0,
+            'data': <Map<String, dynamic>>[],
+          },
+        ),
       );
       await dataSource.getActivities(lang: 'zh-tw', page: 1);
       final captured =

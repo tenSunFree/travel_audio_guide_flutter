@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 /// A backup block of emojis to display when an image fails to load.
 class HomeFallbackImage extends StatelessWidget {

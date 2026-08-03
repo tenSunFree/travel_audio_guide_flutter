@@ -1,7 +1,7 @@
 import 'dart:convert';
-import '../entities/reminder.dart';
-import '../repositories/reminder_repository.dart';
-import '../services/notification_service.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/repositories/reminder_repository.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/services/notification_service.dart';
 
 class CreateReminderUseCase {
   CreateReminderUseCase(this._repository, this._notificationService);
@@ -29,7 +29,6 @@ class CreateReminderUseCase {
       'notificationId': notificationId,
     });
     final reminder = Reminder(
-      id: null,
       sourceType: params.sourceType,
       sourceId: params.sourceId,
       title: params.title,
@@ -45,7 +44,6 @@ class CreateReminderUseCase {
       isEnabled: true,
       isDone: false,
       createdAt: DateTime.now(),
-      updatedAt: null,
     );
     final savedReminder = await _repository.createReminder(reminder);
     try {
@@ -73,11 +71,11 @@ class CreateReminderParams {
     required this.sourceType,
     required this.sourceId,
     required this.title,
+    required this.targetTime,
+    required this.remindBeforeSeconds,
     this.subtitle,
     this.imageUrl,
     this.address,
-    required this.targetTime,
-    required this.remindBeforeSeconds,
   });
 
   final String sourceType;

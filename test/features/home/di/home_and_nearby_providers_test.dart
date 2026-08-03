@@ -1,9 +1,6 @@
 import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
-import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
 import 'package:flutter_travel_audio_guide/core/preferences/shared_preferences_provider.dart';
@@ -12,6 +9,9 @@ import 'package:flutter_travel_audio_guide/features/home/data/repositories/home_
 import 'package:flutter_travel_audio_guide/features/home/data/repositories/nearby_repository_impl.dart';
 import 'package:flutter_travel_audio_guide/features/home/di/home_providers.dart';
 import 'package:flutter_travel_audio_guide/features/home/di/nearby_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
+import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 void main() {
   setUp(() {
@@ -35,7 +35,7 @@ void main() {
     'nearbyLocalDataSourceProvider 與 nearbyRepositoryProvider 正確組裝',
     () async {
       final prefs = await SharedPreferencesWithCache.create(
-        cacheOptions: SharedPreferencesWithCacheOptions(
+        cacheOptions: const SharedPreferencesWithCacheOptions(
           allowList: AppPreferenceKeys.allowList,
         ),
       );

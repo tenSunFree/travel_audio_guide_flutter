@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../domain/entities/home_state.dart';
-import '../constants/home_ui_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/constants/home_ui_colors.dart';
 
 class PeriodChips extends StatelessWidget {
   const PeriodChips({
-    super.key,
     required this.selected,
     required this.onSelected,
+    super.key,
   });
 
   final HomePeriod selected;
   final ValueChanged<HomePeriod> onSelected;
 
-  static const _periods = [
+  static const List<HomePeriod> _periods = [
     HomePeriod.morning,
     HomePeriod.afternoon,
     HomePeriod.evening,

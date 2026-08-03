@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/data/datasources/attraction_remote_data_source.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockDio extends Mock implements Dio {}
 
@@ -100,8 +100,13 @@ void main() {
           queryParameters: any(named: 'queryParameters'),
         ),
       ).thenAnswer(
-        (_) async =>
-            buildMapResponse(statusCode: 200, data: {'total': 0, 'data': []}),
+        (_) async => buildMapResponse(
+          statusCode: 200,
+          data: {
+            'total': 0,
+            'data': <Map<String, dynamic>>[],
+          },
+        ),
       );
       await dataSource.getAttractions(
         lang: 'zh-tw',
@@ -130,8 +135,13 @@ void main() {
           queryParameters: any(named: 'queryParameters'),
         ),
       ).thenAnswer(
-        (_) async =>
-            buildMapResponse(statusCode: 200, data: {'total': 0, 'data': []}),
+        (_) async => buildMapResponse(
+          statusCode: 200,
+          data: {
+            'total': 0,
+            'data': <Map<String, dynamic>>[],
+          },
+        ),
       );
       await dataSource.getAttractions(lang: 'zh-tw', page: 1, categoryIds: '');
       final captured =
@@ -209,7 +219,6 @@ void main() {
             path: '/zh-tw/Miscellaneous/Categories',
           ),
           statusCode: 500,
-          data: null,
         ),
       );
       final result = await dataSource.getAttractionCategories(lang: 'zh-tw');

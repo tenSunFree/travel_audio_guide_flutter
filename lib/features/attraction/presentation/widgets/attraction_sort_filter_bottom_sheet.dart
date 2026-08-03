@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../domain/entities/attraction.dart';
-import '../enums/attraction_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/enums/attraction_sort_filter_enums.dart';
 
 typedef AttractionFilterResult = ({
   AttractionSortOrder sortOrder,
@@ -16,7 +16,6 @@ typedef AttractionFilterResult = ({
 
 class AttractionSortFilterBottomSheet extends StatefulWidget {
   const AttractionSortFilterBottomSheet({
-    super.key,
     required this.initialSortOrder,
     required this.initialCategoryIds,
     required this.initialDistric,
@@ -27,6 +26,7 @@ class AttractionSortFilterBottomSheet extends StatefulWidget {
     required this.initialDistanceFilter,
     required this.availableCategories,
     required this.availableDistrics,
+    super.key,
   });
 
   final AttractionSortOrder initialSortOrder;
@@ -134,7 +134,7 @@ class _AttractionSortFilterBottomSheetState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Open now
-                  _SectionLabel(label: '開放狀態'),
+                  const _SectionLabel(label: '開放狀態'),
                   SwitchListTile(
                     title: const Text('只看現在可去'),
                     subtitle: const Text('只顯示此刻正在開放的景點'),
@@ -145,7 +145,7 @@ class _AttractionSortFilterBottomSheetState
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Distance
-                  _SectionLabel(label: '距離範圍'),
+                  const _SectionLabel(label: '距離範圍'),
                   _ChipWrap(
                     children: DistanceFilter.values.map((f) {
                       return ChoiceChip(
@@ -157,7 +157,7 @@ class _AttractionSortFilterBottomSheetState
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Time slot
-                  _SectionLabel(label: '推薦時段'),
+                  const _SectionLabel(label: '推薦時段'),
                   RadioGroup<AttractionTimeSlotFilter>(
                     groupValue: _timeSlotFilter,
                     onChanged: (v) => setState(() => _timeSlotFilter = v!),
@@ -178,7 +178,7 @@ class _AttractionSortFilterBottomSheetState
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Sort
-                  _SectionLabel(label: '排序'),
+                  const _SectionLabel(label: '排序'),
                   RadioGroup<AttractionSortOrder>(
                     groupValue: _sortOrder,
                     onChanged: (v) => setState(() => _sortOrder = v!),
@@ -200,7 +200,7 @@ class _AttractionSortFilterBottomSheetState
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Category
                   if (widget.availableCategories.isNotEmpty) ...[
-                    _SectionLabel(label: '分類'),
+                    const _SectionLabel(label: '分類'),
                     _ChipWrap(
                       children: widget.availableCategories
                           .map(
@@ -222,7 +222,7 @@ class _AttractionSortFilterBottomSheetState
                   ],
                   // District
                   if (widget.availableDistrics.isNotEmpty) ...[
-                    _SectionLabel(label: '行政區'),
+                    const _SectionLabel(label: '行政區'),
                     _ChipWrap(
                       children: [
                         ChoiceChip(
@@ -242,7 +242,7 @@ class _AttractionSortFilterBottomSheetState
                     const Divider(height: 24, indent: 16, endIndent: 16),
                   ],
                   // Target groups
-                  _SectionLabel(label: '適合族群'),
+                  const _SectionLabel(label: '適合族群'),
                   _ChipWrap(
                     children: AttractionTargetFilter.values
                         .map(
@@ -262,7 +262,7 @@ class _AttractionSortFilterBottomSheetState
                   ),
                   const Divider(height: 24, indent: 16, endIndent: 16),
                   // Facilities
-                  _SectionLabel(label: '友善設施'),
+                  const _SectionLabel(label: '友善設施'),
                   _ChipWrap(
                     children: AttractionFacilityFilter.values
                         .map(

@@ -1,11 +1,16 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/monitoring/monitoring_service.dart';
-import '../../di/audio_guide_providers.dart';
-import '../../domain/entities/audio_playback_state.dart';
-import '../../domain/services/audio_playback_service.dart';
+import 'package:flutter_travel_audio_guide/core/monitoring/monitoring_service.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/di/audio_guide_providers.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_playback_state.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/services/audio_playback_service.dart';
 
-final audioPlayerControllerProvider = StateNotifierProvider.autoDispose
+final AutoDisposeStateNotifierProviderFamily<
+  AudioPlayerController,
+  AudioPlaybackState,
+  String
+>
+audioPlayerControllerProvider = StateNotifierProvider.autoDispose
     .family<AudioPlayerController, AudioPlaybackState, String>((ref, path) {
       final service = ref.watch(audioPlaybackServiceProvider(path));
       return AudioPlayerController(service, path);
@@ -24,15 +29,19 @@ class AudioPlayerController extends StateNotifier<AudioPlaybackState> {
 
   // Critical business path: Player initialization
   // - Breadcrumb records the start of initialization
-  // - MonitorFuture establishes a performance transaction (operation: audio.player.initialize)
-  // - Failure: Do not rethrow (change to updating state), and simultaneously captureException report.
+  // - MonitorFuture establishes a performance transaction
+  // (operation: audio.player.initialize)
+  // - Failure: Do not rethrow (change to updating state),
+  // and simultaneously captureException report.
   Future<void> _init() async {
     // First listen to the stream to ensure that all state changes during the initialization process are captured.
     _subscription = _service.stateStream.listen((playbackState) {
       final previous = state;
       state = playbackState;
-      // Tracking playback state transitions (also tracked via ref.listen in AudioGuideDetailPage)
-      // Because the guide id/title is unavailable here, playback tracking is moved to ref.listen on the detail page.
+      // Tracking playback state transitions (also tracked via ref.
+      // listen in AudioGuideDetailPage)
+      // Because the guide id/title is unavailable here,
+      // playback tracking is moved to ref.listen on the detail page.
       // Detection can still be done here (only the duration is passed).
       _detectCompletion(previous, playbackState);
     });

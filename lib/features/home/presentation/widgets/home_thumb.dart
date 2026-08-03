@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../core/widgets/app_cached_network_image.dart';
-import '../../domain/entities/home_state.dart';
-import 'home_fallback_image.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/app_cached_network_image.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_fallback_image.dart';
 
 /// List thumbnails 96×96
 class HomeThumb extends StatelessWidget {
-  const HomeThumb({super.key, required this.card});
+  const HomeThumb({required this.card, super.key});
 
   final HomeRecommendCard card;
 
@@ -21,7 +21,6 @@ class HomeThumb extends StatelessWidget {
                 imageUrl: card.imageUrl!,
                 width: 96,
                 height: 96,
-                fit: BoxFit.cover,
                 errorWidget: HomeFallbackImage(card.emoji),
               )
             : HomeFallbackImage(card.emoji),

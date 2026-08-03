@@ -1,9 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/services/notification_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
-import '../../domain/entities/reminder.dart';
-import '../../domain/services/notification_service.dart';
 
 class NotificationServiceImpl implements NotificationService {
   NotificationServiceImpl(this._plugin);

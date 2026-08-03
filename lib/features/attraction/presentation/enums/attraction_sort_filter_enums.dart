@@ -2,7 +2,8 @@ enum AttractionSortOrder {
   apiOrder,
   distanceAsc,
   nameAZ,
-  modifiedNewest;
+  modifiedNewest
+  ;
 
   String get label => switch (this) {
     AttractionSortOrder.apiOrder => '預設（API 順序）',
@@ -17,7 +18,8 @@ enum AttractionTimeSlotFilter {
   morning,
   afternoon,
   evening,
-  night;
+  night
+  ;
 
   String get label => switch (this) {
     AttractionTimeSlotFilter.all => '全部',
@@ -53,7 +55,8 @@ enum AttractionTargetFilter {
   familyLearning(61, '親子共學'),
   fieldTrip(62, '校外教學'),
   cyclist(63, '單車族'),
-  birdWatcher(65, '賞鳥族');
+  birdWatcher(65, '賞鳥族')
+  ;
 
   const AttractionTargetFilter(this.apiId, this.label);
 
@@ -70,7 +73,8 @@ enum AttractionFacilityFilter {
   vegetarian(395, '🍽️ 素食'),
   toilet(396, '🚽 友善廁所'),
   nursing(400, '👶 哺乳室'),
-  charging(390, '🔋 充電');
+  charging(390, '🔋 充電')
+  ;
 
   const AttractionFacilityFilter(this.apiId, this.label);
 

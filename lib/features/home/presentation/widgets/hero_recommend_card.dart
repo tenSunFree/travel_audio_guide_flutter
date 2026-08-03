@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/widgets/app_cached_network_image.dart';
-import '../../domain/entities/home_state.dart';
-import '../utils/home_navigation_launcher.dart';
-import 'home_badge.dart';
-import 'home_fallback_image.dart';
-import '../constants/home_ui_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/app_cached_network_image.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/constants/home_ui_colors.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/utils/home_navigation_launcher.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_badge.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/widgets/home_fallback_image.dart';
 
 class HeroRecommendCard extends StatelessWidget {
-  const HeroRecommendCard({super.key, required this.card, this.onViewDetail});
+  const HeroRecommendCard({required this.card, super.key, this.onViewDetail});
 
   final HomeRecommendCard card;
 
@@ -38,7 +38,6 @@ class HeroRecommendCard extends StatelessWidget {
                         imageUrl: card.imageUrl!,
                         width: constraints.maxWidth,
                         height: 170,
-                        fit: BoxFit.cover,
                         errorWidget: HomeFallbackImage(card.emoji),
                       );
                     },

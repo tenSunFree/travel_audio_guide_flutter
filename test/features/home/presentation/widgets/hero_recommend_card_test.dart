@@ -61,7 +61,7 @@ void main() {
         MaterialApp(
           home: Scaffold(
             body: HeroRecommendCard(
-              card: _buildCard(type: HomeRecommendType.attraction),
+              card: _buildCard(),
             ),
           ),
         ),

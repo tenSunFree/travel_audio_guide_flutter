@@ -1,4 +1,4 @@
-import '../entities/exercise_summary_data.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/domain/entities/exercise_summary_data.dart';
 
 abstract class StepTrackingService {
   Future<bool> checkAvailability();

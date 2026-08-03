@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 class HomeSubtitle extends StatelessWidget {
-  const HomeSubtitle({super.key, required this.subtitle});
+  const HomeSubtitle({required this.subtitle, super.key});
 
   final String subtitle;
 

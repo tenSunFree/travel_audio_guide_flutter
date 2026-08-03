@@ -1,8 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
-import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/data/repositories/reminder_repository_impl.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 
 void main() {
   late AppDatabase db;
@@ -31,7 +31,6 @@ void main() {
     final now = DateTime.now();
     final targetTime = now.add(notifyOffset + const Duration(hours: 1));
     return Reminder(
-      id: null,
       sourceType: sourceType,
       sourceId: sourceId,
       title: '提醒 $sourceId',
@@ -47,7 +46,6 @@ void main() {
       isEnabled: isEnabled,
       isDone: isDone,
       createdAt: now,
-      updatedAt: null,
     );
   }
 
@@ -73,13 +71,9 @@ void main() {
     test('subtitle / imageUrl / address 為 null 時也能正確寫入與讀出', () async {
       final now = DateTime.now();
       final input = Reminder(
-        id: null,
         sourceType: 'activity',
         sourceId: 'B001',
         title: '無副標提醒',
-        subtitle: null,
-        imageUrl: null,
-        address: null,
         targetTime: now.add(const Duration(hours: 2)),
         remindBeforeSeconds: 1800,
         notifyTime: now.add(const Duration(hours: 1)),
@@ -126,20 +120,17 @@ void main() {
       await repository.createReminder(
         buildReminder(
           sourceId: 'pending',
-          notifyOffset: const Duration(hours: 1),
         ),
       );
       await repository.createReminder(
         buildReminder(
           sourceId: 'disabled',
-          notifyOffset: const Duration(hours: 1),
           isEnabled: false,
         ),
       );
       await repository.createReminder(
         buildReminder(
           sourceId: 'done',
-          notifyOffset: const Duration(hours: 1),
           isDone: true,
         ),
       );

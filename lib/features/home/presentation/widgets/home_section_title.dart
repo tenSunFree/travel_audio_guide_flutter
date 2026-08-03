@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../constants/home_ui_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/constants/home_ui_colors.dart';
 
 class HomeSectionTitle extends StatelessWidget {
   const HomeSectionTitle({
-    super.key,
     required this.title,
     required this.action,
+    super.key,
     this.onActionTap,
   });
 

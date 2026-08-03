@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 /// Colored labels on homepage cards (Type / Recommendation status)
 class HomeBadge extends StatelessWidget {
   const HomeBadge({
-    super.key,
     required this.text,
     required this.backgroundColor,
     required this.textColor,
+    super.key,
   });
 
   final String text;

@@ -1,10 +1,10 @@
 import 'dart:async';
-import '../../../../core/database/daos/activity_dao.dart';
-import '../../../../core/database/daos/attraction_dao.dart';
-import '../../../activity/domain/entities/activity.dart';
-import '../../../attraction/domain/entities/attraction.dart';
-import '../../domain/entities/home_state.dart';
-import '../../domain/services/open_time_parser.dart';
+import 'package:flutter_travel_audio_guide/core/database/daos/activity_dao.dart';
+import 'package:flutter_travel_audio_guide/core/database/daos/attraction_dao.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/services/open_time_parser.dart';
 
 class HomeRepository {
   HomeRepository({
@@ -288,24 +288,30 @@ class HomeRepository {
     var hasA = false;
     var hasB = false;
     final controller = StreamController<R>();
-    late final StreamSubscription subA;
-    late final StreamSubscription subB;
+    late final StreamSubscription<A> subA;
+    late final StreamSubscription<B> subB;
     void emitIfReady() {
       if (hasA && hasB) {
         controller.add(combiner(latestA, latestB));
       }
     }
 
-    subA = streamA.listen((value) {
-      latestA = value;
-      hasA = true;
-      emitIfReady();
-    }, onError: controller.addError);
-    subB = streamB.listen((value) {
-      latestB = value;
-      hasB = true;
-      emitIfReady();
-    }, onError: controller.addError);
+    subA = streamA.listen(
+      (value) {
+        latestA = value;
+        hasA = true;
+        emitIfReady();
+      },
+      onError: controller.addError,
+    );
+    subB = streamB.listen(
+      (value) {
+        latestB = value;
+        hasB = true;
+        emitIfReady();
+      },
+      onError: controller.addError,
+    );
     controller.onCancel = () async {
       await subA.cancel();
       await subB.cancel();
@@ -315,8 +321,8 @@ class HomeRepository {
 }
 
 class _ScoredCard {
+  const _ScoredCard({required this.score, required this.card});
+
   final int score;
   final HomeRecommendCard card;
-
-  const _ScoredCard({required this.score, required this.card});
 }

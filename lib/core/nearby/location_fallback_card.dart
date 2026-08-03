@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
 
 /// Displays the correct fallback UI for every [NearbyPermissionState].
 /// Returns [SizedBox.shrink] when state is [NearbyPermissionState.granted].
 class LocationFallbackCard extends StatelessWidget {
   const LocationFallbackCard({
-    super.key,
     required this.permissionState,
     required this.isLoading,
     required this.onRequestLocation,
     required this.onOpenSettings,
     required this.onOpenLocationService,
     required this.onBrowseAll,
+    super.key,
   });
 
   final NearbyPermissionState permissionState;

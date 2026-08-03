@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import '../../../../core/error/exceptions.dart';
-import '../models/activity_page_model.dart';
+import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
+import 'package:flutter_travel_audio_guide/features/activity/data/models/activity_page_model.dart';
 
 class ActivityRemoteDataSource {
   const ActivityRemoteDataSource(this._dio);

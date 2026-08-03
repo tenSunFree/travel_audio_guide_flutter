@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide_page.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/repositories/audio_guide_repository.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/usecases/download_audio_guide_usecase.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/usecases/get_audio_guides_usecase.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAudioGuideRepository extends Mock implements AudioGuideRepository {}
 
@@ -36,7 +36,6 @@ void main() {
     fileExt: 'mp3',
     modified: '2026-05-01',
     isDownloaded: false,
-    localFilePath: null,
   );
 
   const tPage = AudioGuidePage(
