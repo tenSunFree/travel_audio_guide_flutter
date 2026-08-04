@@ -5,17 +5,6 @@ import 'package:flutter_travel_audio_guide/features/step_tracking/data/services/
 import 'package:flutter_travel_audio_guide/features/step_tracking/di/step_tracking_providers.dart';
 import 'package:flutter_travel_audio_guide/features/step_tracking/presentation/controllers/step_tracking_controller.dart';
 
-/// Flush the microtask queue so the chained `await`s inside
-/// `StepTrackingController._init()` (checkAvailability → hasPermissions →
-/// requestPermissions → hasActivityRecognitionPermission →
-/// requestActivityRecognitionPermission) fully resolve before we tear down
-/// the provider. Without this, disposal races with `_init()` and hits
-/// `Bad state: Tried to use StepTrackingController after dispose was called.`
-Future<void> _flush() async {
-  await Future<void>.delayed(Duration.zero);
-  await Future<void>.delayed(Duration.zero);
-}
-
 void main() {
   test('desktop test environment 回傳 NoOpStepTrackingService', () {
     if (Platform.isAndroid) return;
@@ -31,19 +20,23 @@ void main() {
       if (Platform.isAndroid) return;
       final container = ProviderContainer();
       addTearDown(container.dispose);
-      // Providers with `.autoDispose` are immediately disposed when they have no listeners.
-      // Keep a live subscription with `container.listen` so the controller remains
-      // alive for the duration of the test.
-      final sub = container.listen(
-        stepTrackingControllerProvider.notifier,
+      // Providers marked .autoDispose are immediately disposed when they have
+      // no listeners. Keep an active subscription with container.listen so the
+      // controller stays alive for the duration of the test.
+      final subscription = container.listen(
+        stepTrackingControllerProvider,
         (_, _) {},
+        fireImmediately: true,
       );
-      addTearDown(sub.close);
-      final controller = sub.read();
+      addTearDown(subscription.close);
+      final controller = container.read(
+        stepTrackingControllerProvider.notifier,
+      );
+      // Await the controller's own initialization signal instead of guessing how
+      // many microtasks to flush. This keeps the test stable even if `_init()`
+      // later adds more awaits.
+      await controller.initialized;
       expect(controller, isA<StepTrackingController>());
-      // Allow the await chain inside `_init()` to complete before tearDown disposes
-      // the controller.
-      await _flush();
     },
   );
 }

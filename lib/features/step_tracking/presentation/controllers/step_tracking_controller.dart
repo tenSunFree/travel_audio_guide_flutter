@@ -53,7 +53,10 @@ class StepTrackingState {
 
 class StepTrackingController extends StateNotifier<StepTrackingState> {
   StepTrackingController(this._service) : super(const StepTrackingState()) {
-    _init();
+    // Save the Future returned by _init() so external callers (especially tests)
+    // can explicitly wait for initialization to complete instead of guessing
+    // with microtasks/milliseconds.
+    initialized = _init();
   }
 
   final StepTrackingService _service;
@@ -61,17 +64,31 @@ class StepTrackingController extends StateNotifier<StepTrackingState> {
   DateTime? _sessionStart;
   String? _guideName;
 
+  /// Signal that initialization is complete. Tests can `await controller.initialized;`
+  /// to ensure all awaits inside `_init()` have finished before making assertions.
+  late final Future<void> initialized;
+
   Future<void> _init() async {
     final available = await _service.checkAvailability();
+    // After each await, verify the controller is still mounted. This prevents
+    // writing to a disposed state if an autoDispose provider or widget was
+    // unmounted while awaiting, which would cause "Tried to use StepTrackingController after dispose was called".
+    if (!mounted) return;
     state = state.copyWith(isAvailable: available);
     // Health Connect permission
     var hcGranted = await _service.hasPermissions();
-    if (!hcGranted) hcGranted = await _service.requestPermissions();
+    if (!mounted) return;
+    if (!hcGranted) {
+      hcGranted = await _service.requestPermissions();
+      if (!mounted) return;
+    }
     state = state.copyWith(hasHealthConnectPermission: hcGranted);
     // Sensor permission
     var sensorGranted = await _service.hasActivityRecognitionPermission();
+    if (!mounted) return;
     if (!sensorGranted) {
       sensorGranted = await _service.requestActivityRecognitionPermission();
+      if (!mounted) return;
     }
     state = state.copyWith(hasSensorPermission: sensorGranted);
   }
