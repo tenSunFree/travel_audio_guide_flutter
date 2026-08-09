@@ -98,7 +98,9 @@ void main() {
     });
 
     test('DB stream 發出資料時，會依目前的排序/篩選條件計算 items 並更新 total', () async {
-      container.read(activityListControllerProvider); // 觸發 controller 建立
+      container.read(
+        activityListControllerProvider,
+      ); // triggers controller creation
       activityStream.add([
         _buildActivity(title: 'B活動', begin: '2026-06-01'),
         _buildActivity(id: 2, title: 'A活動'),

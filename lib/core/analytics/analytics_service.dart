@@ -1,5 +1,5 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
 
 /// A centralized service for Firebase Analytics.
 /// All feature layers log events through this service and do not directly depend on the firebase_analytics SDK.
@@ -16,13 +16,17 @@ class AnalyticsService {
   /// Internal generic log method (prints to the console during debugging)
   static Future<void> _log(String name, [Map<String, Object>? params]) async {
     try {
-      if (kDebugMode) {
-        debugPrint('[Analytics] $name | ${params ?? {}}');
-      }
+      AppLogger.debug(
+        '[Analytics] $name | ${params ?? {}}',
+      );
       await _analytics.logEvent(name: name, parameters: params);
-    } catch (e) {
+    } catch (error, stackTrace) {
       // Analytics failures should not affect the main workflow; handle them silently.
-      if (kDebugMode) debugPrint('[Analytics] ERROR: $e');
+      AppLogger.error(
+        '[Analytics] Failed to log event: $name',
+        exception: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -32,7 +36,9 @@ class AnalyticsService {
       screenName: screenName,
       screenClass: 'Flutter',
     );
-    if (kDebugMode) debugPrint('[Analytics] screen_view | $screenName');
+    AppLogger.debug(
+      '[Analytics] screen_view | $screenName',
+    );
   }
 
   // Tab Switching
