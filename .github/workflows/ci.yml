@@ -53,6 +53,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Install app_lints dependencies
+        working-directory: packages/app_lints
+        run: dart pub get
+
       - name: Restore Firebase config files
         run: |
           for v in FIREBASE_OPTIONS_STAGING_DART_BASE64 FIREBASE_OPTIONS_PRODUCTION_DART_BASE64 \

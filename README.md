@@ -151,7 +151,7 @@ It handles JWT verification and user profile management.
 
 - Static analysis baseline upgraded from `flutter_lints` to [`very_good_analysis`](https://pub.dev/packages/very_good_analysis) (10.2.0), a stricter, community-adopted Dart/Flutter lint set
 - Generated files (`*.g.dart`, `*.freezed.dart`, per-flavor Firebase config) are excluded from analysis to keep signal-to-noise high
-- Static analysis runs as part of the standard `flutter analyze` command — no additional tooling or CI step required
+- Static analysis runs through the standard `flutter analyze` command; the standalone `packages/app_lints` package resolves its own dependencies before analysis in both CI and `scripts/check.sh`
 - Lint violations are enforced in CI (`Static analysis` step in `ci.yml`) and locally via `scripts/check.sh` and the `pre-push` git hook
 - A project-owned [`analysis_server_plugin`](https://pub.dev/packages/analysis_server_plugin)-based analyzer plugin (`packages/app_lints`) enforces selected Clean Architecture dependency rules and team naming/logging conventions directly inside `flutter analyze` — see [Architecture Enforcement](#architecture-enforcement)
 - `pubspec.yaml` dependency ordering is enforced by the built-in `sort_pub_dependencies` lint and can be auto-fixed on demand by `scripts/quality/sort_pubspec_dependencies.py`
@@ -191,11 +191,13 @@ plugins:
       avoid_cross_feature_import: false
 ```
 
-`packages/app_lints` is a standalone Dart package with its own `pubspec.yaml` and `analysis_options.yaml` — it is loaded through the analyzer `plugins:` configuration rather than as a regular `pubspec.yaml` dependency of the main app.
+`packages/app_lints` is a standalone Dart package with its own `pubspec.yaml` and `analysis_options.yaml` — it is loaded through the analyzer `plugins:` configuration rather than as a regular `pubspec.yaml` dependency of the main app. Because it is an independent Dart package, its dependencies are resolved separately with `dart pub get`; both GitHub Actions CI and `scripts/check.sh` perform this step before analysis.
+
+Because it is a separate package, its `package:app_lints/...` self-imports only resolve once `dart pub get` has been run **inside `packages/app_lints`**, not just at the repository root. If you ever run analysis outside of the CI/`scripts/check.sh` entry points and see `uri_does_not_exist` errors scoped to `packages/app_lints`, run `(cd packages/app_lints && fvm dart pub get)` once and retry.
 
 ### Developer Experience
 
-- Local CI check script (`scripts/check.sh`) mirrors the main GitHub Actions validation pipeline: dependency installation, format check, static analysis, tests with coverage, LCOV report validation, and staging flavor debug APK build — validates only and never rewrites source files
+- Local CI check script (`scripts/check.sh`) mirrors the main GitHub Actions validation pipeline: dependency installation for both the main app and `packages/app_lints`, format check, static analysis, tests with coverage, LCOV report validation, and staging flavor debug APK build — validates only and never rewrites source files
 - Local coverage tooling (`scripts/coverage.sh`) runs `flutter test --coverage`, verifies that `coverage/lcov.info` was generated, and produces an HTML coverage report via `genhtml` (lcov) or `lcov-viewer` (npm) when available; the report opens automatically in the default browser unless `NO_OPEN=1` is set
 - Coverage exclusions reported to Codecov are maintained centrally in `codecov.yml`. Locally, `coverage/lcov.info` stays unfiltered (used by `scripts/check.sh` and uploaded as-is to Codecov); `scripts/coverage.sh` additionally produces a filtered `coverage/lcov.filtered.info`, used only for the local HTML report, to exclude generated files (`*.g.dart`, `*.freezed.dart`, `firebase_options_*.dart`) from local viewing
 - Auto-formatting script (`scripts/format.sh`) runs `dart format` and writes changes directly, kept as a separate command from `check.sh` so CI can never silently rewrite source code
@@ -385,7 +387,8 @@ flutter analyze
 
 - Generated files (`*.g.dart`, `*.freezed.dart`, per-flavor Firebase config under `lib/config/firebase/`) are excluded from analysis
 - A small set of rules are temporarily relaxed while the codebase catches up with the stricter baseline (see comments in `analysis_options.yaml`); new code is still expected to stay clean
-- No separate custom-lint command or additional CI step is required — both the baseline and enabled `app_lints` diagnostics run through `flutter analyze`, which already runs in the `Static analysis` CI step and `scripts/check.sh`
+- No separate custom-lint command is required — both the baseline and enabled `app_lints` diagnostics are reported through `flutter analyze`
+- Because `packages/app_lints` is a standalone Dart package, its dependencies are resolved separately with `dart pub get`; this is handled automatically by GitHub Actions CI and `scripts/check.sh` — if you ever see `uri_does_not_exist` errors scoped to `packages/app_lints`, run `(cd packages/app_lints && fvm dart pub get)` once
 - After changing `analysis_options.yaml` or `packages/app_lints`, restart the Dart Analysis Server if IDE diagnostics appear stale; command-line analysis can be rerun directly with `flutter analyze`
 
 ### Local Coverage Report
@@ -477,7 +480,7 @@ bash scripts/check.sh
 
 The local check script validates:
 
-- Dependency installation / resolution
+- Dependency installation / resolution (main app and `packages/app_lints`)
 - Dart format validation
 - Static analysis
 - Unit tests
