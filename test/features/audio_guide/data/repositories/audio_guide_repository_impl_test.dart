@@ -310,7 +310,7 @@ void main() {
           id: 1,
           title: '故宮導覽',
           url: 'https://example.com/download?id=1',
-          // ← 不含 .mp3
+          // ← does not include .mp3
           modified: '2026-05-01',
           isDownloaded: false,
         );
@@ -331,7 +331,8 @@ void main() {
           (_) async => DownloadedAudioBinary(
             bytes: Uint8List.fromList([60, 104, 116, 109, 108]), // <html
             contentType: 'text/html',
-            finalUrl: 'https://example.com/login.html', // ← 不含 .mp3
+            finalUrl:
+                'https://example.com/login.html', // ← does not include .mp3
           ),
         );
 

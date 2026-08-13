@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/services/notification_service.dart';
 import 'package:timezone/data/latest_all.dart' as tz_data;
@@ -86,8 +86,12 @@ class NotificationServiceImpl implements NotificationService {
       if (canExact == true) {
         return AndroidScheduleMode.exactAllowWhileIdle;
       }
-    } catch (e) {
-      debugPrint('canScheduleExactNotifications query failed: $e');
+    } catch (error, stackTrace) {
+      AppLogger.error(
+        'canScheduleExactNotifications query failed',
+        exception: error,
+        stackTrace: stackTrace,
+      );
     }
     return AndroidScheduleMode.inexactAllowWhileIdle;
   }

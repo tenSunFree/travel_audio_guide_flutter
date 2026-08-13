@@ -55,7 +55,7 @@ It handles JWT verification and user profile management.
 </p> 
 <p align="left">
   <img src="https://i.postimg.cc/brv12g1R/Screenshot-20260506-015654.png" width="160"/>
-  <img src="https://i.postimg.cc/HnLb7zbw/Screenshot-20260506-014008.png" width="160"/>
+  <img src="https://i.postimg.cc/HnLbKD1R/Screenshot-20260506-014008.png" width="160"/>
   <img src="https://i.postimg.cc/NGb45rYP/368017.jpg" width="160"/>
   <img src="https://i.postimg.cc/PJ26XgL1/Screenshot-20260512-214659.png" width="160"/>
   <img src="https://i.postimg.cc/0j8WqkNk/Screenshot-20260512-214724.png" width="160"/>
@@ -133,6 +133,7 @@ It handles JWT verification and user profile management.
 - Local persistence with Drift and generated DAOs
 - HTTP client with Dio and centralized request / response logging via Talker
 - Type-safe Android native method channels generated with Pigeon
+- Selected Clean Architecture boundaries and team conventions are enforced at analysis time through a project-owned Dart Analyzer Plugin (`packages/app_lints`) rather than relying solely on documentation and code review — see [Architecture Enforcement](#architecture-enforcement)
 
 ### Testing
 
@@ -150,15 +151,57 @@ It handles JWT verification and user profile management.
 
 - Static analysis baseline upgraded from `flutter_lints` to [`very_good_analysis`](https://pub.dev/packages/very_good_analysis) (10.2.0), a stricter, community-adopted Dart/Flutter lint set
 - Generated files (`*.g.dart`, `*.freezed.dart`, per-flavor Firebase config) are excluded from analysis to keep signal-to-noise high
-- Static analysis runs as part of the standard `flutter analyze` command — no additional tooling or CI step required
+- Static analysis runs through the standard `flutter analyze` command; the standalone `packages/app_lints` package resolves its own dependencies before analysis in both CI and `scripts/check.sh`
 - Lint violations are enforced in CI (`Static analysis` step in `ci.yml`) and locally via `scripts/check.sh` and the `pre-push` git hook
+- A project-owned [`analysis_server_plugin`](https://pub.dev/packages/analysis_server_plugin)-based analyzer plugin (`packages/app_lints`) enforces selected Clean Architecture dependency rules and team naming/logging conventions directly inside `flutter analyze` — see [Architecture Enforcement](#architecture-enforcement)
+- `pubspec.yaml` dependency ordering is enforced by the built-in `sort_pub_dependencies` lint and can be auto-fixed on demand by `scripts/quality/sort_pubspec_dependencies.py`
+
+### Architecture Enforcement
+
+The project includes a custom [`analysis_server_plugin`](https://pub.dev/packages/analysis_server_plugin)-based Dart Analyzer Plugin under `packages/app_lints/`.
+
+It converts selected architecture boundaries and team conventions into diagnostics reported directly through the standard analyzer pipeline. The same rules are available during local development and enforced by the existing `flutter analyze` CI step without introducing a separate lint command.
+
+#### Enabled rules
+
+- `avoid_domain_data_import` — prevents domain code from importing the data layer, keeping dependency direction pointed inward toward domain abstractions
+- `avoid_domain_flutter_import` — prevents domain code from importing `package:flutter/*`, keeping business logic independent from the Flutter framework
+- `avoid_presentation_data_import` — prevents production presentation code from importing data-layer implementations directly; presentation should depend on domain abstractions such as UseCases or repository interfaces, while DI wires concrete implementations
+- `avoid_debug_print` — prevents direct top-level `print()` / `debugPrint()` calls in favor of the centralized `AppLogger`, keeping application logging consistent through Talker
+- `usecase_naming_convention` — enforces the `*UseCase` suffix for UseCase classes under `domain/usecases/`, while allowing supported helper types such as `*Params`, `*Result`, and `*Command`
+
+#### Temporarily disabled rule
+
+- `avoid_cross_feature_import` — implemented and verified, but currently disabled while the existing cross-feature dependency graph is reviewed and explicit policies are defined for legitimate composition points such as the app shell, navigation, DI, and public feature APIs
+
+Tests remain fully analyzed by Dart and `very_good_analysis`. Architecture-specific custom diagnostics may selectively exclude test paths where unit, widget, or integration tests need to compose collaborators differently from production code.
+
+Rules are registered in `packages/app_lints/lib/main.dart` and enabled individually through the root `analysis_options.yaml`:
+
+```yaml
+plugins:
+  app_lints:
+    path: packages/app_lints
+    diagnostics:
+      avoid_domain_data_import: true
+      avoid_domain_flutter_import: true
+      avoid_presentation_data_import: true
+      avoid_debug_print: true
+      usecase_naming_convention: true
+      avoid_cross_feature_import: false
+```
+
+`packages/app_lints` is a standalone Dart package with its own `pubspec.yaml` and `analysis_options.yaml` — it is loaded through the analyzer `plugins:` configuration rather than as a regular `pubspec.yaml` dependency of the main app. Because it is an independent Dart package, its dependencies are resolved separately with `dart pub get`; both GitHub Actions CI and `scripts/check.sh` perform this step before analysis.
+
+Because it is a separate package, its `package:app_lints/...` self-imports only resolve once `dart pub get` has been run **inside `packages/app_lints`**, not just at the repository root. If you ever run analysis outside of the CI/`scripts/check.sh` entry points and see `uri_does_not_exist` errors scoped to `packages/app_lints`, run `(cd packages/app_lints && fvm dart pub get)` once and retry.
 
 ### Developer Experience
 
-- Local CI check script (`scripts/check.sh`) mirrors the main GitHub Actions validation pipeline: dependency installation, format check, static analysis, tests with coverage, LCOV report validation, and staging flavor debug APK build — validates only and never rewrites source files
+- Local CI check script (`scripts/check.sh`) mirrors the main GitHub Actions validation pipeline: dependency installation for both the main app and `packages/app_lints`, format check, static analysis, tests with coverage, LCOV report validation, and staging flavor debug APK build — validates only and never rewrites source files
 - Local coverage tooling (`scripts/coverage.sh`) runs `flutter test --coverage`, verifies that `coverage/lcov.info` was generated, and produces an HTML coverage report via `genhtml` (lcov) or `lcov-viewer` (npm) when available; the report opens automatically in the default browser unless `NO_OPEN=1` is set
 - Coverage exclusions reported to Codecov are maintained centrally in `codecov.yml`. Locally, `coverage/lcov.info` stays unfiltered (used by `scripts/check.sh` and uploaded as-is to Codecov); `scripts/coverage.sh` additionally produces a filtered `coverage/lcov.filtered.info`, used only for the local HTML report, to exclude generated files (`*.g.dart`, `*.freezed.dart`, `firebase_options_*.dart`) from local viewing
 - Auto-formatting script (`scripts/format.sh`) runs `dart format` and writes changes directly, kept as a separate command from `check.sh` so CI can never silently rewrite source code
+- Pubspec dependency sorter (`scripts/quality/sort_pubspec_dependencies.py`) auto-fixes ordering in `dependencies`, `dev_dependencies`, and `dependency_overrides` across project `pubspec.yaml` files; the built-in `sort_pub_dependencies` analyzer lint remains the source of truth for validation
 - Environment health check script (`scripts/doctor.sh`) verifies required tooling (Git, Flutter, Dart), optional tooling (Java, FVM, gitleaks), `env/` configuration files, FVM version pinning, and installed Git hooks before development starts
 - One-command onboarding script (`scripts/bootstrap.sh`) runs the environment check, installs Flutter dependencies, creates `env/dev.json` from the template if missing, and installs Git hooks
 - Deterministic Android version code calculation (`scripts/compute_android_version.sh`) derives both `versionName` and `versionCode` from the git tag (e.g. `v1.0.8-rc.2` → version `1.0.8`, code `1000802`), shared by both `deploy-rc.yml` and `cd.yml` so RC and production builds never produce a lower version code than a previously distributed build
@@ -276,6 +319,8 @@ It handles JWT verification and user profile management.
   Mock library for Dart unit testing (Stubs repository and data source dependencies to isolate domain and data layer logic; verifies interaction behavior with `verify` and `verifyNever` without code generation)
 - very_good_analysis  
   Stricter Dart/Flutter static analysis baseline, replacing the default `flutter_lints` set (Enforced through the standard `flutter analyze` command in CI and the `pre-push` hook; generated files are excluded from analysis)
+- analysis_server_plugin (`packages/app_lints`)  
+  Project-owned Dart analyzer plugin that turns selected Clean Architecture dependency rules and team conventions into native `flutter analyze` diagnostics
 - shared_preferences  
   Lightweight local key-value storage (Persists onboarding completion state to control first-launch welcome flow and subsequent app startup routing)
 - geolocator  
@@ -315,6 +360,8 @@ bash scripts/check.sh        # local CI checks with coverage validation — neve
 bash scripts/coverage.sh     # generate coverage + local HTML report when tooling is available
 bash scripts/secret-scan.sh  # full repo + git-history secret scan
 bash scripts/doctor.sh       # check local environment
+python scripts/quality/sort_pubspec_dependencies.py            # auto-fix pubspec.yaml dependency ordering
+python scripts/quality/sort_pubspec_dependencies.py --dry-run  # preview pubspec.yaml sorting
 ```
 
 Or via `Makefile`:
@@ -332,13 +379,17 @@ make doctor
 
 This project uses [`very_good_analysis`](https://pub.dev/packages/very_good_analysis) as its lint baseline (`analysis_options.yaml`), replacing the default `flutter_lints` set that ships with new Flutter projects.
 
+The project-local `packages/app_lints` Dart Analyzer Plugin participates in the same analyzer pipeline for project-specific architecture and convention diagnostics.
+
 ```bash
 flutter analyze
 ```
 
 - Generated files (`*.g.dart`, `*.freezed.dart`, per-flavor Firebase config under `lib/config/firebase/`) are excluded from analysis
 - A small set of rules are temporarily relaxed while the codebase catches up with the stricter baseline (see comments in `analysis_options.yaml`); new code is still expected to stay clean
-- No separate command or CI step is required — `flutter analyze` covers this baseline directly, and it already runs in both the `Static analysis` CI step and `scripts/check.sh`
+- No separate custom-lint command is required — both the baseline and enabled `app_lints` diagnostics are reported through `flutter analyze`
+- Because `packages/app_lints` is a standalone Dart package, its dependencies are resolved separately with `dart pub get`; this is handled automatically by GitHub Actions CI and `scripts/check.sh` — if you ever see `uri_does_not_exist` errors scoped to `packages/app_lints`, run `(cd packages/app_lints && fvm dart pub get)` once
+- After changing `analysis_options.yaml` or `packages/app_lints`, restart the Dart Analysis Server if IDE diagnostics appear stale; command-line analysis can be rerun directly with `flutter analyze`
 
 ### Local Coverage Report
 
@@ -429,7 +480,7 @@ bash scripts/check.sh
 
 The local check script validates:
 
-- Dependency installation / resolution
+- Dependency installation / resolution (main app and `packages/app_lints`)
 - Dart format validation
 - Static analysis
 - Unit tests
@@ -495,7 +546,7 @@ If you plan to open-source it, please choose a license and confirm third-party a
 
 > This is a high-level overview, not an exhaustive file listing — each feature under `lib/features/` follows the same `data / di / domain / presentation` layering shown for `activity` below. Run `tree -L 4 --gitignore lib test` locally for the full, up-to-date tree.
 
-```
+```text
 travel-audio-guide-flutter
 ├─ android
 │  └─ app
@@ -557,6 +608,16 @@ travel-audio-guide-flutter
 │     ├─ reminder                   # Journey reminders, local notifications
 │     ├─ splash                     # Animated splash screen widgets
 │     └─ step_tracking              # Android step sensor integration (Pigeon-based)
+├─ packages
+│  └─ app_lints                     # Project-local Dart Analyzer Plugin
+│     ├─ analysis_options.yaml      # Static-analysis config for the plugin package
+│     ├─ pubspec.yaml
+│     └─ lib
+│        ├─ main.dart               # Plugin entry point and rule registration
+│        └─ src
+│           ├─ path_utils.dart      # Shared path / feature helpers
+│           ├─ architecture         # Architecture dependency diagnostics
+│           └─ conventions          # Naming and logging diagnostics
 ├─ pigeons
 │  └─ health_connect_api.dart
 ├─ scripts
@@ -564,6 +625,8 @@ travel-audio-guide-flutter
 │  │  ├─ commit-msg
 │  │  ├─ pre-commit
 │  │  └─ pre-push
+│  ├─ quality
+│  │  └─ sort_pubspec_dependencies.py   # Auto-fixes pubspec.yaml dependency ordering
 │  ├─ _fvm.sh
 │  ├─ bootstrap.sh
 │  ├─ build_release.sh

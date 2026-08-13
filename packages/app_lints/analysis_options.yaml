@@ -1,0 +1,10 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+linter:
+  rules:
+    # The analyzer plugin has a small public API surface; during the
+    # initial phase, full DartDoc is not required.
+    public_member_api_docs: false
+    # Custom diagnostic messages may exceed 80 characters; align with the
+    # main project's policy for now.
+    lines_longer_than_80_chars: false

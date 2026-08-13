@@ -1,5 +1,6 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
 
 /// A centralized service for Firebase Analytics.
 /// All feature layers log events through this service and do not directly depend on the firebase_analytics SDK.
@@ -7,7 +8,32 @@ import 'package:flutter/foundation.dart';
 class AnalyticsService {
   const AnalyticsService._();
 
-  static final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
+  static FirebaseAnalytics? _analyticsOverride;
+
+  /// Resolves to the injected test override when present, otherwise falls
+  /// back to the real Firebase singleton. Using a getter (rather than
+  /// eagerly assigning `FirebaseAnalytics.instance` to a field) means the
+  /// real singleton is only ever touched when actually needed — never
+  /// during test setup/teardown.
+  static FirebaseAnalytics get _analytics =>
+      _analyticsOverride ?? FirebaseAnalytics.instance;
+
+  @visibleForTesting
+  // A setter here would read as public production API; keeping this as a
+  // named method makes its test-only, side-effecting intent explicit.
+  // ignore: use_setters_to_change_properties
+  static void debugSetInstance(FirebaseAnalytics analytics) {
+    _analyticsOverride = analytics;
+  }
+
+  /// Test-only hook: clears the override after a test. Deliberately does
+  /// NOT touch `FirebaseAnalytics.instance` — doing so would itself throw
+  /// `[core/no-app]` in a plain unit-test environment with no Firebase app
+  /// initialized.
+  @visibleForTesting
+  static void debugResetInstance() {
+    _analyticsOverride = null;
+  }
 
   /// Observer instances provided for use by GoRouter observers
   static FirebaseAnalyticsObserver get observer =>
@@ -16,13 +42,17 @@ class AnalyticsService {
   /// Internal generic log method (prints to the console during debugging)
   static Future<void> _log(String name, [Map<String, Object>? params]) async {
     try {
-      if (kDebugMode) {
-        debugPrint('[Analytics] $name | ${params ?? {}}');
-      }
+      AppLogger.debug(
+        '[Analytics] $name | ${params ?? {}}',
+      );
       await _analytics.logEvent(name: name, parameters: params);
-    } catch (e) {
+    } catch (error, stackTrace) {
       // Analytics failures should not affect the main workflow; handle them silently.
-      if (kDebugMode) debugPrint('[Analytics] ERROR: $e');
+      AppLogger.error(
+        '[Analytics] Failed to log event: $name',
+        exception: error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -32,7 +62,9 @@ class AnalyticsService {
       screenName: screenName,
       screenClass: 'Flutter',
     );
-    if (kDebugMode) debugPrint('[Analytics] screen_view | $screenName');
+    AppLogger.debug(
+      '[Analytics] screen_view | $screenName',
+    );
   }
 
   // Tab Switching
