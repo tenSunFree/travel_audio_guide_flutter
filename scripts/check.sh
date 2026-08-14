@@ -20,6 +20,8 @@ run_step "flutter pub get" $FLUTTER_CMD pub get
 
 run_step "app_lints pub get" bash -c "cd packages/app_lints && $DART_CMD pub get"
 
+run_step "app_lints analyze" bash -c "cd packages/app_lints && $DART_CMD analyze"
+
 echo ""
 echo "==> dart format check"
 if $DART_CMD format --output=none --set-exit-if-changed lib test pigeons; then

@@ -73,6 +73,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Install app_lints dependencies
+        working-directory: packages/app_lints
+        run: dart pub get
+
+      - name: Analyze app_lints
+        working-directory: packages/app_lints
+        run: dart analyze
+
       - name: Format generated Firebase config files
         run: dart format lib/config/firebase/firebase_options_production.dart lib/config/firebase/firebase_options_staging.dart
 
