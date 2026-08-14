@@ -57,6 +57,10 @@ jobs:
         working-directory: packages/app_lints
         run: dart pub get
 
+      - name: Analyze app_lints
+        working-directory: packages/app_lints
+        run: dart analyze
+
       - name: Restore Firebase config files
         run: |
           for v in FIREBASE_OPTIONS_STAGING_DART_BASE64 FIREBASE_OPTIONS_PRODUCTION_DART_BASE64 \
