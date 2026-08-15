@@ -1,20 +1,21 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/location_controller.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/common_app_bar.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/list_skeleton.dart';
+import 'package:flutter_travel_audio_guide/features/activity/di/activity_providers.dart';
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/controllers/activity_list_controller.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/enums/activity_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/widgets/activity_condition_summary_bar.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/widgets/activity_sort_filter_bottom_sheet.dart';
+import 'package:flutter_travel_audio_guide/features/activity/presentation/widgets/activity_tile.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/nearby/location_controller.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../../../core/router/app_router.dart';
-import '../../../../core/widgets/common_app_bar.dart';
-import '../../../../core/widgets/list_skeleton.dart';
-import '../../di/activity_providers.dart';
-import '../../domain/entities/activity.dart';
-import '../controllers/activity_list_controller.dart';
-import '../enums/activity_sort_filter_enums.dart';
-import '../widgets/activity_condition_summary_bar.dart';
-import '../widgets/activity_sort_filter_bottom_sheet.dart';
-import '../widgets/activity_tile.dart';
 
 class ActivityListPage extends ConsumerStatefulWidget {
   const ActivityListPage({super.key, this.initialStatus});

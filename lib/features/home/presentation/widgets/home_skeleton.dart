@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/widgets/list_skeleton.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/list_skeleton.dart';
 
 /// Homepage skeleton screen
 /// Corresponding real-world layout: HeroRecommendCard + HomeSectionTitle + RecommendListTile
@@ -26,7 +26,7 @@ class _HomeSkeletonState extends State<HomeSkeleton>
     )..repeat(reverse: true);
     _animation = Tween<double>(
       begin: 0.3,
-      end: 1.0,
+      end: 1,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
@@ -47,7 +47,7 @@ class _HomeSkeletonState extends State<HomeSkeleton>
             _HomeSectionTitleSkeleton(color: color),
             const SizedBox(height: 4),
             // "Go Now" list skeleton (4 entries)
-            SizedBox(
+            const SizedBox(
               height: 96.0 * 4,
               child: ListSkeleton(
                 itemCount: 4,
@@ -60,7 +60,7 @@ class _HomeSkeletonState extends State<HomeSkeleton>
             _HomeSectionTitleSkeleton(color: color),
             const SizedBox(height: 4),
             // "Recommended Activities" list skeleton (3 entries)
-            SizedBox(
+            const SizedBox(
               height: 96.0 * 3,
               child: ListSkeleton(
                 itemCount: 3,

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/daos/attraction_dao.dart';
 import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
@@ -11,6 +10,7 @@ import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/di/attraction_providers.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/presentation/enums/attraction_sort_filter_enums.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAppDatabase extends Mock implements AppDatabase {}
 
@@ -99,7 +99,7 @@ void main() {
     test('DB stream 發出資料時，會依目前篩選條件計算 items 並更新 total', () async {
       container.read(attractionListControllerProvider);
       attractionStream.add([
-        _buildAttraction(id: 1, name: 'B景點'),
+        _buildAttraction(name: 'B景點'),
         _buildAttraction(id: 2, name: 'A景點'),
       ]);
       await _flush();
@@ -138,7 +138,7 @@ void main() {
         attractionListControllerProvider.notifier,
       );
       attractionStream.add([
-        _buildAttraction(id: 1, name: '信義景點', distric: '信義區'),
+        _buildAttraction(name: '信義景點', distric: '信義區'),
         _buildAttraction(id: 2, name: '士林景點', distric: '士林區'),
       ]);
       await _flush();
@@ -158,13 +158,13 @@ void main() {
     test(
       'applyHomeEntryFilter 會套用首頁帶入的 openNowOnly / timeSlotFilter',
       () async {
-        final notifier = container.read(
-          attractionListControllerProvider.notifier,
-        );
-        notifier.applyHomeEntryFilter(
-          openNowOnly: true,
-          timeSlotFilter: AttractionTimeSlotFilter.morning,
-        );
+        final _ =
+            container.read(
+              attractionListControllerProvider.notifier,
+            )..applyHomeEntryFilter(
+              openNowOnly: true,
+              timeSlotFilter: AttractionTimeSlotFilter.morning,
+            );
         final state = container.read(attractionListControllerProvider);
         expect(state.openNowOnly, isTrue);
         expect(state.timeSlotFilter, AttractionTimeSlotFilter.morning);
@@ -172,19 +172,19 @@ void main() {
     );
 
     test('resetFilter 會把所有篩選條件還原成預設值', () async {
-      final notifier = container.read(
-        attractionListControllerProvider.notifier,
-      );
-      notifier.applySortFilter(
-        sortOrder: AttractionSortOrder.nameAZ,
-        categoryIds: const {1, 2},
-        distric: '信義區',
-        targets: const {},
-        facilities: const {},
-        openNowOnly: true,
-        timeSlotFilter: AttractionTimeSlotFilter.night,
-        distanceFilter: DistanceFilter.km1,
-      );
+      final notifier =
+          container.read(
+            attractionListControllerProvider.notifier,
+          )..applySortFilter(
+            sortOrder: AttractionSortOrder.nameAZ,
+            categoryIds: const {1, 2},
+            distric: '信義區',
+            targets: const {},
+            facilities: const {},
+            openNowOnly: true,
+            timeSlotFilter: AttractionTimeSlotFilter.night,
+            distanceFilter: DistanceFilter.km1,
+          );
       expect(
         container.read(attractionListControllerProvider).isDefaultFilter,
         isFalse,
@@ -197,10 +197,9 @@ void main() {
     });
 
     test('applyLocation 會更新使用者座標', () async {
-      final notifier = container.read(
+      final _ = container.read(
         attractionListControllerProvider.notifier,
-      );
-      notifier.applyLocation(25.0330, 121.5654);
+      )..applyLocation(25.0330, 121.5654);
       final state = container.read(attractionListControllerProvider);
       expect(state.userLat, 25.0330);
       expect(state.userLng, 121.5654);

@@ -1,0 +1,16 @@
+name: app_lints
+description: flutter_travel_audio_guide Team Guidelines and Clean Architecture Boundary Checks (Official Analyzer Plugin)
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: ">=3.11.0 <4.0.0"
+
+dependencies:
+  analysis_server_plugin: ^0.3.0
+  analyzer: ^8.0.0
+  analyzer_plugin: ^0.13.0
+
+dev_dependencies:
+  test: ^1.26.0
+  very_good_analysis: 10.2.0

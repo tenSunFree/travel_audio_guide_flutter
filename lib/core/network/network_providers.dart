@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/constants/api_constants.dart';
+import 'package:flutter_travel_audio_guide/core/network/dio_log_filter.dart';
+import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
 import 'package:sentry_dio/sentry_dio.dart';
 import 'package:talker_dio_logger/talker_dio_logger.dart';
-import '../constants/api_constants.dart';
-import '../utils/app_logger.dart';
-import 'dio_log_filter.dart';
 
 class _RetryInterceptor extends Interceptor {
   _RetryInterceptor(this._dio);
@@ -29,7 +29,8 @@ class _RetryInterceptor extends Interceptor {
     final isTimeout =
         err.type == DioExceptionType.connectionTimeout ||
         err.type == DioExceptionType.receiveTimeout;
-    // If the number of attempts exceeds the limit, or if the error is not 5xx or timeout
+    // If the number of attempts exceeds the limit,
+    // or if the error is not 5xx or timeout
     // do not retry, and continue passing the request directly.
     if (attempt >= _maxRetries || (!is5xx && !isTimeout)) {
       return handler.next(err);
@@ -39,10 +40,10 @@ class _RetryInterceptor extends Interceptor {
       ' | status: $statusCode'
       ' | path: ${err.requestOptions.path}',
     );
-    await Future.delayed(_retryDelays[attempt]);
+    await Future<void>.delayed(_retryDelays[attempt]);
     err.requestOptions.extra['_retryAttempt'] = attempt + 1;
     try {
-      final response = await _dio.fetch(err.requestOptions);
+      final response = await _dio.fetch<dynamic>(err.requestOptions);
       handler.resolve(response);
     } on DioException catch (e) {
       handler.next(e);
@@ -63,7 +64,8 @@ final dioProvider = Provider<Dio>((ref) {
   // Retry is added first (processed before Sentry records
   // if the retry succeeds, no error will be reported).
   dio.interceptors.add(_RetryInterceptor(dio));
-  // Sentry tracing, disable automatic reporting to avoid duplication with _syncIfNeeded.
+  // Sentry tracing, disable automatic reporting
+  // to avoid duplication with _syncIfNeeded.
   dio.addSentry(captureFailedRequests: false);
   // Add at the end of Talker log
   dio.interceptors.add(
@@ -71,8 +73,6 @@ final dioProvider = Provider<Dio>((ref) {
       talker: AppLogger.talker,
       settings: const TalkerDioLoggerSettings(
         printRequestHeaders: true,
-        printResponseHeaders: false,
-        printResponseData: true,
         requestFilter: DioLogFilter.shouldLogRequest,
         responseFilter: DioLogFilter.shouldLogResponse,
         errorFilter: DioLogFilter.shouldLogError,

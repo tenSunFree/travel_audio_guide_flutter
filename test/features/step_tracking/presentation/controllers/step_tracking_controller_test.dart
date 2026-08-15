@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/step_tracking/domain/entities/exercise_summary_data.dart';
 import 'package:flutter_travel_audio_guide/features/step_tracking/domain/services/step_tracking_service.dart';
 import 'package:flutter_travel_audio_guide/features/step_tracking/presentation/controllers/step_tracking_controller.dart';
 import 'package:flutter_travel_audio_guide/features/step_tracking/presentation/enums/step_tracking_source.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockStepTrackingService extends Mock implements StepTrackingService {}
 
@@ -30,12 +30,10 @@ void main() {
       const ready = StepTrackingState(
         isAvailable: true,
         hasSensorPermission: true,
-        hasHealthConnectPermission: false,
       );
       expect(ready.isReady, isTrue);
       const notReady = StepTrackingState(
         isAvailable: true,
-        hasSensorPermission: false,
       );
       expect(notReady.isReady, isFalse);
     });
@@ -47,13 +45,11 @@ void main() {
           source: StepTrackingSource.healthConnect,
           isAvailable: true,
           hasHealthConnectPermission: true,
-          hasSensorPermission: false,
         );
         expect(ready.isReady, isTrue);
         const notReady = StepTrackingState(
           source: StepTrackingSource.healthConnect,
           isAvailable: true,
-          hasHealthConnectPermission: false,
           hasSensorPermission: true,
         );
         expect(notReady.isReady, isFalse);

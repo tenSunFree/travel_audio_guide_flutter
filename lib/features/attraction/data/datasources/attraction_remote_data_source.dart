@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import '../../../../core/error/exceptions.dart';
-import '../../../../core/utils/app_logger.dart';
-import '../models/attraction_model.dart';
-import '../models/attraction_page_model.dart';
+import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
+import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_model.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_page_model.dart';
 
 class AttractionRemoteDataSource {
   const AttractionRemoteDataSource(this._dio);
@@ -60,10 +60,10 @@ class AttractionRemoteDataSource {
       if (response.statusCode == 200 && response.data != null) {
         final data = response.data;
         final rawList = switch (data) {
-          {'data': final List list} => list,
-          {'categories': final List list} => list,
-          final List list => list,
-          _ => const [],
+          {'data': final List<dynamic> list} => list,
+          {'categories': final List<dynamic> list} => list,
+          final List<dynamic> list => list,
+          _ => const <dynamic>[],
         };
         return rawList
             .whereType<Map<String, dynamic>>()

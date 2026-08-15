@@ -1,20 +1,21 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/location_controller.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/common_app_bar.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/list_skeleton.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/controllers/audio_guide_list_controller.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/enums/sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/audio_guide_tile.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/condition_summary_bar.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/widgets/sort_filter_bottom_sheet.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/nearby/location_controller.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../../../core/router/app_router.dart';
-import '../../../../core/widgets/list_skeleton.dart';
-import '../../../../core/widgets/common_app_bar.dart';
-import '../../domain/entities/audio_guide.dart';
-import '../enums/sort_filter_enums.dart';
-import '../controllers/audio_guide_list_controller.dart';
-import '../widgets/audio_guide_tile.dart';
-import '../widgets/condition_summary_bar.dart';
-import '../widgets/sort_filter_bottom_sheet.dart';
 
 class AudioGuideListPage extends ConsumerStatefulWidget {
   const AudioGuideListPage({super.key});
@@ -83,7 +84,6 @@ class _AudioGuideListPageState extends ConsumerState<AudioGuideListPage> {
             .applySortFilter(
               SortOrder.dateNewest,
               FilterType.all,
-              distanceFilter: DistanceFilter.unlimited,
             );
         ScaffoldMessenger.of(
           context,
@@ -136,7 +136,6 @@ class _AudioGuideListPageState extends ConsumerState<AudioGuideListPage> {
     final primaryColor = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: CommonAppBar(
-        title: '語音導覽',
         actions: [
           Stack(
             alignment: Alignment.center,

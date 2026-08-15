@@ -12,7 +12,6 @@ void main() {
         fileExt: 'mp3',
         modified: '2026-01-01',
         isDownloaded: false,
-        localFilePath: null,
       );
       expect(guide.isDownloaded, isFalse);
       expect(guide.localFilePath, isNull);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_travel_audio_guide/features/attraction/presentation/widgets/attraction_condition_summary_bar.dart';
 import 'package:flutter_travel_audio_guide/features/attraction/presentation/enums/attraction_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/widgets/attraction_condition_summary_bar.dart';
 
 Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 

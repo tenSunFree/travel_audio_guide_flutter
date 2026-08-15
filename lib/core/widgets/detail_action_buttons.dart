@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/home/presentation/utils/home_navigation_launcher.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../features/home/presentation/utils/home_navigation_launcher.dart';
-import '../constants/app_colors.dart';
 
 /// Detail page action buttons.
 class DetailActionButtons extends StatefulWidget {
   const DetailActionButtons({
-    super.key,
     required this.navigateName,
+    required this.shareText,
+    super.key,
     this.navigateLat,
     this.navigateLng,
-    required this.shareText,
     this.shareLabel = '分享',
     this.onReminderPressed,
     this.reminderLabel = '設定提醒',
@@ -62,7 +62,8 @@ class _DetailActionButtonsState extends State<DetailActionButtons> {
 
   Future<void> _onShare() async {
     await SharePlus.instance.share(ShareParams(text: widget.shareText));
-    // Share sheet and notify external parties after closing (for tracking purposes)
+    // Share sheet and notify external parties after closing
+    // (for tracking purposes)
     widget.onSharePressed?.call();
   }
 

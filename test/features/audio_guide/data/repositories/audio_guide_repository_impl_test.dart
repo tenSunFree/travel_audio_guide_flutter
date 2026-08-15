@@ -1,6 +1,6 @@
 import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/datasources/audio_guide_local_data_source.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/datasources/audio_guide_remote_data_source.dart';
@@ -8,6 +8,7 @@ import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audi
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audio_guide_page_model.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/repositories/audio_guide_repository_impl.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAudioGuideRemoteDataSource extends Mock
     implements AudioGuideRemoteDataSource {}
@@ -63,7 +64,6 @@ void main() {
     fileExt: 'mp3',
     modified: '2026-05-01',
     isDownloaded: false,
-    localFilePath: null,
   );
 
   const tModel1 = AudioGuideModel(
@@ -89,8 +89,11 @@ void main() {
       when(
         () => remoteDataSource.getAudioGuides(lang: 'zh-tw', page: 1),
       ).thenAnswer(
-        (_) async =>
-            AudioGuidePageModel(total: 2, page: 1, data: [tModel1, tModel2]),
+        (_) async => const AudioGuidePageModel(
+          total: 2,
+          page: 1,
+          data: [tModel1, tModel2],
+        ),
       );
 
       when(
@@ -141,8 +144,11 @@ void main() {
           page: any(named: 'page'),
         ),
       ).thenAnswer(
-        (_) async =>
-            AudioGuidePageModel(total: 2, page: 1, data: [tModel1, tModel2]),
+        (_) async => const AudioGuidePageModel(
+          total: 2,
+          page: 1,
+          data: [tModel1, tModel2],
+        ),
       );
 
       when(
@@ -304,7 +310,7 @@ void main() {
           id: 1,
           title: '故宮導覽',
           url: 'https://example.com/download?id=1',
-          // ← 不含 .mp3
+          // ← does not include .mp3
           modified: '2026-05-01',
           isDownloaded: false,
         );
@@ -325,7 +331,8 @@ void main() {
           (_) async => DownloadedAudioBinary(
             bytes: Uint8List.fromList([60, 104, 116, 109, 108]), // <html
             contentType: 'text/html',
-            finalUrl: 'https://example.com/login.html', // ← 不含 .mp3
+            finalUrl:
+                'https://example.com/login.html', // ← does not include .mp3
           ),
         );
 

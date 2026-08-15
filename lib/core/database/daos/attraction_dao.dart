@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../../../features/attraction/data/models/attraction_model.dart';
-import '../../../features/attraction/domain/entities/attraction.dart';
-import '../tables/attraction_table.dart';
+import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
+import 'package:flutter_travel_audio_guide/core/database/tables/attraction_table.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_model.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 
 part 'attraction_dao.g.dart';
 
@@ -86,15 +86,32 @@ class AttractionDao extends DatabaseAccessor<AppDatabase>
       );
 
   Attraction _toEntity(AttractionTableData r) {
-    final categories = (jsonDecode(r.categoriesJson) as List)
-        .map((e) => AttractionCategory(id: e['id'], name: e['name']))
-        .toList();
-    final images = (jsonDecode(r.imagesJson) as List)
-        .map((e) => AttractionImage(src: e['src'], subject: '', ext: ''))
-        .toList();
-    final friendlies = (jsonDecode(r.friendliesJson) as List)
-        .map((e) => AttractionTag(id: e['id'], name: e['name']))
-        .toList();
+    final categories = (jsonDecode(r.categoriesJson) as List<dynamic>).map((
+      item,
+    ) {
+      final map = item as Map<String, dynamic>;
+      return AttractionCategory(
+        id: (map['id'] as num).toInt(),
+        name: map['name'] as String,
+      );
+    }).toList();
+    final images = (jsonDecode(r.imagesJson) as List<dynamic>).map((item) {
+      final map = item as Map<String, dynamic>;
+      return AttractionImage(
+        src: map['src'] as String,
+        subject: '',
+        ext: '',
+      );
+    }).toList();
+    final friendlies = (jsonDecode(r.friendliesJson) as List<dynamic>).map((
+      item,
+    ) {
+      final map = item as Map<String, dynamic>;
+      return AttractionTag(
+        id: (map['id'] as num).toInt(),
+        name: map['name'] as String,
+      );
+    }).toList();
     return Attraction(
       id: r.id,
       name: r.name,

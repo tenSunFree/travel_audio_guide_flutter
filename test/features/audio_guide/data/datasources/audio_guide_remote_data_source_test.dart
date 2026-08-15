@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/data/datasources/audio_guide_remote_data_source.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockDio extends Mock implements Dio {}
 
@@ -137,7 +137,6 @@ void main() {
         (_) async => Response<List<int>>(
           requestOptions: RequestOptions(path: url),
           statusCode: 200,
-          data: null,
         ),
       );
       await expectLater(

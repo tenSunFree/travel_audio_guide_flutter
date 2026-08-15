@@ -1,8 +1,8 @@
 import 'package:drift/drift.dart';
-import '../app_database.dart';
-import '../../../features/audio_guide/data/models/audio_guide_model.dart';
-import '../../../features/audio_guide/domain/entities/audio_guide.dart';
-import '../tables/audio_guide_table.dart';
+import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
+import 'package:flutter_travel_audio_guide/core/database/tables/audio_guide_table.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audio_guide_model.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
 
 part 'audio_guide_dao.g.dart';
 

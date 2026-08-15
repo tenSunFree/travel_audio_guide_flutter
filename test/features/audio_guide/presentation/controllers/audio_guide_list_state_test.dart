@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/controllers/audio_guide_list_controller.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/enums/sort_filter_enums.dart';
-import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
 
 // Helper
 AudioGuide _guide({
@@ -14,7 +14,6 @@ AudioGuide _guide({
   return AudioGuide(
     id: id,
     title: title,
-    summary: null,
     url: 'https://example.com/$id.mp3',
     fileExt: 'mp3',
     modified: modified,
@@ -182,7 +181,6 @@ void main() {
             id: 2,
             title: 'B',
             modified: '2026-01-01',
-            isDownloaded: false,
           ),
           _guide(id: 3, title: 'C', modified: '2026-05-01', isDownloaded: true),
         ];

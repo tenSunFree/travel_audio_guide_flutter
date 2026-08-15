@@ -1,10 +1,10 @@
-import '../../../../core/constants/api_constants.dart';
-import '../../../../core/error/exceptions.dart';
-import '../../domain/entities/audio_guide.dart';
-import '../../domain/entities/audio_guide_page.dart';
-import '../../domain/repositories/audio_guide_repository.dart';
-import '../datasources/audio_guide_local_data_source.dart';
-import '../datasources/audio_guide_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/core/constants/api_constants.dart';
+import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/data/datasources/audio_guide_local_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/data/datasources/audio_guide_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide_page.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/repositories/audio_guide_repository.dart';
 
 class AudioGuideRepositoryImpl implements AudioGuideRepository {
   const AudioGuideRepositoryImpl({
@@ -62,7 +62,7 @@ class AudioGuideRepositoryImpl implements AudioGuideRepository {
         result.finalUrl.toLowerCase().endsWith('.mp3') ||
         guide.url.toLowerCase().endsWith('.mp3');
     if (!looksLikeAudio) {
-      throw DownloadException('非音訊檔，請提供MP3下載連結。');
+      throw const DownloadException('非音訊檔，請提供MP3下載連結。');
     }
     await _localDataSource.writeBytes(bytes: result.bytes, path: targetPath);
     return targetPath;

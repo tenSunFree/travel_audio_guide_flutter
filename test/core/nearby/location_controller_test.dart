@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/location_controller.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
 import 'package:geolocator_platform_interface/geolocator_platform_interface.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:flutter_travel_audio_guide/core/nearby/location_controller.dart';
-import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
 
 class MockGeolocatorPlatform extends Mock
     with MockPlatformInterfaceMixin

@@ -1,9 +1,9 @@
 import 'dart:async';
+
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
 import 'package:flutter_travel_audio_guide/core/sync/app_sync_service.dart';
@@ -12,6 +12,7 @@ import 'package:flutter_travel_audio_guide/core/widgets/list_skeleton.dart';
 import 'package:flutter_travel_audio_guide/features/activity/data/models/activity_model.dart';
 import 'package:flutter_travel_audio_guide/features/activity/di/activity_providers.dart';
 import 'package:flutter_travel_audio_guide/features/activity/presentation/pages/activity_list_page.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Same pattern reused from audio_guide_list_page_test.dart:
 /// an in-memory Drift DB and a ProviderScope override for AppSyncService
@@ -43,7 +44,7 @@ Widget buildTestApp({
 
 AppSyncService _buildInstantSyncService() {
   final mock = MockAppSyncService();
-  when(() => mock.syncAllIfNeeded()).thenAnswer((_) async {});
+  when(mock.syncAllIfNeeded).thenAnswer((_) async {});
   when(() => mock.forceSync(any())).thenAnswer((_) async {});
   return mock;
 }
@@ -64,24 +65,15 @@ Future<void> insertActivity(
     ActivityModel(
       id: id,
       title: title,
-      description: '',
       begin: begin,
       end: end,
       posted: begin,
       modified: begin,
-      url: '',
       address: '台北市信義區',
       distric: '信義區',
       nlat: '25.03',
       elong: '121.56',
       organizer: '台北市政府',
-      coRganizer: '',
-      contact: '',
-      tel: '',
-      ticket: '',
-      traffic: '',
-      parking: '',
-      links: const [],
     ),
   ]);
 }
@@ -117,7 +109,7 @@ void main() {
       // forceSync so the isInitialLoading:true state can be observed.
       final forceSyncCompleter = Completer<void>();
       final mockSync = MockAppSyncService();
-      when(() => mockSync.syncAllIfNeeded()).thenAnswer((_) async {});
+      when(mockSync.syncAllIfNeeded).thenAnswer((_) async {});
       when(
         () => mockSync.forceSync(any()),
       ).thenAnswer((_) => forceSyncCompleter.future);
@@ -142,7 +134,7 @@ void main() {
 
   group('有活動資料', () {
     testWidgets('DB 有資料時顯示 ActivityTile 列表', (tester) async {
-      await insertActivity(db, id: 1, title: '台北燈節');
+      await insertActivity(db);
       await insertActivity(db, id: 2, title: '花卉展');
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
@@ -194,7 +186,7 @@ void main() {
       final now = DateTime.now();
       final today = _formatDate(now);
       final future = _formatDate(now.add(const Duration(days: 20)));
-      await insertActivity(db, id: 1, title: '今日活動A', begin: today, end: today);
+      await insertActivity(db, title: '今日活動A', begin: today, end: today);
       await insertActivity(
         db,
         id: 2,
@@ -213,7 +205,7 @@ void main() {
     });
 
     testWidgets('initialStatus 為 null 或無法辨識時維持預設（全部）篩選', (tester) async {
-      await insertActivity(db, id: 1, title: '活動A');
+      await insertActivity(db, title: '活動A');
       await tester.pumpWidget(buildTestApp(db: db, initialStatus: 'unknown'));
       await tester.pumpAndSettle();
       expect(find.text('活動A'), findsOneWidget);
@@ -227,7 +219,7 @@ void main() {
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
       expect(find.text('暫無活動資料'), findsOneWidget);
-      await insertActivity(db, id: 1, title: '動態新增活動');
+      await insertActivity(db, title: '動態新增活動');
       await tester.pumpAndSettle();
       expect(find.text('動態新增活動'), findsOneWidget);
       expect(find.text('暫無活動資料'), findsNothing);

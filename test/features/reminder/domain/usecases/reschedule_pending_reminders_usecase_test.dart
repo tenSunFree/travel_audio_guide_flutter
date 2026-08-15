@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/repositories/reminder_repository.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/services/notification_service.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/usecases/reschedule_pending_reminders_usecase.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockReminderRepository extends Mock implements ReminderRepository {}
 

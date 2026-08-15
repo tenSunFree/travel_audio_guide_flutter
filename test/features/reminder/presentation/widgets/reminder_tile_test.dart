@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:go_router/go_router.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/di/reminder_providers.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/domain/usecases/delete_reminder_usecase.dart';
 import 'package:flutter_travel_audio_guide/features/reminder/presentation/widgets/reminder_tile.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockDeleteReminderUseCase extends Mock implements DeleteReminderUseCase {}
 

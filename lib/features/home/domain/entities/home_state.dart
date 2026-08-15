@@ -1,6 +1,6 @@
+import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../../activity/domain/entities/activity.dart';
-import '../../../attraction/domain/entities/attraction.dart';
 
 part 'home_state.freezed.dart';
 
@@ -40,8 +40,6 @@ abstract class HomeRecommendCard with _$HomeRecommendCard {
 
 @freezed
 abstract class HomeUiState with _$HomeUiState {
-  const HomeUiState._();
-
   const factory HomeUiState({
     required HomePeriod selectedPeriod,
     required bool isRainyMode,
@@ -54,6 +52,7 @@ abstract class HomeUiState with _$HomeUiState {
     required bool isLoading,
     required String? errorMessage,
   }) = _HomeUiState;
+  const HomeUiState._();
 
   factory HomeUiState.initial() {
     final period = HomePeriodHelper.fromNow(DateTime.now());

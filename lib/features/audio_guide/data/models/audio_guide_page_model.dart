@@ -1,4 +1,4 @@
-import 'audio_guide_model.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/data/models/audio_guide_model.dart';
 
 class AudioGuidePageModel {
   const AudioGuidePageModel({
@@ -6,10 +6,6 @@ class AudioGuidePageModel {
     required this.page,
     required this.data,
   });
-
-  final int total;
-  final int page;
-  final List<AudioGuideModel> data;
 
   factory AudioGuidePageModel.fromJson(Map<String, dynamic> json, int page) {
     final rawList = (json['data'] as List<dynamic>? ?? <dynamic>[])
@@ -20,4 +16,8 @@ class AudioGuidePageModel {
       data: rawList.map(AudioGuideModel.fromJson).toList(),
     );
   }
+
+  final int total;
+  final int page;
+  final List<AudioGuideModel> data;
 }

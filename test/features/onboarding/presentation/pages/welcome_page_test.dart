@@ -13,7 +13,7 @@ class FakeOnboardingRepository implements OnboardingRepository {
 
   final bool initiallyCompleted;
   final Duration completeDelay;
-  var completeCallCount = 0;
+  int completeCallCount = 0;
 
   @override
   bool hasSeenWelcome() => initiallyCompleted;

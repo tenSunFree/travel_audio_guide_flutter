@@ -1,5 +1,5 @@
 import 'dart:async';
-import '../entities/audio_playback_state.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_playback_state.dart';
 
 abstract class AudioPlaybackService {
   Stream<AudioPlaybackState> get stateStream;

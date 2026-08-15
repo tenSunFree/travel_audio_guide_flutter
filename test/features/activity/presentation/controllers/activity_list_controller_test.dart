@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/daos/activity_dao.dart';
 import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
@@ -11,6 +10,7 @@ import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
 import 'package:flutter_travel_audio_guide/features/activity/di/activity_providers.dart';
 import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
 import 'package:flutter_travel_audio_guide/features/activity/presentation/enums/activity_sort_filter_enums.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockAppDatabase extends Mock implements AppDatabase {}
 
@@ -98,10 +98,12 @@ void main() {
     });
 
     test('DB stream 發出資料時，會依目前的排序/篩選條件計算 items 並更新 total', () async {
-      container.read(activityListControllerProvider); // 觸發 controller 建立
+      container.read(
+        activityListControllerProvider,
+      ); // triggers controller creation
       activityStream.add([
-        _buildActivity(id: 1, title: 'B活動', begin: '2026-06-01'),
-        _buildActivity(id: 2, title: 'A活動', begin: '2026-01-01'),
+        _buildActivity(title: 'B活動', begin: '2026-06-01'),
+        _buildActivity(id: 2, title: 'A活動'),
       ]);
       await _flush();
       final state = container.read(activityListControllerProvider);
@@ -133,7 +135,7 @@ void main() {
     test('applySortFilter 會更新排序/篩選條件並重新計算 items', () async {
       final notifier = container.read(activityListControllerProvider.notifier);
       activityStream.add([
-        _buildActivity(id: 1, title: '免費活動', ticket: ''),
+        _buildActivity(title: '免費活動'),
         _buildActivity(id: 2, title: '付費活動', ticket: '100元'),
       ]);
       await _flush();
@@ -151,14 +153,14 @@ void main() {
     });
 
     test('resetSortFilter 會把所有篩選條件還原成預設值', () async {
-      final notifier = container.read(activityListControllerProvider.notifier);
-      notifier.applySortFilter(
-        sortOrder: ActivitySortOrder.nameAZ,
-        statusFilter: ActivityStatusFilter.today,
-        feeFilter: ActivityFeeFilter.paid,
-        distric: '信義區',
-        distanceFilter: DistanceFilter.km1,
-      );
+      final notifier = container.read(activityListControllerProvider.notifier)
+        ..applySortFilter(
+          sortOrder: ActivitySortOrder.nameAZ,
+          statusFilter: ActivityStatusFilter.today,
+          feeFilter: ActivityFeeFilter.paid,
+          distric: '信義區',
+          distanceFilter: DistanceFilter.km1,
+        );
       expect(
         container.read(activityListControllerProvider).isDefaultFilter,
         isFalse,
@@ -172,7 +174,7 @@ void main() {
 
     test('applyLocation 會更新使用者座標並套用距離篩選重新計算 items', () async {
       final notifier = container.read(activityListControllerProvider.notifier);
-      activityStream.add([_buildActivity(id: 1, title: '附近活動')]);
+      activityStream.add([_buildActivity(title: '附近活動')]);
       await _flush();
       notifier.applyLocation(25.0330, 121.5654);
       final state = container.read(activityListControllerProvider);

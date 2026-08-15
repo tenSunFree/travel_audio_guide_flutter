@@ -3,7 +3,8 @@ enum DistanceFilter {
   km1,
   km3,
   km5,
-  unlimited;
+  unlimited
+  ;
 
   String get label => switch (this) {
     DistanceFilter.meters500 => '500m',

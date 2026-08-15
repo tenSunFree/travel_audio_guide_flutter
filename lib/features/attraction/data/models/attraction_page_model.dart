@@ -1,5 +1,5 @@
-import '../../domain/entities/attraction_page.dart';
-import 'attraction_model.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/data/models/attraction_model.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction_page.dart';
 
 class AttractionPageModel {
   const AttractionPageModel({
@@ -7,10 +7,6 @@ class AttractionPageModel {
     required this.page,
     required this.data,
   });
-
-  final int total;
-  final int page;
-  final List<AttractionModel> data;
 
   factory AttractionPageModel.fromJson(Map<String, dynamic> json, int page) {
     return AttractionPageModel(
@@ -22,6 +18,10 @@ class AttractionPageModel {
           .toList(),
     );
   }
+
+  final int total;
+  final int page;
+  final List<AttractionModel> data;
 
   AttractionPage toEntity() {
     return AttractionPage(

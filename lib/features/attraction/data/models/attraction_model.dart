@@ -1,8 +1,7 @@
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import '../../domain/entities/attraction.dart';
 
 part 'attraction_model.freezed.dart';
-
 part 'attraction_model.g.dart';
 
 double? _toDoubleOrNull(dynamic value) {
@@ -14,12 +13,11 @@ double? _toDoubleOrNull(dynamic value) {
 
 @freezed
 abstract class AttractionTagModel with _$AttractionTagModel {
-  const AttractionTagModel._();
-
   const factory AttractionTagModel({
     @Default(0) int id,
     @Default('') String name,
   }) = _AttractionTagModel;
+  const AttractionTagModel._();
 
   factory AttractionTagModel.fromJson(Map<String, dynamic> json) =>
       _$AttractionTagModelFromJson(json);
@@ -29,12 +27,11 @@ abstract class AttractionTagModel with _$AttractionTagModel {
 
 @freezed
 abstract class AttractionCategoryModel with _$AttractionCategoryModel {
-  const AttractionCategoryModel._();
-
   const factory AttractionCategoryModel({
     @Default(0) int id,
     @Default('') String name,
   }) = _AttractionCategoryModel;
+  const AttractionCategoryModel._();
 
   factory AttractionCategoryModel.fromJson(Map<String, dynamic> json) =>
       _$AttractionCategoryModelFromJson(json);
@@ -44,13 +41,12 @@ abstract class AttractionCategoryModel with _$AttractionCategoryModel {
 
 @freezed
 abstract class AttractionImageModel with _$AttractionImageModel {
-  const AttractionImageModel._();
-
   const factory AttractionImageModel({
     @Default('') String src,
     @Default('') String subject,
     @Default('') String ext,
   }) = _AttractionImageModel;
+  const AttractionImageModel._();
 
   factory AttractionImageModel.fromJson(Map<String, dynamic> json) =>
       _$AttractionImageModelFromJson(json);
@@ -61,8 +57,6 @@ abstract class AttractionImageModel with _$AttractionImageModel {
 
 @freezed
 abstract class AttractionModel with _$AttractionModel {
-  const AttractionModel._();
-
   const factory AttractionModel({
     @Default(0) int id,
     @Default('') String name,
@@ -86,6 +80,7 @@ abstract class AttractionModel with _$AttractionModel {
     @JsonKey(name: 'friendly') @Default([]) List<AttractionTagModel> friendlies,
     @Default([]) List<AttractionImageModel> images,
   }) = _AttractionModel;
+  const AttractionModel._();
 
   factory AttractionModel.fromJson(Map<String, dynamic> json) =>
       _attractionModelFromJson(json);

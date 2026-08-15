@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 class RainyModeCard extends StatelessWidget {
   const RainyModeCard({
-    super.key,
     required this.value,
     required this.onChanged,
+    super.key,
   });
 
   final bool value;

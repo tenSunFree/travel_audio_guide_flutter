@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_travel_audio_guide/core/preferences/shared_preferences_provider.dart';
 import 'package:flutter_travel_audio_guide/features/onboarding/data/datasources/onboarding_local_data_source.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MockSharedPreferencesWithCache extends Mock
     implements SharedPreferencesWithCache {}

@@ -1,5 +1,5 @@
-import '../entities/attraction.dart';
-import '../entities/attraction_page.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction_page.dart';
 
 abstract class AttractionRepository {
   Future<AttractionPage> getAttractions({

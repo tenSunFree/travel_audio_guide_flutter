@@ -1,11 +1,12 @@
 import 'package:dio/dio.dart';
 
-/// Controls which API paths should be logged
-/// Paths added to _blockedPaths will be excluded and will not appear in the console.
+/// Controls which API paths should be logged.
+///
+/// Paths added to [_blockedPaths] are excluded from console output.
 class DioLogFilter {
   const DioLogFilter._();
 
-  /// Add the path where you don't want to display logs here
+  /// Paths that should not be logged.
   static const List<String> _blockedPaths = [
     // '/Media/Audio',
     // '/Events/Activity',
@@ -13,13 +14,13 @@ class DioLogFilter {
   ];
 
   static bool _shouldLog(String path) {
-    return !_blockedPaths.any((blocked) => path.contains(blocked));
+    return !_blockedPaths.any(path.contains);
   }
 
   static bool shouldLogRequest(RequestOptions options) =>
       _shouldLog(options.path);
 
-  static bool shouldLogResponse(Response response) =>
+  static bool shouldLogResponse(Response<dynamic> response) =>
       _shouldLog(response.requestOptions.path);
 
   static bool shouldLogError(DioException error) =>

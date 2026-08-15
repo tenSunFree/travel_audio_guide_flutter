@@ -1,6 +1,6 @@
-import '../../domain/entities/exercise_summary_data.dart';
-import '../../domain/services/step_tracking_service.dart';
-import '../health_connect_api.g.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/data/health_connect_api.g.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/domain/entities/exercise_summary_data.dart';
+import 'package:flutter_travel_audio_guide/features/step_tracking/domain/services/step_tracking_service.dart';
 
 class StepTrackingServiceImpl implements StepTrackingService {
   StepTrackingServiceImpl() : _api = HealthConnectHostApi();

@@ -27,7 +27,7 @@ void main() {
   group('ConditionSummaryBar — 顯示', () {
     testWidgets('預設顯示 sortOrder.label ・ filterType.label', (tester) async {
       await tester.pumpWidget(
-        _wrap(sortOrder: SortOrder.dateNewest, filterType: FilterType.all),
+        _wrap(),
       );
       expect(find.textContaining('日期（新→舊）'), findsOneWidget);
       expect(find.textContaining('全部'), findsOneWidget);
@@ -49,7 +49,7 @@ void main() {
       expect(find.byIcon(Icons.tune), findsOneWidget);
     });
     testWidgets('isNonDefault=false → 不顯示「重設」按鈕', (tester) async {
-      await tester.pumpWidget(_wrap(isNonDefault: false));
+      await tester.pumpWidget(_wrap());
       expect(find.text('重設'), findsNothing);
     });
     testWidgets('isNonDefault=true → 顯示「重設」按鈕', (tester) async {

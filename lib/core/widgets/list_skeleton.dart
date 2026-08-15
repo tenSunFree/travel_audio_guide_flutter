@@ -34,7 +34,7 @@ class _ListSkeletonState extends State<ListSkeleton>
     )..repeat(reverse: true);
     _animation = Tween<double>(
       begin: 0.3,
-      end: 1.0,
+      end: 1,
     ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
@@ -93,7 +93,6 @@ class _SkeletonItem extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Left-side image placeholder (used by AttractionTile)
             if (hasLeadingBox) ...[

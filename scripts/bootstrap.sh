@@ -24,6 +24,7 @@ echo "=== bootstrap: Initialize the development environment ==="
 
 run_step "Check local environment" bash scripts/doctor.sh
 run_step "Install Flutter dependencies" $FLUTTER_CMD pub get
+run_step "Install app_lints dependencies" bash -c "cd packages/app_lints && $DART_CMD pub get"
 
 if [ ! -f "env/dev.json" ]; then
     echo ""

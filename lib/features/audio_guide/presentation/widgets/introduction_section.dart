@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 class IntroductionSection extends StatelessWidget {
   const IntroductionSection({
-    super.key,
     required this.pageTitle,
     required this.text,
+    super.key,
   });
 
   final String pageTitle;

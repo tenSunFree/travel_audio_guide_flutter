@@ -3,7 +3,8 @@ enum SortOrder {
   dateOldest,
   nameAZ,
   downloadedFirst,
-  distanceAsc;
+  distanceAsc
+  ;
 
   String get label => switch (this) {
     SortOrder.dateNewest => '日期（新→舊）',
@@ -17,7 +18,8 @@ enum SortOrder {
 enum FilterType {
   all,
   downloaded,
-  notDownloaded;
+  notDownloaded
+  ;
 
   String get label => switch (this) {
     FilterType.all => '全部',

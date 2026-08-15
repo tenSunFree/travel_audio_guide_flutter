@@ -20,7 +20,7 @@ void main() {
       final text = tester.widget<Text>(find.text('景點推薦'));
       expect(text.style?.color, Colors.white);
       final container = tester.widget<Container>(find.byType(Container));
-      final decoration = container.decoration as BoxDecoration;
+      final decoration = container.decoration! as BoxDecoration;
       expect(decoration.color, Colors.blue);
     });
 

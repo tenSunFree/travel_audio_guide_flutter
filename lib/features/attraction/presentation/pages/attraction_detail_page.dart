@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/analytics/analytics_service.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/widgets/app_cached_network_image.dart';
-import '../../../reminder/presentation/utils/detail_schedule_actions.dart';
-import '../../domain/entities/attraction.dart';
-import '../../../../core/widgets/detail_action_buttons.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/app_cached_network_image.dart';
+import 'package:flutter_travel_audio_guide/core/widgets/detail_action_buttons.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/presentation/utils/detail_schedule_actions.dart';
 
 class AttractionDetailPage extends ConsumerStatefulWidget {
-  const AttractionDetailPage({super.key, required this.attraction});
+  const AttractionDetailPage({required this.attraction, super.key});
 
   final Attraction attraction;
 
@@ -52,7 +52,6 @@ class _AttractionDetailPageState extends ConsumerState<AttractionDetailPage> {
       address: attraction.address,
       description: attraction.introduction,
       location: attraction.address,
-      allDay: false,
     );
     return Scaffold(
       appBar: AppBar(
@@ -60,8 +59,8 @@ class _AttractionDetailPageState extends ConsumerState<AttractionDetailPage> {
           attraction.name,
           style: const TextStyle(fontWeight: FontWeight.w800),
         ),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
+        bottom: const PreferredSize(
+          preferredSize: Size.fromHeight(1),
           child: Divider(height: 1, thickness: 1, color: AppColors.divider),
         ),
       ),
@@ -251,7 +250,6 @@ class _ImageSectionState extends State<_ImageSection> {
                     imageUrl: images[i].src,
                     width: constraints.maxWidth,
                     height: 220,
-                    fit: BoxFit.cover,
                     errorWidget: Container(
                       color: AppColors.surfaceMuted,
                       alignment: Alignment.center,

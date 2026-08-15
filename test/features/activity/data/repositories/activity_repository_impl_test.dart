@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/activity/data/datasources/activity_remote_data_source.dart';
 import 'package:flutter_travel_audio_guide/features/activity/data/models/activity_model.dart';
 import 'package:flutter_travel_audio_guide/features/activity/data/models/activity_page_model.dart';
 import 'package:flutter_travel_audio_guide/features/activity/data/repositories/activity_repository_impl.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockActivityRemoteDataSource extends Mock
     implements ActivityRemoteDataSource {}
@@ -37,7 +37,6 @@ void main() {
       nlat: '25.033',
       elong: '121.565',
       organizer: '台北市政府',
-      coRganizer: '',
       contact: '服務人員',
       tel: '02-12345678',
       ticket: '免費',
@@ -126,8 +125,6 @@ void main() {
           () => remoteDataSource.getActivities(
             lang: 'zh-tw',
             page: 1,
-            begin: null,
-            end: null,
           ),
         ).thenAnswer((_) async => pageModel);
 
@@ -184,7 +181,7 @@ void main() {
       });
 
       test('空資料時 items 為空且 hasMore = false', () async {
-        final pageModel = ActivityPageModel(total: 0, page: 1, data: []);
+        const pageModel = ActivityPageModel(total: 0, page: 1, data: []);
 
         when(
           () => remoteDataSource.getActivities(

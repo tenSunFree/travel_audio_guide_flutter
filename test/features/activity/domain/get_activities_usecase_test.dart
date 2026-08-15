@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity.dart';
 import 'package:flutter_travel_audio_guide/features/activity/domain/entities/activity_page.dart';
 import 'package:flutter_travel_audio_guide/features/activity/domain/repositories/activity_repository.dart';
 import 'package:flutter_travel_audio_guide/features/activity/domain/usecases/get_activities_usecase.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockActivityRepository extends Mock implements ActivityRepository {}
 
@@ -85,8 +85,6 @@ void main() {
         () => repository.getActivities(
           lang: 'zh-tw',
           page: 1,
-          begin: null,
-          end: null,
         ),
       ).thenAnswer(
         (_) async =>
@@ -101,8 +99,6 @@ void main() {
         () => repository.getActivities(
           lang: 'zh-tw',
           page: 1,
-          begin: null,
-          end: null,
         ),
       ).called(1);
     });

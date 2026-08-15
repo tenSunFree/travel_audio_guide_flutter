@@ -1,16 +1,16 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/database/database_provider.dart';
-import '../../../../core/nearby/location_controller.dart';
-import '../../../../core/nearby/nearby_models.dart';
-import '../../../../core/nearby/nearby_utils.dart';
-import '../../../../core/utils/app_logger.dart';
-import '../../../activity/di/activity_providers.dart';
-import '../../../attraction/di/attraction_providers.dart';
-import '../../../attraction/domain/entities/attraction.dart';
-import '../../../audio_guide/domain/entities/audio_guide.dart';
-import '../../../audio_guide/presentation/controllers/audio_guide_list_controller.dart';
-import '../../di/nearby_providers.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/location_controller.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_models.dart';
+import 'package:flutter_travel_audio_guide/core/nearby/nearby_utils.dart';
+import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
+import 'package:flutter_travel_audio_guide/features/activity/di/activity_providers.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/di/attraction_providers.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/domain/entities/audio_guide.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/controllers/audio_guide_list_controller.dart';
+import 'package:flutter_travel_audio_guide/features/home/di/nearby_providers.dart';
 
 // State
 class NearbyHomeState {
@@ -112,7 +112,8 @@ class NearbyHomeController extends StateNotifier<NearbyHomeState> {
     }
   }
 
-  // Silent restore upon app startup (does not force cache refresh, directly uses cache coordinates)
+  // Silent restore upon app startup (does not force cache refresh,
+  // directly uses cache coordinates)
   Future<void> _silentRefresh() async {
     if (!mounted) return;
     state = state.copyWith(isLoading: true);
@@ -122,7 +123,8 @@ class NearbyHomeController extends StateNotifier<NearbyHomeState> {
           .getCurrentLocation();
       if (!mounted) return;
       if (point == null) {
-        // Permissions revoked, or location services turned off: Clear memory and display fallback UI.
+        // Permissions revoked, or location services turned off:
+        // Clear memory and display fallback UI.
         await _ref.read(nearbyRepositoryProvider).setNearbyEnabled(false);
         state = state.copyWith(isLoading: false);
         return;

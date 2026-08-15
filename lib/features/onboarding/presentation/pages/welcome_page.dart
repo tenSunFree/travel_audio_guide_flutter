@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../di/onboarding_providers.dart';
+import 'package:flutter_travel_audio_guide/features/onboarding/di/onboarding_providers.dart';
 
 class WelcomePage extends ConsumerStatefulWidget {
   const WelcomePage({super.key});
@@ -37,14 +37,14 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
     _heroFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.40, curve: Curves.easeOut),
+        curve: const Interval(0, 0.40, curve: Curves.easeOut),
       ),
     );
     _heroSlide = Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero)
         .animate(
           CurvedAnimation(
             parent: _controller,
-            curve: const Interval(0.0, 0.40, curve: Curves.easeOutBack),
+            curve: const Interval(0, 0.40, curve: Curves.easeOutBack),
           ),
         );
     _titleFade = Tween<double>(begin: 0, end: 1).animate(
@@ -81,14 +81,14 @@ class _WelcomePageState extends ConsumerState<WelcomePage>
     _buttonFade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.72, 1.0, curve: Curves.easeOut),
+        curve: const Interval(0.72, 1, curve: Curves.easeOut),
       ),
     );
     _buttonSlide = Tween<Offset>(begin: const Offset(0, 0.25), end: Offset.zero)
         .animate(
           CurvedAnimation(
             parent: _controller,
-            curve: const Interval(0.72, 1.0, curve: Curves.easeOut),
+            curve: const Interval(0.72, 1, curve: Curves.easeOut),
           ),
         );
     _controller.forward();
@@ -493,7 +493,7 @@ class _StaticMapPainter extends CustomPainter {
     );
     canvas.drawCircle(
       Offset(size.width * 0.14, size.height * 0.82),
-      4.0,
+      4,
       _sparklePaint,
     );
     canvas.drawCircle(

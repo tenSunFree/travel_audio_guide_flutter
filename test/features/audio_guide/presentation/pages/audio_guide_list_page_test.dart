@@ -3,13 +3,13 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 import 'package:flutter_travel_audio_guide/core/database/app_database.dart';
 import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
 import 'package:flutter_travel_audio_guide/core/sync/app_sync_service.dart';
 import 'package:flutter_travel_audio_guide/core/sync/sync_providers.dart';
 import 'package:flutter_travel_audio_guide/core/widgets/list_skeleton.dart';
 import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/pages/audio_guide_list_page.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// Mock (mocktail) of AppSyncService
 /// Used to control the behavior of syncAllIfNeeded() / forceSync()
@@ -34,7 +34,7 @@ Widget buildTestApp({required AppDatabase db, AppSyncService? syncService}) {
 /// Create a MockAppSyncService that completes sync immediately.
 AppSyncService _buildInstantSyncService(AppDatabase db) {
   final mock = MockAppSyncService();
-  when(() => mock.syncAllIfNeeded()).thenAnswer((_) async {});
+  when(mock.syncAllIfNeeded).thenAnswer((_) async {});
   when(() => mock.forceSync(any())).thenAnswer((_) async {});
   return mock;
 }
@@ -85,7 +85,7 @@ void main() {
   group('loading 狀態', () {
     testWidgets('isSyncing=true 且無資料時顯示 ListSkeleton', (tester) async {
       final mockSync = MockAppSyncService();
-      when(() => mockSync.syncAllIfNeeded()).thenAnswer((_) async {});
+      when(mockSync.syncAllIfNeeded).thenAnswer((_) async {});
       when(() => mockSync.forceSync(any())).thenAnswer((_) async {});
       await tester.pumpWidget(buildTestApp(db: db, syncService: mockSync));
       expect(find.byType(ListSkeleton), findsOneWidget);
@@ -96,7 +96,7 @@ void main() {
   group('有語音導覽資料', () {
     testWidgets('DB 有資料時顯示 AudioGuideTile 列表', (tester) async {
       // Insert the data first, then create the widget (sync completes immediately).
-      await insertGuide(db, id: 1, title: '故宮語音導覽');
+      await insertGuide(db);
       await insertGuide(db, id: 2, title: '大稻埕語音導覽');
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
@@ -105,7 +105,7 @@ void main() {
       await disposeWidgetTree(tester);
     });
     testWidgets('顯示更新日期文字（更新於）', (tester) async {
-      await insertGuide(db, id: 1, modified: '2026-05-19');
+      await insertGuide(db);
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
       expect(find.textContaining('更新於'), findsOneWidget);
@@ -114,7 +114,6 @@ void main() {
     testWidgets('已下載的 guide 顯示「播放」按鈕', (tester) async {
       await insertGuide(
         db,
-        id: 1,
         title: '已下載導覽',
         isDownloaded: true,
         localFilePath: '/tmp/audio.mp3',
@@ -125,7 +124,7 @@ void main() {
       await disposeWidgetTree(tester);
     });
     testWidgets('未下載的 guide 顯示「下載」按鈕', (tester) async {
-      await insertGuide(db, id: 1, isDownloaded: false);
+      await insertGuide(db);
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
       expect(find.text('下載'), findsOneWidget);
@@ -152,7 +151,7 @@ void main() {
   group('錯誤狀態', () {
     testWidgets('errorMessage 在 items 為空時顯示錯誤文字', (tester) async {
       final mockSync = MockAppSyncService();
-      when(() => mockSync.syncAllIfNeeded()).thenThrow(Exception('sync 失敗'));
+      when(mockSync.syncAllIfNeeded).thenThrow(Exception('sync 失敗'));
       when(() => mockSync.forceSync(any())).thenAnswer((_) async {});
       await tester.pumpWidget(buildTestApp(db: db, syncService: mockSync));
       await tester.pumpAndSettle();
@@ -180,7 +179,7 @@ void main() {
       await tester.pumpWidget(buildTestApp(db: db));
       await tester.pumpAndSettle();
       expect(find.text('暫無語音導覽資料'), findsOneWidget);
-      await insertGuide(db, id: 1, title: '動態新增導覽');
+      await insertGuide(db, title: '動態新增導覽');
       await tester.pumpAndSettle();
       expect(find.text('動態新增導覽'), findsOneWidget);
       expect(find.text('暫無語音導覽資料'), findsNothing);

@@ -1,13 +1,6 @@
-import '../entities/home_state.dart';
+import 'package:flutter_travel_audio_guide/features/home/domain/entities/home_state.dart';
 
 class OpenTimeResult {
-  final RecommendStatus status;
-  final String badgeText;
-  final String? reasonText;
-  final bool isOpenNow;
-  final int? closeHour;
-  final int? closeMinute;
-
   const OpenTimeResult({
     required this.status,
     required this.badgeText,
@@ -27,6 +20,12 @@ class OpenTimeResult {
       closeMinute: null,
     );
   }
+  final RecommendStatus status;
+  final String badgeText;
+  final String? reasonText;
+  final bool isOpenNow;
+  final int? closeHour;
+  final int? closeMinute;
 }
 
 class OpenTimeParser {

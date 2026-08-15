@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/preferences/shared_preferences_provider.dart';
-import '../data/datasources/onboarding_local_data_source.dart';
-import '../data/repositories/onboarding_repository_impl.dart';
-import '../domain/repositories/onboarding_repository.dart';
+import 'package:flutter_travel_audio_guide/core/preferences/shared_preferences_provider.dart';
+import 'package:flutter_travel_audio_guide/features/onboarding/data/datasources/onboarding_local_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/onboarding/data/repositories/onboarding_repository_impl.dart';
+import 'package:flutter_travel_audio_guide/features/onboarding/domain/repositories/onboarding_repository.dart';
 
 final onboardingLocalDataSourceProvider = Provider<OnboardingLocalDataSource>((
   ref,

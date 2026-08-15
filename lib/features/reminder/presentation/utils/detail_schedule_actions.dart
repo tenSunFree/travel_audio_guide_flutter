@@ -2,11 +2,11 @@ import 'package:add_2_calendar/add_2_calendar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/di/reminder_providers.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/usecases/create_reminder_usecase.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/presentation/widgets/reminder_bottom_sheet.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../../../core/analytics/analytics_service.dart';
-import '../../di/reminder_providers.dart';
-import '../../domain/usecases/create_reminder_usecase.dart';
-import '../widgets/reminder_bottom_sheet.dart';
 
 /// Pass in the scheduling data for each page.
 class DetailScheduleItem {

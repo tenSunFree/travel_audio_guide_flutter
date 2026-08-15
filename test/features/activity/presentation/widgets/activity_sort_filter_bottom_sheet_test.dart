@@ -63,7 +63,7 @@ void main() {
     });
 
     testWidgets('顯示行政區選項', (tester) async {
-      await tester.pumpWidget(wrap(availableDistrics: const ['信義區', '中正區']));
+      await tester.pumpWidget(wrap());
       await tester.scrollUntilVisible(find.text('信義區'), 100);
       expect(find.text('信義區'), findsOneWidget);
       expect(find.text('中正區'), findsOneWidget);
@@ -78,7 +78,7 @@ void main() {
   group('ActivitySortFilterBottomSheet — 操作', () {
     testWidgets('可以切換活動狀態', (tester) async {
       await tester.pumpWidget(wrap());
-      final target = ActivityStatusFilter.ongoing;
+      const target = ActivityStatusFilter.ongoing;
       await tester.tap(find.text(target.label));
       await tester.pump();
       final chip = tester.widget<ChoiceChip>(
@@ -99,7 +99,7 @@ void main() {
 
     testWidgets('可以切換距離篩選', (tester) async {
       await tester.pumpWidget(wrap());
-      final target = DistanceFilter.km1;
+      const target = DistanceFilter.km1;
       await tester.scrollUntilVisible(find.text(target.label), 100);
       await tester.tap(find.text(target.label));
       await tester.pump();

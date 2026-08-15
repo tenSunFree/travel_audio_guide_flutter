@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../enums/sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/audio_guide/presentation/enums/sort_filter_enums.dart';
 
 class ConditionSummaryBar extends StatelessWidget {
   const ConditionSummaryBar({
-    super.key,
     required this.sortOrder,
     required this.filterType,
     required this.isNonDefault,
     required this.onReset,
+    super.key,
   });
 
   final SortOrder sortOrder;

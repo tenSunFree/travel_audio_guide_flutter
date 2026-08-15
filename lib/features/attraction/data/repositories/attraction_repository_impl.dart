@@ -1,7 +1,7 @@
-import '../../domain/entities/attraction.dart';
-import '../../domain/entities/attraction_page.dart';
-import '../../domain/repositories/attraction_repository.dart';
-import '../datasources/attraction_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/data/datasources/attraction_remote_data_source.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction_page.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/repositories/attraction_repository.dart';
 
 class AttractionRepositoryImpl implements AttractionRepository {
   const AttractionRepositoryImpl(this._remoteDataSource);

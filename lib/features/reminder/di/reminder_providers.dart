@@ -1,14 +1,14 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/database/database_provider.dart';
-import '../data/repositories/reminder_repository_impl.dart';
-import '../data/services/notification_service_impl.dart';
-import '../domain/entities/reminder.dart';
-import '../domain/repositories/reminder_repository.dart';
-import '../domain/services/notification_service.dart';
-import '../domain/usecases/create_reminder_usecase.dart';
-import '../domain/usecases/delete_reminder_usecase.dart';
-import '../domain/usecases/reschedule_pending_reminders_usecase.dart';
+import 'package:flutter_travel_audio_guide/core/database/database_provider.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/data/repositories/reminder_repository_impl.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/data/services/notification_service_impl.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/entities/reminder.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/repositories/reminder_repository.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/services/notification_service.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/usecases/create_reminder_usecase.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/usecases/delete_reminder_usecase.dart';
+import 'package:flutter_travel_audio_guide/features/reminder/domain/usecases/reschedule_pending_reminders_usecase.dart';
 
 final flutterLocalNotificationsPluginProvider =
     Provider<FlutterLocalNotificationsPlugin>((ref) {

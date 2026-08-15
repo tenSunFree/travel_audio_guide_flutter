@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
 
 class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
   const CommonAppBar({
@@ -19,8 +19,8 @@ class CommonAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
       centerTitle: centerTitle,
       actions: actions,
-      bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(1),
+      bottom: const PreferredSize(
+        preferredSize: Size.fromHeight(1),
         child: Divider(height: 1, thickness: 1, color: AppColors.divider),
       ),
     );

@@ -1,0 +1,47 @@
+name: Dependabot Auto Merge
+
+# This workflow is intentionally configured to be manually triggered only;
+# it will not automatically act on Dependabot PRs.
+# When to switch to automatic: see the GitHub issue
+# "chore(deps): Evaluate Dependabot auto-merge (after 4-8 weeks)" checklist.
+# How to switch: remove the following workflow_dispatch line and uncomment the
+# pull_request block below.
+on:
+  workflow_dispatch:
+  # pull_request:
+  #   types:
+  #     - opened
+  #     - synchronize
+  #     - reopened
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot:
+    # Only run on PRs opened by Dependabot and limit execution to this repo
+    # (prevents accidental triggering on forked PRs).
+    # Note: when triggered via workflow_dispatch there is no pull_request context,
+    # so this "if" will evaluate to false and the job will not run. That means
+    # manually clicking "Run workflow" will not perform any merge actions.
+    if: >
+      github.event.pull_request.user.login == 'dependabot[bot]' &&
+      github.repository == github.event.pull_request.base.repo.full_name
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # Only auto-merge patch-level updates. Minor/major updates must be
+      # reviewed and merged manually after checking the changelog.
+      - name: Enable auto-merge for patch updates only
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

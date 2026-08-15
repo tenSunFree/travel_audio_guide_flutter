@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../domain/entities/attraction.dart';
-import '../enums/attraction_sort_filter_enums.dart';
+import 'package:flutter_travel_audio_guide/core/constants/app_colors.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/domain/entities/attraction.dart';
+import 'package:flutter_travel_audio_guide/features/attraction/presentation/enums/attraction_sort_filter_enums.dart';
 
 /// Top filter summary column of the recreation attractions page
 /// Displays the currently active criteria
 /// allowing users to clearly understand the conditions under which the list is filtered.
 class AttractionConditionSummaryBar extends StatelessWidget {
   const AttractionConditionSummaryBar({
-    super.key,
     required this.sortOrder,
     required this.categoryIds,
     required this.distric,
@@ -19,6 +18,7 @@ class AttractionConditionSummaryBar extends StatelessWidget {
     required this.availableCategories,
     required this.isNonDefault,
     required this.onReset,
+    super.key,
   });
 
   final AttractionSortOrder sortOrder;
