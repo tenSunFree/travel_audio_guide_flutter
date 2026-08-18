@@ -2,6 +2,21 @@
 
 ---
 
+## v1.0.9 - 2026-08-16
+
+### Fixed
+- Guarded `StepTrackingController` initialization against dispose races, and exposed an `initialized` future so callers can safely await readiness before use
+- Fixed CI, staging, RC, and production deployment workflows failing to resolve `packages/app_lints`, the project's standalone Dart Analyzer Plugin, before running static analysis
+
+### Internal
+- Added a project-owned Dart Analyzer Plugin (`packages/app_lints`) enforcing Clean Architecture dependency boundaries and team naming/logging conventions directly inside `flutter analyze`
+- Adopted `very_good_analysis` as the project-wide lint baseline
+- Configured Dependabot version updates for the `pub` and `github-actions` ecosystems, and added explicit `permissions` blocks to CI workflows
+- Added `AnalyticsService` unit tests covering the success and failure logging paths, closing the last Codecov patch-coverage gap
+- Added test coverage for splash screen particle animation, attraction/activity models, and the step tracking provider
+
+---
+
 ## v1.0.8 - 2026-07-28
 
 ### Internal
