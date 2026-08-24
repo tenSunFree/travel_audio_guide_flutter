@@ -57,7 +57,7 @@ class LoginController extends StateNotifier<LoginState> {
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
-        errorMessage: 'Sign in failed, please try again later',
+        errorMessage: '登入失敗，請稍後再試',
       );
     }
   }
