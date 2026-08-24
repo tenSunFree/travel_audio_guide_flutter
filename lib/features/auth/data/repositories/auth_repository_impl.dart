@@ -30,11 +30,15 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> signUpWithPassword({
+  Future<bool> signUpWithPassword({
     required String email,
     required String password,
-  }) {
-    return _dataSource.signUpWithPassword(email: email, password: password);
+  }) async {
+    final response = await _dataSource.signUpWithPassword(
+      email: email,
+      password: password,
+    );
+    return response.session != null;
   }
 
   @override

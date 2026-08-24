@@ -9,29 +9,42 @@ class LoginController extends StateNotifier<LoginState> {
   final Ref ref;
 
   Future<void> signIn({required String email, required String password}) {
-    return _submit(
-      () => ref
+    return _submit(() async {
+      await ref
           .read(authRepositoryProvider)
-          .signInWithPassword(email: email, password: password),
-    );
+          .signInWithPassword(email: email, password: password);
+      // There is never an intermediate "needs email confirmation" state for sign-in.
+      return false;
+    });
   }
 
   Future<void> signUp({required String email, required String password}) {
     return _submit(
       () => ref
           .read(authRepositoryProvider)
-          .signUpWithPassword(email: email, password: password),
+          .signUpWithPassword(email: email, password: password)
+          // The repository returns true to indicate a session was obtained
+          // immediately after sign-up. For the UI we invert this: hasSession == false
+          // means we need to prompt the user to check their email for confirmation.
+          .then((hasSession) => !hasSession),
     );
   }
 
-  Future<void> _submit(Future<void> Function() action) async {
+  Future<void> _submit(Future<bool> Function() action) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
     try {
-      await action();
-      // After successful sign-in, authStateChangesProvider will emit the new state,
-      // and the router's redirect will navigate to the home page.
-      // No manual context.go() is needed here.
-      state = state.copyWith(isLoading: false, isSuccess: true);
+      final needsEmailConfirmation = await action();
+      // After successful sign-in / sign-up:
+      // - authStateChangesProvider will automatically emit a new state if a
+      //   session was obtained.
+      // - If no session was obtained (needsEmailConfirmation == true), the
+      //   Router's redirect won't be triggered and the UI stays on the login
+      //   page so we can show a prompt.
+      state = state.copyWith(
+        isLoading: false,
+        isSuccess: true,
+        needsEmailConfirmation: needsEmailConfirmation,
+      );
     } on AppException catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -42,7 +55,10 @@ class LoginController extends StateNotifier<LoginState> {
         ),
       );
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: '登入失敗，請稍後再試');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'Sign in failed, please try again later',
+      );
     }
   }
 }

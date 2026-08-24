@@ -2,8 +2,8 @@ import 'package:flutter_travel_audio_guide/core/error/exceptions.dart';
 import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Wraps Supabase Flutter's GoTrueClient so upper layers (Repository)
-/// don't need to depend directly on supabase_flutter types.
+/// Wraps supabase_flutter's GoTrueClient so the upper layer (Repository)
+/// doesn't need to depend directly on supabase_flutter types.
 class SupabaseAuthDataSource {
   const SupabaseAuthDataSource(this._client);
 
@@ -13,7 +13,7 @@ class SupabaseAuthDataSource {
 
   User? get currentUser => _client.auth.currentUser;
 
-  /// Emits when the session changes (sign-in, sign-out, token refresh).
+  /// Emits whenever the Session changes (sign-in, sign-out, or token auto-refresh).
   Stream<AuthState> get onAuthStateChange => _client.auth.onAuthStateChange;
 
   Future<void> signInWithPassword({
@@ -28,12 +28,19 @@ class SupabaseAuthDataSource {
     }
   }
 
-  Future<void> signUpWithPassword({
+  /// Returns the full [AuthResponse] so callers can check whether
+  /// `response.session` is null.
+  ///
+  /// If the Supabase project has email confirmation enabled, `session` will be
+  /// null after a successful signup (meaning the account is created but the
+  /// user must confirm their email before being fully signed in). Callers
+  /// must not treat a successful response as an authenticated state.
+  Future<AuthResponse> signUpWithPassword({
     required String email,
     required String password,
   }) async {
     try {
-      await _client.auth.signUp(email: email, password: password);
+      return await _client.auth.signUp(email: email, password: password);
     } on AuthException catch (e) {
       AppLogger.error('SupabaseAuth signUp failed: ${e.message}', exception: e);
       throw ServerException(_mapAuthError(e));
@@ -52,7 +59,8 @@ class SupabaseAuthDataSource {
     }
   }
 
-  /// Map common Supabase error codes to user-friendly messages for UI display.
+  /// Map common Supabase error codes to user-facing messages in Chinese so
+  /// the UI can display them directly.
   String _mapAuthError(AuthException e) {
     switch (e.code) {
       case 'invalid_credentials':

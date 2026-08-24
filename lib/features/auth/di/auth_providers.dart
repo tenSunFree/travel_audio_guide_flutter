@@ -4,8 +4,8 @@ import 'package:flutter_travel_audio_guide/features/auth/data/repositories/auth_
 import 'package:flutter_travel_audio_guide/features/auth/domain/repositories/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Supabase.initialize() is already executed in bootstrap.dart;
-/// use the global singleton client here.
+/// Supabase.initialize() is already called in `bootstrap.dart`,
+/// so we directly use the global singleton client here.
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
 });
@@ -20,23 +20,27 @@ final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepositoryImpl(ref.watch(supabaseAuthDataSourceProvider));
 });
 
-/// Stream of sign-in state changes: true = signed in, false = signed out.
-/// GoRouter's refreshListenable depends on this provider to automatically redirect.
+/// Authentication state changes Stream: true = signed in, false = signed out.
+/// GoRouter's refreshListenable depends on this provider to automatically
+/// redirect routes.
 final authStateChangesProvider = StreamProvider<bool>((ref) {
   final repo = ref.watch(authRepositoryProvider);
-  // Emit the current state immediately to avoid having no value when the app starts.
+  // Immediately emit the current state to avoid the Stream not having emitted any values when the App just starts.
   return repo.authStateChanges.startWith(repo.isSignedIn);
 });
 
-/// Synchronous snapshot whether the user is signed in, used by the UI
-/// (e.g., to show sign in/out button).
+/// Whether the user is currently signed in, for UI decisions (e.g. show
+/// sign-in/sign-out buttons). It updates with [authStateChangesProvider]. If
+/// the Stream hasn't emitted its first value yet (for example right at
+/// app startup), fall back to the repository's synchronous snapshot.
 final isSignedInProvider = Provider<bool>((ref) {
-  return ref.watch(authRepositoryProvider).isSignedIn;
+  final authState = ref.watch(authStateChangesProvider);
+  return authState.valueOrNull ?? ref.read(authRepositoryProvider).isSignedIn;
 });
 
 extension _StartWith<T> on Stream<T> {
-  /// Stream doesn't include startWith natively; implement a simple version
-  /// here to avoid adding rxdart as a dependency.
+  /// The Stream package doesn't provide startWith, so we implement a small
+  /// helper here to avoid adding an rxdart dependency.
   Stream<T> startWith(T value) async* {
     yield value;
     yield* this;

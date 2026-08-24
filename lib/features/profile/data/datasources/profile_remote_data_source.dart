@@ -6,15 +6,15 @@ import 'package:flutter_travel_audio_guide/features/profile/data/models/profile_
 class ProfileRemoteDataSource {
   const ProfileRemoteDataSource(this._dio);
 
-  /// The [_dio] here must be an instance pointing to the Go backend and have
-  /// the AuthInterceptor attached. It corresponds to the
-  /// `backendDioProvider` in `network_providers.dart`, not the dioProvider
-  /// used for the travel.taipei open-api.
+  /// Here [_dio] must point to the Go backend and be an instance with the
+  /// AuthInterceptor attached.
+  /// (This corresponds to `backendDioProvider` in `network_providers.dart`,
+  /// not the dioProvider used for the travel.taipei open-api.)
   final Dio _dio;
 
   /// GET /api/v1/me
-  /// If a profile does not exist the backend will create one automatically
-  /// (preferred_language defaults to zh-TW).
+  /// If a profile does not exist, the backend will automatically create one
+  /// (preferred_language defaults to 'zh-TW').
   Future<ProfileModel> getMe() async {
     try {
       final response = await _dio.get<Map<String, dynamic>>('/api/v1/me');
@@ -25,8 +25,8 @@ class ProfileRemoteDataSource {
   }
 
   /// PUT /api/v1/me
-  /// Only send fields you want to update; fields not provided will be left
-  /// unchanged by the backend.
+  /// Only send the fields you want to update; fields not provided will be
+  /// preserved by the backend.
   Future<ProfileModel> updateMe({
     String? displayName,
     String? avatarUrl,

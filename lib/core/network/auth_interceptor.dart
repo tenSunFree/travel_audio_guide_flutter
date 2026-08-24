@@ -1,31 +1,36 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter_travel_audio_guide/core/utils/app_logger.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// For every request sent to the Go backend (/api/v1/*),
-/// automatically attach the current Supabase session's access token.
+/// Automatically attaches the current Supabase session access_token to
+/// every request sent to the Go backend (e.g. /api/v1/*).
 ///
 /// Flow:
 /// Flutter -> Supabase Auth sign-in -> obtain access_token
-///   -> call Go Backend API -> include `Authorization: Bearer <access_token>` header
+///   -> call Go backend API -> include `Authorization: Bearer <access_token>` header
 class AuthInterceptor extends Interceptor {
   AuthInterceptor(this._client);
 
   final SupabaseClient _client;
+
+  /// Prevent multiple concurrent requests receiving 401 from triggering
+  /// repeated signOut() calls.
+  bool _isHandlingUnauthorized = false;
 
   @override
   Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Supabase SDK automatically refreshes tokens in the background,
-    // so currentSession.accessToken should be up-to-date.
+    // The Supabase SDK automatically refreshes expiring tokens in the
+    // background, so the access_token from currentSession is always up-to-date.
     final accessToken = _client.auth.currentSession?.accessToken;
     if (accessToken != null) {
       options.headers['Authorization'] = 'Bearer $accessToken';
     } else {
       AppLogger.info(
-        '[AuthInterceptor] Not signed in, Authorization header not added'
+        '[AuthInterceptor] 尚未登入，未帶入 Authorization header'
         ' | path=${options.path}',
       );
     }
@@ -34,15 +39,36 @@ class AuthInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    // 401 indicates the token may be invalid (e.g., user logged out on another device or refresh token expired).
-    // We only log it here and don't perform global sign-out inside the interceptor,
-    // to avoid conflicting with UI-layer error handling or navigation.
+    // 401 indicates the token is invalid (for example, the user signed out on
+    // another device, or the refresh token expired). Trigger a real signOut()
+    // here so:
+    // - authStateChangesProvider receives the new state and GoRouter's
+    //   redirect will navigate to the login page automatically
+    // - avoid manipulating navigation directly here to prevent conflicts with
+    //   UI-level error handling and navigation logic
     if (err.response?.statusCode == 401) {
-      AppLogger.info(
-        '[AuthInterceptor] Received 401, token may be invalid'
-        ' | path=${err.requestOptions.path}',
-      );
+      _handleUnauthorized(err.requestOptions.path);
     }
     handler.next(err);
+  }
+
+  void _handleUnauthorized(String path) {
+    if (_isHandlingUnauthorized) return;
+    _isHandlingUnauthorized = true;
+    AppLogger.info(
+      '[AuthInterceptor] Received 401, forcing sign out | path=$path',
+    );
+    unawaited(
+      _client.auth
+          .signOut()
+          .catchError((Object e, StackTrace st) {
+            AppLogger.error(
+              '[AuthInterceptor] signOut() failed after receiving 401',
+              exception: e,
+              stackTrace: st,
+            );
+          })
+          .whenComplete(() => _isHandlingUnauthorized = false),
+    );
   }
 }

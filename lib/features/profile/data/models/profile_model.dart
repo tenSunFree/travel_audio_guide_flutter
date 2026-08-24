@@ -5,8 +5,7 @@ part 'profile_model.freezed.dart';
 
 part 'profile_model.g.dart';
 
-/// Corresponds to the backend `data` object returned by
-/// GET/PUT /api/v1/me:
+/// Corresponds to the backend's `data` object returned by `GET/PUT /api/v1/me`:
 /// {
 ///   "id": "...", "email": "...", "display_name": "...",
 ///   "avatar_url": null, "preferred_language": "zh-TW",

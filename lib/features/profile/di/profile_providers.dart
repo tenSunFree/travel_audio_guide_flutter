@@ -7,7 +7,7 @@ import 'package:flutter_travel_audio_guide/features/profile/domain/repositories/
 final profileRemoteDataSourceProvider = Provider<ProfileRemoteDataSource>((
   ref,
 ) {
-  // Note: use backendDioProvider here (talks to the Go Backend + attaches JWT),
+  // Note: use backendDioProvider here (targets Go backend + includes JWT),
   // not the dioProvider used for the travel.taipei open-api.
   return ProfileRemoteDataSource(ref.watch(backendDioProvider));
 });

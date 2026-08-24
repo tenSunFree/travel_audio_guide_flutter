@@ -14,7 +14,11 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$LoginState {
 
- bool get isLoading; bool get isSuccess; String? get errorMessage;
+ bool get isLoading; bool get isSuccess;/// Registration succeeded but a session was not obtained because email
+/// confirmation is still pending.
+/// The UI uses this to decide whether to redirect to the home page or to
+/// prompt the user to check their email for confirmation.
+ bool get needsEmailConfirmation; String? get errorMessage;
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +29,16 @@ $LoginStateCopyWith<LoginState> get copyWith => _$LoginStateCopyWithImpl<LoginSt
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is LoginState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.needsEmailConfirmation, needsEmailConfirmation) || other.needsEmailConfirmation == needsEmailConfirmation)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,isSuccess,errorMessage);
+int get hashCode => Object.hash(runtimeType,isLoading,isSuccess,needsEmailConfirmation,errorMessage);
 
 @override
 String toString() {
-  return 'LoginState(isLoading: $isLoading, isSuccess: $isSuccess, errorMessage: $errorMessage)';
+  return 'LoginState(isLoading: $isLoading, isSuccess: $isSuccess, needsEmailConfirmation: $needsEmailConfirmation, errorMessage: $errorMessage)';
 }
 
 
@@ -45,7 +49,7 @@ abstract mixin class $LoginStateCopyWith<$Res>  {
   factory $LoginStateCopyWith(LoginState value, $Res Function(LoginState) _then) = _$LoginStateCopyWithImpl;
 @useResult
 $Res call({
- bool isLoading, bool isSuccess, String? errorMessage
+ bool isLoading, bool isSuccess, bool needsEmailConfirmation, String? errorMessage
 });
 
 
@@ -62,10 +66,11 @@ class _$LoginStateCopyWithImpl<$Res>
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? isSuccess = null,Object? errorMessage = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? isLoading = null,Object? isSuccess = null,Object? needsEmailConfirmation = null,Object? errorMessage = freezed,}) {
   return _then(_self.copyWith(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
+as bool,needsEmailConfirmation: null == needsEmailConfirmation ? _self.needsEmailConfirmation : needsEmailConfirmation // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -152,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isLoading,  bool isSuccess,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool isLoading,  bool isSuccess,  bool needsEmailConfirmation,  String? errorMessage)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _LoginState() when $default != null:
-return $default(_that.isLoading,_that.isSuccess,_that.errorMessage);case _:
+return $default(_that.isLoading,_that.isSuccess,_that.needsEmailConfirmation,_that.errorMessage);case _:
   return orElse();
 
 }
@@ -173,10 +178,10 @@ return $default(_that.isLoading,_that.isSuccess,_that.errorMessage);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isLoading,  bool isSuccess,  String? errorMessage)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool isLoading,  bool isSuccess,  bool needsEmailConfirmation,  String? errorMessage)  $default,) {final _that = this;
 switch (_that) {
 case _LoginState():
-return $default(_that.isLoading,_that.isSuccess,_that.errorMessage);case _:
+return $default(_that.isLoading,_that.isSuccess,_that.needsEmailConfirmation,_that.errorMessage);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +198,10 @@ return $default(_that.isLoading,_that.isSuccess,_that.errorMessage);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isLoading,  bool isSuccess,  String? errorMessage)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool isLoading,  bool isSuccess,  bool needsEmailConfirmation,  String? errorMessage)?  $default,) {final _that = this;
 switch (_that) {
 case _LoginState() when $default != null:
-return $default(_that.isLoading,_that.isSuccess,_that.errorMessage);case _:
+return $default(_that.isLoading,_that.isSuccess,_that.needsEmailConfirmation,_that.errorMessage);case _:
   return null;
 
 }
@@ -208,11 +213,16 @@ return $default(_that.isLoading,_that.isSuccess,_that.errorMessage);case _:
 
 
 class _LoginState implements LoginState {
-  const _LoginState({this.isLoading = false, this.isSuccess = false, this.errorMessage});
+  const _LoginState({this.isLoading = false, this.isSuccess = false, this.needsEmailConfirmation = false, this.errorMessage});
   
 
 @override@JsonKey() final  bool isLoading;
 @override@JsonKey() final  bool isSuccess;
+/// Registration succeeded but a session was not obtained because email
+/// confirmation is still pending.
+/// The UI uses this to decide whether to redirect to the home page or to
+/// prompt the user to check their email for confirmation.
+@override@JsonKey() final  bool needsEmailConfirmation;
 @override final  String? errorMessage;
 
 /// Create a copy of LoginState
@@ -225,16 +235,16 @@ _$LoginStateCopyWith<_LoginState> get copyWith => __$LoginStateCopyWithImpl<_Log
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _LoginState&&(identical(other.isLoading, isLoading) || other.isLoading == isLoading)&&(identical(other.isSuccess, isSuccess) || other.isSuccess == isSuccess)&&(identical(other.needsEmailConfirmation, needsEmailConfirmation) || other.needsEmailConfirmation == needsEmailConfirmation)&&(identical(other.errorMessage, errorMessage) || other.errorMessage == errorMessage));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,isLoading,isSuccess,errorMessage);
+int get hashCode => Object.hash(runtimeType,isLoading,isSuccess,needsEmailConfirmation,errorMessage);
 
 @override
 String toString() {
-  return 'LoginState(isLoading: $isLoading, isSuccess: $isSuccess, errorMessage: $errorMessage)';
+  return 'LoginState(isLoading: $isLoading, isSuccess: $isSuccess, needsEmailConfirmation: $needsEmailConfirmation, errorMessage: $errorMessage)';
 }
 
 
@@ -245,7 +255,7 @@ abstract mixin class _$LoginStateCopyWith<$Res> implements $LoginStateCopyWith<$
   factory _$LoginStateCopyWith(_LoginState value, $Res Function(_LoginState) _then) = __$LoginStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool isLoading, bool isSuccess, String? errorMessage
+ bool isLoading, bool isSuccess, bool needsEmailConfirmation, String? errorMessage
 });
 
 
@@ -262,10 +272,11 @@ class __$LoginStateCopyWithImpl<$Res>
 
 /// Create a copy of LoginState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? isSuccess = null,Object? errorMessage = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? isLoading = null,Object? isSuccess = null,Object? needsEmailConfirmation = null,Object? errorMessage = freezed,}) {
   return _then(_LoginState(
 isLoading: null == isLoading ? _self.isLoading : isLoading // ignore: cast_nullable_to_non_nullable
 as bool,isSuccess: null == isSuccess ? _self.isSuccess : isSuccess // ignore: cast_nullable_to_non_nullable
+as bool,needsEmailConfirmation: null == needsEmailConfirmation ? _self.needsEmailConfirmation : needsEmailConfirmation // ignore: cast_nullable_to_non_nullable
 as bool,errorMessage: freezed == errorMessage ? _self.errorMessage : errorMessage // ignore: cast_nullable_to_non_nullable
 as String?,
   ));

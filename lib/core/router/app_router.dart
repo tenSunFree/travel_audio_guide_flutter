@@ -79,14 +79,14 @@ class AppRoutes {
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  // Whether the welcome page has been seen (existing logic)
+  // Whether the welcome page has been seen
   final hasSeenNotifier = ValueNotifier<bool>(ref.read(onboardingProvider));
   ref.listen<bool>(
     onboardingProvider,
     (_, next) => hasSeenNotifier.value = next,
   );
   ref.onDispose(hasSeenNotifier.dispose);
-  // Whether the user is signed in to Supabase
+  // Whether the user is signed in with Supabase
   final signedInNotifier = ValueNotifier<bool>(
     ref.read(authStateChangesProvider).valueOrNull ?? false,
   );
@@ -107,19 +107,19 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       if (location == AppRoutes.splash) {
         return null;
       }
-      // If the welcome page hasn't been seen: redirect everything except the welcome page to welcome.
+      // If the welcome page hasn't been seen: redirect to welcome for all routes except welcome itself.
       if (!hasSeen && location != AppRoutes.welcome) {
         return AppRoutes.welcome;
       }
-      // If the welcome page has been seen but the user is still on the welcome page: route based on sign-in status.
+      // If welcome has been seen but the user is still on the welcome page: route based on sign-in state.
       if (hasSeen && location == AppRoutes.welcome) {
         return signedIn ? AppRoutes.home : AppRoutes.login;
       }
-      // Welcome seen, not signed in, and not on the login page: redirect to the login page.
+      // If welcome has been seen, user is not signed in, and not on the login page: redirect to login.
       if (hasSeen && !signedIn && location != AppRoutes.login) {
         return AppRoutes.login;
       }
-      // Signed in but still on the login page: redirect to the home page.
+      // If signed in but still on the login page: redirect to home.
       if (signedIn && location == AppRoutes.login) {
         return AppRoutes.home;
       }

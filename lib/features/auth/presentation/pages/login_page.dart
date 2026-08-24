@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_travel_audio_guide/features/auth/presentation/controllers/login_controller.dart';
+import 'package:flutter_travel_audio_guide/features/auth/presentation/controllers/login_state.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -39,10 +40,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(loginControllerProvider);
-    // When sign-up succeeds but requires email confirmation, Supabase does not create a session.
-    // Here we simply notify the user to check their email without forcing navigation.
-    ref.listen(loginControllerProvider, (previous, next) {
-      if (next.isSuccess && !next.isLoading && _isSignUpMode) {
+    // When registration succeeds but email confirmation is required, Supabase
+    // does not create a session immediately.
+    // Show a simple prompt asking the user to check their email instead of
+    // forcing navigation.
+    ref.listen<LoginState?>(loginControllerProvider, (
+      previous,
+      next,
+    ) {
+      if (next != null &&
+          next.isSuccess &&
+          !next.isLoading &&
+          next.needsEmailConfirmation) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('註冊成功，請至信箱完成驗證後登入')),
         );

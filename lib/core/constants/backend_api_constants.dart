@@ -1,9 +1,7 @@
-import 'package:flutter_travel_audio_guide/core/constants/api_constants.dart';
-
 /// Network settings dedicated to the Go backend (/api/v1/*).
-/// Intentionally separated from [ApiConstants] (travel.taipei open-api)
-/// to avoid sharing a single configuration between two entirely different
-/// API providers that use different authentication methods.
+/// Intentionally separated from ApiConstants (travel.taipei open-api)
+/// to avoid sharing the same configuration between two APIs with
+/// different origins and authentication methods.
 class BackendApiConstants {
   const BackendApiConstants._();
 
