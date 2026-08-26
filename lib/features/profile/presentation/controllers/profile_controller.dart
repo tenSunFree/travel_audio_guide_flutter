@@ -4,21 +4,18 @@ import 'package:flutter_travel_audio_guide/features/profile/di/profile_providers
 import 'package:flutter_travel_audio_guide/features/profile/domain/entities/profile.dart';
 
 /// Attached to the authentication state:
-/// - Signed in -> automatically call GET /api/v1/me once (the profile will be
-///   created automatically if missing).
+/// - Signed in -> automatically call GET /api/v1/me once.
 /// - Signed out -> clear the state.
 class ProfileController extends AsyncNotifier<Profile?> {
-  /// Monotonically increasing request sequence number.
-  ///
-  /// Both [updateProfile] and [refresh] are asynchronous operations; a user may
-  /// trigger another request before the previous one completes (e.g. tapping
-  /// update twice). The sequence number marks whether this call is the most
-  /// recent one; only when it matches do we write the result into state, which
-  /// prevents older responses from overwriting newer data.
+  /// Request generation for [updateProfile] and [refresh].
+  /// [build] increments this when auth changes so in-flight writes are dropped.
   int _requestId = 0;
 
   @override
   Future<Profile?> build() async {
+    // Auth changed -> previous refresh/update must not write state.
+    // A stale generation is not the same thing as "signed out".
+    ++_requestId;
     final signedIn = await ref.watch(authStateChangesProvider.future);
     if (!signedIn) return null;
     return ref.read(profileRepositoryProvider).getMe();
@@ -29,6 +26,12 @@ class ProfileController extends AsyncNotifier<Profile?> {
     String? avatarUrl,
     String? preferredLanguage,
   }) async {
+    final userId = ref.read(authRepositoryProvider).currentUser?.id;
+    if (userId == null) {
+      state = const AsyncData<Profile?>(null);
+      return;
+    }
+
     final requestId = ++_requestId;
     state = const AsyncLoading<Profile?>().copyWithPrevious(state);
     final result = await AsyncValue.guard(
@@ -40,22 +43,28 @@ class ProfileController extends AsyncNotifier<Profile?> {
             preferredLanguage: preferredLanguage,
           ),
     );
-    // If an updated request is sent during this waiting period, and the result of this request has expired, it will be discarded.
-    // Let the latest request determine the final state.
-    if (requestId != _requestId) return;
-    // Directly use the guard result: success is AsyncData, failure is AsyncError.
-    // Don't swallow the error here and replace it with the old data—the UI needs to know that the update truly failed.
+    if (!_shouldCommit(requestId: requestId, userId: userId)) return;
     state = result;
   }
 
   Future<void> refresh() async {
+    final userId = ref.read(authRepositoryProvider).currentUser?.id;
+    if (userId == null) {
+      state = const AsyncData<Profile?>(null);
+      return;
+    }
     final requestId = ++_requestId;
     state = const AsyncLoading<Profile?>().copyWithPrevious(state);
     final result = await AsyncValue.guard(
       () => ref.read(profileRepositoryProvider).getMe(),
     );
-    if (requestId != _requestId) return;
+    if (!_shouldCommit(requestId: requestId, userId: userId)) return;
     state = result;
+  }
+
+  bool _shouldCommit({required int requestId, required String userId}) {
+    if (requestId != _requestId) return false;
+    return ref.read(authRepositoryProvider).currentUser?.id == userId;
   }
 }
 

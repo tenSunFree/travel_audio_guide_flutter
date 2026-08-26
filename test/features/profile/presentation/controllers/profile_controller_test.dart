@@ -12,17 +12,19 @@ import 'package:flutter_travel_audio_guide/features/profile/presentation/control
 class FakeAuthRepository implements AuthRepository {
   FakeAuthRepository(
     this._controller, {
-    this.initialIsSignedIn = false,
-  });
+    bool initialIsSignedIn = false,
+    String initialUserId = 'user-a',
+  }) : currentUser = initialIsSignedIn
+           ? AppUser(id: initialUserId, email: '$initialUserId@b.com')
+           : null;
 
   final StreamController<bool> _controller;
-  final bool initialIsSignedIn;
 
   @override
-  AppUser? get currentUser => null;
+  AppUser? currentUser;
 
   @override
-  bool get isSignedIn => initialIsSignedIn;
+  bool get isSignedIn => currentUser != null;
 
   @override
   Stream<bool> get authStateChanges => _controller.stream;
@@ -41,15 +43,26 @@ class FakeAuthRepository implements AuthRepository {
 
   @override
   Future<void> signOut() async {}
+
+  void signInAs(String userId) {
+    currentUser = AppUser(id: userId, email: '$userId@b.com');
+    _controller.add(true);
+  }
+
+  void signOutUser() {
+    currentUser = null;
+    _controller.add(false);
+  }
 }
 
 Profile buildProfile({
+  String id = 'user-a',
   String displayName = 'Sun',
 }) {
   final now = DateTime(2026);
   return Profile(
-    id: 'uid-1',
-    email: 'a@b.com',
+    id: id,
+    email: '$id@b.com',
     displayName: displayName,
     preferredLanguage: 'zh-TW',
     createdAt: now,
@@ -58,29 +71,26 @@ Profile buildProfile({
 }
 
 class FakeProfileRepository implements ProfileRepository {
-  FakeProfileRepository({
-    this.getMeResult,
-  });
+  FakeProfileRepository({this.getMeResult});
 
   Profile? getMeResult;
-
   int getMeCallCount = 0;
   int updateMeCallCount = 0;
-
-  /// When true, updateMe() returns manually controlled Futures.
-  /// This allows tests to simulate out-of-order network responses.
+  bool useManualGetMeGates = false;
   bool useManualUpdateGates = false;
-
+  final List<Completer<Profile>> getMeCompleters = [];
   final List<Completer<Profile>> updateCompleters = [];
-
-  /// In normal mode, results are returned in call order.
-  /// Put an Exception into this list to simulate a failed request.
   final List<Object> updateMeResults = [];
 
   @override
-  Future<Profile> getMe() async {
+  Future<Profile> getMe() {
     getMeCallCount++;
-    return getMeResult ?? buildProfile();
+    if (useManualGetMeGates) {
+      final completer = Completer<Profile>();
+      getMeCompleters.add(completer);
+      return completer.future;
+    }
+    return Future.value(getMeResult ?? buildProfile());
   }
 
   @override
@@ -104,84 +114,60 @@ class FakeProfileRepository implements ProfileRepository {
 }
 
 void main() {
+  late StreamController<bool> authController;
+  late FakeAuthRepository authRepository;
+  late FakeProfileRepository profileRepository;
+  late ProviderContainer container;
+
   ProviderContainer buildContainer({
-    required StreamController<bool> authController,
-    required FakeProfileRepository profileRepository,
     bool initialIsSignedIn = false,
+    String initialUserId = 'user-a',
   }) {
+    authController = StreamController<bool>();
+    authRepository = FakeAuthRepository(
+      authController,
+      initialIsSignedIn: initialIsSignedIn,
+      initialUserId: initialUserId,
+    );
     return ProviderContainer(
       overrides: [
-        authRepositoryProvider.overrideWithValue(
-          FakeAuthRepository(
-            authController,
-            initialIsSignedIn: initialIsSignedIn,
-          ),
-        ),
-        profileRepositoryProvider.overrideWithValue(
-          profileRepository,
-        ),
+        authRepositoryProvider.overrideWithValue(authRepository),
+        profileRepositoryProvider.overrideWithValue(profileRepository),
       ],
     );
   }
 
+  tearDown(() async {
+    container.dispose();
+    await authController.close();
+  });
+
   test('初始已登入時自動呼叫 getMe() 取得 profile', () async {
-    final authController = StreamController<bool>();
-    final profileRepository = FakeProfileRepository(
-      getMeResult: buildProfile(
-        displayName: 'Sun2',
-      ),
+    profileRepository = FakeProfileRepository(
+      getMeResult: buildProfile(displayName: 'Sun2'),
     );
-    final container = buildContainer(
-      authController: authController,
-      profileRepository: profileRepository,
-      initialIsSignedIn: true,
-    );
-    addTearDown(() {
-      container.dispose();
-      authController.close();
-    });
+    container = buildContainer(initialIsSignedIn: true);
     final profile = await container.read(profileControllerProvider.future);
     expect(profile?.displayName, 'Sun2');
     expect(profileRepository.getMeCallCount, 1);
   });
 
   test('未登入時不會呼叫 getMe()，state 為 null', () async {
-    final authController = StreamController<bool>();
-    final profileRepository = FakeProfileRepository();
-    final container = buildContainer(
-      authController: authController,
-      profileRepository: profileRepository,
-    );
-    addTearDown(() {
-      container.dispose();
-      authController.close();
-    });
+    profileRepository = FakeProfileRepository();
+    container = buildContainer();
     final profile = await container.read(profileControllerProvider.future);
     expect(profile, isNull);
     expect(profileRepository.getMeCallCount, 0);
   });
 
   test('從未登入切換為登入時，會自動呼叫 getMe()', () async {
-    final authController = StreamController<bool>();
-    final profileRepository = FakeProfileRepository(
-      getMeResult: buildProfile(
-        displayName: 'Sun2',
-      ),
+    profileRepository = FakeProfileRepository(
+      getMeResult: buildProfile(id: 'user-b', displayName: 'Sun2'),
     );
-    final container = buildContainer(
-      authController: authController,
-      profileRepository: profileRepository,
-    );
-    addTearDown(() {
-      container.dispose();
-      authController.close();
-    });
-    final initialProfile = await container.read(
-      profileControllerProvider.future,
-    );
-    expect(initialProfile, isNull);
+    container = buildContainer();
+    expect(await container.read(profileControllerProvider.future), isNull);
     expect(profileRepository.getMeCallCount, 0);
-    authController.add(true);
+    authRepository.signInAs('user-b');
     await Future<void>.delayed(Duration.zero);
     final profile = await container.read(profileControllerProvider.future);
     expect(profile?.displayName, 'Sun2');
@@ -189,135 +175,114 @@ void main() {
   });
 
   test('updateProfile 成功時 state 更新為最新資料', () async {
-    final authController = StreamController<bool>();
-    final profileRepository =
-        FakeProfileRepository(
-            getMeResult: buildProfile(),
-          )
-          ..updateMeResults.add(
-            buildProfile(
-              displayName: 'Sun2',
-            ),
-          );
-    final container = buildContainer(
-      authController: authController,
-      profileRepository: profileRepository,
-      initialIsSignedIn: true,
-    );
-    addTearDown(() {
-      container.dispose();
-      authController.close();
-    });
+    profileRepository = FakeProfileRepository(getMeResult: buildProfile())
+      ..updateMeResults.add(buildProfile(displayName: 'Sun2'));
+    container = buildContainer(initialIsSignedIn: true);
     await container.read(profileControllerProvider.future);
     await container
         .read(profileControllerProvider.notifier)
-        .updateProfile(
-          displayName: 'Sun2',
-        );
+        .updateProfile(displayName: 'Sun2');
     final state = container.read(profileControllerProvider);
-    expect(
-      state.value?.displayName,
-      'Sun2',
-    );
-    expect(
-      state.hasError,
-      isFalse,
-    );
+    expect(state.value?.displayName, 'Sun2');
+    expect(state.hasError, isFalse);
   });
 
-  test(
-    'updateProfile 失敗時，state 保留錯誤，不會被吞掉換成舊資料',
-    () async {
-      final authController = StreamController<bool>();
-      final profileRepository =
-          FakeProfileRepository(
-              getMeResult: buildProfile(),
-            )
-            ..updateMeResults.add(
-              Exception('update failed'),
-            );
-      final container = buildContainer(
-        authController: authController,
-        profileRepository: profileRepository,
-        initialIsSignedIn: true,
-      );
-      addTearDown(() {
-        container.dispose();
-        authController.close();
-      });
-      await container.read(
-        profileControllerProvider.future,
-      );
-      await container
-          .read(profileControllerProvider.notifier)
-          .updateProfile(
-            displayName: 'Sun2',
-          );
-      final state = container.read(profileControllerProvider);
-      expect(
-        state.hasError,
-        isTrue,
-      );
-    },
-  );
+  test('updateProfile 失敗時，state 保留錯誤，不會被吞掉換成舊資料', () async {
+    profileRepository = FakeProfileRepository(getMeResult: buildProfile())
+      ..updateMeResults.add(Exception('update failed'));
+    container = buildContainer(initialIsSignedIn: true);
+    await container.read(profileControllerProvider.future);
+    await container
+        .read(profileControllerProvider.notifier)
+        .updateProfile(displayName: 'Sun2');
+    expect(container.read(profileControllerProvider).hasError, isTrue);
+  });
 
-  test(
-    '較舊的 updateProfile 回應晚到時，不會蓋掉較新的結果',
-    () async {
-      final authController = StreamController<bool>();
-      final profileRepository = FakeProfileRepository(
-        getMeResult: buildProfile(),
-      )..useManualUpdateGates = true;
-      final container = buildContainer(
-        authController: authController,
-        profileRepository: profileRepository,
-        initialIsSignedIn: true,
-      );
-      addTearDown(() {
-        container.dispose();
-        authController.close();
-      });
-      await container.read(
-        profileControllerProvider.future,
-      );
-      final notifier = container.read(
-        profileControllerProvider.notifier,
-      );
-      final firstUpdate = notifier.updateProfile(
-        displayName: 'Old',
-      );
-      await Future<void>.delayed(
-        Duration.zero,
-      );
-      final secondUpdate = notifier.updateProfile(
-        displayName: 'New',
-      );
-      await Future<void>.delayed(
-        Duration.zero,
-      );
-      expect(
-        profileRepository.updateCompleters.length,
-        2,
-      );
-      // Complete the newer request first.
-      profileRepository.updateCompleters[1].complete(
-        buildProfile(
-          displayName: 'New',
-        ),
-      );
-      await secondUpdate;
-      // Then complete the older request.
-      profileRepository.updateCompleters[0].complete(
-        buildProfile(
-          displayName: 'Old',
-        ),
-      );
-      await firstUpdate;
-      final state = container.read(profileControllerProvider);
-      expect(
-        state.value?.displayName,
-        'New',
-      );
-    },
-  );
+  test('較舊的 updateProfile 回應晚到時，不會蓋掉較新的結果', () async {
+    profileRepository = FakeProfileRepository(getMeResult: buildProfile())
+      ..useManualUpdateGates = true;
+    container = buildContainer(initialIsSignedIn: true);
+    await container.read(profileControllerProvider.future);
+    final notifier = container.read(profileControllerProvider.notifier);
+    final firstUpdate = notifier.updateProfile(displayName: 'Old');
+    await Future<void>.delayed(Duration.zero);
+    final secondUpdate = notifier.updateProfile(displayName: 'New');
+    await Future<void>.delayed(Duration.zero);
+    expect(profileRepository.updateCompleters.length, 2);
+    profileRepository.updateCompleters[1].complete(
+      buildProfile(displayName: 'New'),
+    );
+    await secondUpdate;
+    profileRepository.updateCompleters[0].complete(
+      buildProfile(displayName: 'Old'),
+    );
+    await firstUpdate;
+    expect(container.read(profileControllerProvider).value?.displayName, 'New');
+  });
+
+  test('refresh 成功時更新 state', () async {
+    profileRepository = FakeProfileRepository(
+      getMeResult: buildProfile(displayName: 'A'),
+    );
+    container = buildContainer(initialIsSignedIn: true);
+    await container.read(profileControllerProvider.future);
+    profileRepository.getMeResult = buildProfile(displayName: 'B');
+    await container.read(profileControllerProvider.notifier).refresh();
+    expect(container.read(profileControllerProvider).value?.displayName, 'B');
+  });
+
+  test('未登入時呼叫 refresh 會把 state 清成 null，且不打 API', () async {
+    profileRepository = FakeProfileRepository();
+    container = buildContainer();
+    await container.read(profileControllerProvider.future);
+    await container.read(profileControllerProvider.notifier).refresh();
+    expect(container.read(profileControllerProvider).value, isNull);
+    expect(profileRepository.getMeCallCount, 0);
+  });
+
+  test('A 的 refresh 晚到時，不可蓋掉已登入的 B profile', () async {
+    profileRepository = FakeProfileRepository()..useManualGetMeGates = true;
+    container = buildContainer(
+      initialIsSignedIn: true,
+    );
+    // AsyncNotifier.build() is lazy. Reading the provider is what starts getMe().
+    final firstLoad = container.read(profileControllerProvider.future);
+    await Future<void>.delayed(Duration.zero);
+    expect(profileRepository.getMeCompleters, hasLength(1));
+    profileRepository.getMeCompleters[0].complete(
+      buildProfile(displayName: 'A'),
+    );
+    expect((await firstLoad)?.id, 'user-a');
+    container.listen(profileControllerProvider, (_, _) {});
+
+    final refreshFuture = container
+        .read(profileControllerProvider.notifier)
+        .refresh();
+    await Future<void>.delayed(Duration.zero);
+    expect(profileRepository.getMeCompleters, hasLength(2));
+
+    authRepository.signOutUser();
+    await Future<void>.delayed(Duration.zero);
+    authRepository.signInAs('user-b');
+    await Future<void>.delayed(Duration.zero);
+    expect(profileRepository.getMeCompleters, hasLength(3));
+
+    // Late A refresh must be dropped.
+    profileRepository.getMeCompleters[1].complete(
+      buildProfile(displayName: 'A-stale'),
+    );
+    await refreshFuture;
+
+    profileRepository.getMeCompleters[2].complete(
+      buildProfile(id: 'user-b', displayName: 'B'),
+    );
+    expect(
+      (await container.read(profileControllerProvider.future))?.id,
+      'user-b',
+    );
+    expect(
+      container.read(profileControllerProvider).value?.displayName,
+      'B',
+    );
+  });
 }

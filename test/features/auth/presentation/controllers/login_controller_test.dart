@@ -13,7 +13,7 @@ class FakeAuthRepository implements AuthRepository {
     this.signUpError,
   });
 
-  final Object? signInError;
+  Object? signInError;
   final bool signUpResult;
   final Object? signUpError;
 
@@ -140,6 +140,25 @@ void main() {
       final state = container.read(loginControllerProvider);
       expect(state.isSuccess, isFalse);
       expect(state.errorMessage, '此信箱已被註冊');
+    });
+  });
+
+  group('stale success flags', () {
+    test('註冊成功後若下一次登入失敗，會清掉舊的 isSuccess / needsEmailConfirmation', () async {
+      final repository = FakeAuthRepository(signUpResult: false);
+      final container = buildContainer(repository);
+      addTearDown(container.dispose);
+      final notifier = container.read(loginControllerProvider.notifier);
+      await notifier.signUp(email: 'a@b.com', password: '123456');
+      var state = container.read(loginControllerProvider);
+      expect(state.isSuccess, isTrue);
+      expect(state.needsEmailConfirmation, isTrue);
+      repository.signInError = const AppException.server('帳號或密碼錯誤');
+      await notifier.signIn(email: 'a@b.com', password: 'wrong');
+      state = container.read(loginControllerProvider);
+      expect(state.isSuccess, isFalse);
+      expect(state.needsEmailConfirmation, isFalse);
+      expect(state.errorMessage, '帳號或密碼錯誤');
     });
   });
 }

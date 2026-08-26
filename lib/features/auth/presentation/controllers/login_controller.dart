@@ -13,7 +13,6 @@ class LoginController extends StateNotifier<LoginState> {
       await ref
           .read(authRepositoryProvider)
           .signInWithPassword(email: email, password: password);
-      // There is never an intermediate "needs email confirmation" state for sign-in.
       return false;
     });
   }
@@ -23,40 +22,42 @@ class LoginController extends StateNotifier<LoginState> {
       () => ref
           .read(authRepositoryProvider)
           .signUpWithPassword(email: email, password: password)
-          // The repository returns true to indicate a session was obtained
-          // immediately after sign-up. For the UI we invert this: hasSession == false
-          // means we need to prompt the user to check their email for confirmation.
           .then((hasSession) => !hasSession),
     );
   }
 
   Future<void> _submit(Future<bool> Function() action) async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    // Invariant: a new submit never inherits previous success flags.
+    state = state.copyWith(
+      isLoading: true,
+      isSuccess: false,
+      needsEmailConfirmation: false,
+      errorMessage: null,
+    );
     try {
       final needsEmailConfirmation = await action();
-      // After successful sign-in / sign-up:
-      // - authStateChangesProvider will automatically emit a new state if a
-      //   session was obtained.
-      // - If no session was obtained (needsEmailConfirmation == true), the
-      //   Router's redirect won't be triggered and the UI stays on the login
-      //   page so we can show a prompt.
       state = state.copyWith(
         isLoading: false,
         isSuccess: true,
         needsEmailConfirmation: needsEmailConfirmation,
+        errorMessage: null,
       );
     } on AppException catch (e) {
       state = state.copyWith(
         isLoading: false,
+        isSuccess: false,
+        needsEmailConfirmation: false,
         errorMessage: e.map(
           server: (e) => e.message,
           download: (e) => e.message,
           localStorage: (e) => e.message,
         ),
       );
-    } catch (e) {
+    } catch (_) {
       state = state.copyWith(
         isLoading: false,
+        isSuccess: false,
+        needsEmailConfirmation: false,
         errorMessage: '登入失敗，請稍後再試',
       );
     }

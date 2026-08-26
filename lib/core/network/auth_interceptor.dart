@@ -48,10 +48,22 @@ class AuthInterceptor extends Interceptor {
       return;
     }
     _isSigningOut = true;
-    unawaited(
-      _supabase.auth.signOut().whenComplete(() {
-        _isSigningOut = false;
-      }),
-    );
+    unawaited(_signOutAfterUnauthorized());
+  }
+
+  Future<void> _signOutAfterUnauthorized() async {
+    try {
+      await _supabase.auth.signOut();
+    } catch (error, stackTrace) {
+      // Supabase clears the local session before the remote revoke request.
+      // A failed revoke must not become an unhandled async error.
+      AppLogger.error(
+        '[AuthInterceptor] signOut failed after 401',
+        exception: error,
+        stackTrace: stackTrace,
+      );
+    } finally {
+      _isSigningOut = false;
+    }
   }
 }
