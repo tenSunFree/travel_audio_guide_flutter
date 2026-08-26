@@ -10,6 +10,7 @@
 [![Architecture](https://img.shields.io/badge/Architecture-Clean%20%2B%20Feature--First-4CAF50)](#architecture)
 [![State](https://img.shields.io/badge/State-Riverpod-1565C0)](https://riverpod.dev)
 [![Data](https://img.shields.io/badge/Data-Offline--First%20%2B%20Drift-009688)](#offline-first-experience)
+[![Auth](https://img.shields.io/badge/Auth-Supabase-3FCF8E?logo=supabase&logoColor=white)](#authentication--profile)
 [![Interop](https://img.shields.io/badge/Interop-Pigeon-673AB7)](https://pub.dev/packages/pigeon)
 [![Testing](https://img.shields.io/badge/Testing-Unit%20%2B%20Widget-FF9800)](#testing)
 [![Monitoring](https://img.shields.io/badge/Monitoring-Sentry-362D59?logo=sentry&logoColor=white)](#observability-and-analytics)
@@ -34,13 +35,17 @@ See [CHANGELOG.md](./CHANGELOG.md) for release history.
 
 ## Related Backend
 
-This app connects to a Go backend for profile management:
+This app connects to a Go backend for authentication-aware profile management:
 
 - [travel-audio-guide-go](https://github.com/tenSunFree/travel-audio-guide-go)
 
 The backend provides a RESTful API built with Go, chi, PostgreSQL, pgxpool, sqlc, Supabase JWT (
 ES256/JWKS), and Docker.
 It handles JWT verification and user profile management.
+
+The Flutter client authenticates directly against Supabase Auth, then attaches the resulting session
+JWT to every request sent to this backend. See [Authentication & Profile](#authentication--profile)
+below for how the two sides fit together.
 
 ---
 
@@ -134,6 +139,22 @@ It handles JWT verification and user profile management.
 - Home section action buttons navigate directly to filtered list pages with query parameters
 - Active filter summary bars showing current filter conditions
 - Consistent loading, empty state, and error state handling across all list pages
+
+### Authentication & Profile
+
+- Email/password authentication via Supabase Auth, with sign-up and sign-in flows
+- Session persistence across app restarts through the Supabase Flutter SDK; no manual token refresh
+  logic required
+- A dedicated `backendDioProvider` automatically attaches the current Supabase session's JWT as an
+  `Authorization: Bearer` header on every request to the Go backend, kept as a separate Dio client
+  from the one used for the Taipei Travel Open API
+- Auth-aware GoRouter redirect: signed-out users are routed to the login page and signed-in users are
+  routed away from it, layered on top of the existing onboarding redirect logic
+- User profile (`display_name`, `avatar_url`, `preferred_language`) is fetched from and updated
+  through the Go backend's `GET`/`PUT /api/v1/me` endpoints; the backend auto-creates a profile on
+  first sign-in
+- The Flutter client never sends `user_id` directly — it is derived server-side from the verified
+  JWT's `claims.sub`
 
 ### Architecture
 
@@ -286,13 +307,15 @@ retry.
   entire working tree and Git history, complementing the staged-only scan in the pre-commit hook
 - Git hook automation (`scripts/setup-hooks.sh`) installs local quality gates in one command; hook
   templates live under `scripts/hooks/` and are copied into `.git/hooks/`:
-    - `pre-commit`: Dart format check and a staged-changes secret scan (
-      uses [gitleaks](https://github.com/gitleaks/gitleaks) when available, falling back to a
-      built-in regex scanner otherwise)
-    - `commit-msg`: validates commit messages against
-      the [Conventional Commits](https://www.conventionalcommits.org/) format
-    - `pre-push`: runs `scripts/check.sh`, including tests with coverage and LCOV validation, before
-      code is pushed
+  - `pre-commit`: Dart format check and a staged-changes secret scan (
+    uses [gitleaks](https://github.com/gitleaks/gitleaks) when available, falling back to a
+    built-in regex scanner otherwise)
+  - `commit-msg`: validates commit messages against
+    the [Conventional Commits](https://www.conventionalcommits.org/) format; branch names follow
+    the same `<type>/description` convention (
+    see [Git Workflow & CI/CD](#git-workflow--cicd))
+  - `pre-push`: runs `scripts/check.sh`, including tests with coverage and LCOV validation, before
+    code is pushed
 - Code generation script (`scripts/codegen.sh`) runs `build_runner` for Drift, Freezed, and Riverpod
   Generator in a single command
 - Development runner (`scripts/run_dev.sh`) injects environment config via `--dart-define-from-file`
@@ -308,6 +331,10 @@ retry.
 ### Git Workflow & CI/CD
 
 - Adopted a feature branch workflow with `develop`, `main`, and `release/*` protected branches
+- Branch names are prefixed with the same type used in `commit-msg` (`feat/`, `fix/`, `chore/`,
+  `docs/`, `refactor/`, `test/`, ...), e.g. `feat/supabase-auth-integration`,
+  `fix/reminder-duplicate-schedule` — keeping branch names and commit types aligned makes it obvious
+  what kind of change a branch introduces before opening the PR
 - Enforced branch protection rules on `develop`, `main`, and `release/*`, blocking direct pushes and
   requiring Pull Requests with passing CI checks before merge
 - Automated AI-assisted code review via CodeRabbit on every Pull Request to identify potential bugs,
@@ -350,7 +377,9 @@ retry.
   cache synchronization, and audio player initialization
 - Captured contextual breadcrumbs and exception metadata to support debugging of user-facing
   failures
-- HTTP request breadcrumbs, failed request capture, and network tracing via `sentry_dio`
+- HTTP request breadcrumbs, failed request capture, and network tracing via `sentry_dio` — the
+  authenticated `backendDioProvider` client omits request headers from Talker/Sentry logging to
+  avoid capturing the Supabase JWT
 - GoRouter navigation breadcrumbs and navigation-related performance traces via
   `SentryNavigatorObserver`
 - Integrated Firebase Analytics to track key user interactions and understand how users navigate the
@@ -386,8 +415,9 @@ retry.
 - Animated splash screen with staggered logo drop, text fade, and map-themed background
 - First-launch welcome page introducing core features with sequential entry animations
 - Persist onboarding completion state locally via SharedPreferences
-- GoRouter `refreshListenable` integration for declarative redirect after onboarding
-- Returning users skip onboarding and navigate directly to the home screen
+- GoRouter `refreshListenable` integration for declarative redirect after onboarding, extended to
+  also react to Supabase sign-in state (see [Authentication & Profile](#authentication--profile))
+- Returning, signed-in users skip onboarding and navigate directly to the home screen
 
 ### Nearby Recommendations
 
@@ -415,6 +445,10 @@ retry.
 - Dio  
   Robust HTTP client (Handles API communication, file downloading, and standardized request
   handling)
+- supabase_flutter  
+  Official Supabase client SDK (Handles email/password authentication, session persistence, and
+  automatic token refresh; the current session's JWT is attached to Go backend requests via a
+  dedicated Dio interceptor, kept separate from the Dio client used for the Taipei Travel Open API)
 - audioplayers  
   Audio playback library (Manages local audio playback, playback state streams, and media controls)
 - path_provider  
@@ -433,7 +467,8 @@ retry.
   caching, and offline browsing support)
 - go_router  
   Declarative routing solution (Centralizes navigation logic, manages detail page routing via
-  `extra` object passing, and improves maintainability across feature modules)
+  `extra` object passing, drives auth- and onboarding-aware redirects, and improves maintainability
+  across feature modules)
 - sentry_flutter  
   Error and performance monitoring SDK (Captures unhandled exceptions, breadcrumbs, app start
   metrics, slow and frozen frames, and custom transactions for key business flows)
@@ -492,6 +527,26 @@ retry.
 - Dart SDK: `3.12.0`
 - Flutter version pinning is optional via [FVM](https://fvm.app/).
   See [Local Development](#local-development) below.
+
+### Runtime Configuration
+
+The app reads the following values via `--dart-define` / `--dart-define-from-file` at build/run
+time:
+
+| Variable                   | Required | Notes                                                                                                    |
+|-----------------------------|----------|------------------------------------------------------------------------------------------------------------|
+| `SUPABASE_URL`              | Yes      | Your Supabase project URL                                                                                 |
+| `SUPABASE_PUBLISHABLE_KEY`  | Yes      | Supabase publishable key. Safe to expose client-side by design — it is not a secret and relies on Supabase Row Level Security, not obscurity |
+| `BACKEND_BASE_URL`          | No       | Defaults to `http://localhost:8080`. Use `http://10.0.2.2:8080` on the Android emulator to reach the host machine's backend; use your machine's LAN IP for physical device testing |
+| `SENTRY_DSN`                | No       | Existing Sentry configuration                                                                              |
+
+Values that must **never** be embedded in the Flutter app: the Supabase `service_role` / `secret`
+key, and any backend-only JWT signing material. Those stay server-side in the
+[travel-audio-guide-go](https://github.com/tenSunFree/travel-audio-guide-go) backend only.
+
+If you use `env/dev.json` (see [Local Development](#local-development)), add the variables above to
+your local copy; `env/example.json` should list them (without real values) so new contributors know
+what to fill in.
 
 ---
 
@@ -633,9 +688,9 @@ Runs fast, staged-only checks before every commit:
 
 - Dart format validation for `lib`, `test`, and `pigeons`
 - Secret scan on staged changes:
-    - Uses `gitleaks` when it is installed
-    - Falls back to a lightweight built-in regex-based scanner with a warning when `gitleaks` is not
-      available
+  - Uses `gitleaks` when it is installed
+  - Falls back to a lightweight built-in regex-based scanner with a warning when `gitleaks` is not
+    available
 
 The regex-based fallback is intended as a basic local guard. For stronger secret detection, install
 `gitleaks`.
@@ -755,16 +810,16 @@ travel-audio-guide-flutter
 │  │     └─ firebase_options_production.dart
 │  ├─ core                          # Cross-feature shared capabilities
 │  │  ├─ analytics                  # AnalyticsService (Firebase wrapper)
-│  │  ├─ constants                  # API constants, app colors
+│  │  ├─ constants                  # API constants (Taipei Travel Open API + Go backend), app colors
 │  │  ├─ database                   # Drift AppDatabase, DAOs, tables
 │  │  ├─ debug                      # Debug-only app options
 │  │  ├─ error                      # Shared exception types
 │  │  ├─ image                      # Cached network image manager
 │  │  ├─ monitoring                 # MonitoringService (Sentry wrapper)
 │  │  ├─ nearby                     # Location controller, nearby models/utils
-│  │  ├─ network                    # Dio client, log filter
+│  │  ├─ network                    # Dio clients, Supabase JWT auth interceptor, log filter
 │  │  ├─ preferences                # SharedPreferences provider
-│  │  ├─ router                     # GoRouter config + route loaders
+│  │  ├─ router                     # GoRouter config + route loaders (onboarding- and auth-aware redirect)
 │  │  ├─ sync                       # Cross-feature Drift sync service
 │  │  ├─ theme                      # AppTheme
 │  │  ├─ utils                      # AppLogger, in-app log viewer
@@ -787,8 +842,30 @@ travel-audio-guide-flutter
 │     │     └─ widgets
 │     ├─ attraction                 # Same layering as activity
 │     ├─ audio_guide                # Same layering, plus domain/services for playback
+│     ├─ auth                       # Supabase email/password auth, session state
+│     │  ├─ data
+│     │  │  ├─ datasources          # SupabaseAuthDataSource
+│     │  │  └─ repositories
+│     │  ├─ di                      # authRepositoryProvider, authStateChangesProvider
+│     │  ├─ domain
+│     │  │  ├─ entities             # AppUser
+│     │  │  └─ repositories
+│     │  └─ presentation
+│     │     ├─ controllers          # LoginController
+│     │     └─ pages                # LoginPage
 │     ├─ home                       # Full layering: home feed + nearby recommendations
-│     ├─ onboarding                 # Splash → welcome → home redirect flow
+│     ├─ onboarding                 # Splash → welcome → login/home redirect flow
+│     ├─ profile                    # Calls Go backend GET/PUT /api/v1/me
+│     │  ├─ data
+│     │  │  ├─ datasources
+│     │  │  ├─ models               # ProfileModel
+│     │  │  └─ repositories
+│     │  ├─ di                      # profileRepositoryProvider (backendDioProvider-backed)
+│     │  ├─ domain
+│     │  │  ├─ entities             # Profile
+│     │  │  └─ repositories
+│     │  └─ presentation
+│     │     └─ controllers          # ProfileController (AsyncNotifier)
 │     ├─ reminder                   # Journey reminders, local notifications
 │     ├─ splash                     # Animated splash screen widgets
 │     └─ step_tracking              # Android step sensor integration (Pigeon-based)
