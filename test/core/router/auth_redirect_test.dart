@@ -22,7 +22,7 @@ void main() {
       );
     });
 
-    test('還沒看過 welcome 時，非 welcome 路徑都導向 welcome', () {
+    test('第一次啟動時非 welcome 頁都導向 welcome', () {
       expect(
         resolveAuthRedirect(
           hasSeenWelcome: false,
@@ -35,21 +35,21 @@ void main() {
         resolveAuthRedirect(
           hasSeenWelcome: false,
           signedIn: false,
-          location: '/login',
-        ),
-        '/welcome',
-      );
-      expect(
-        resolveAuthRedirect(
-          hasSeenWelcome: false,
-          signedIn: false,
           location: '/welcome',
         ),
         isNull,
       );
     });
 
-    test('已看過 welcome 且仍停在 welcome 時，依登入狀態分流', () {
+    test('完成 onboarding 後直接進 Home，不要求登入', () {
+      expect(
+        resolveAuthRedirect(
+          hasSeenWelcome: true,
+          signedIn: false,
+          location: '/welcome',
+        ),
+        '/',
+      );
       expect(
         resolveAuthRedirect(
           hasSeenWelcome: true,
@@ -58,71 +58,87 @@ void main() {
         ),
         '/',
       );
-      expect(
-        resolveAuthRedirect(
-          hasSeenWelcome: true,
-          signedIn: false,
-          location: '/welcome',
-        ),
-        '/login',
-      );
     });
 
-    test('已看過 welcome 且未登入時，非 login 路徑都導向 login', () {
-      expect(
-        resolveAuthRedirect(
-          hasSeenWelcome: true,
-          signedIn: false,
-          location: '/',
-        ),
-        '/login',
-      );
-      expect(
-        resolveAuthRedirect(
-          hasSeenWelcome: true,
-          signedIn: false,
-          location: '/attractions',
-        ),
-        '/login',
-      );
-      expect(
-        resolveAuthRedirect(
-          hasSeenWelcome: true,
-          signedIn: false,
-          location: '/login',
-        ),
-        isNull,
-      );
-    });
-
-    test('已登入卻停在 login 時導向 home', () {
-      expect(
-        resolveAuthRedirect(
-          hasSeenWelcome: true,
-          signedIn: true,
-          location: '/login',
-        ),
+    test('Guest 可以直接使用公開頁面', () {
+      const publicRoutes = [
         '/',
+        '/attractions',
+        '/activities',
+        '/audio-guides',
+        '/attractions/123',
+      ];
+      for (final route in publicRoutes) {
+        expect(
+          resolveAuthRedirect(
+            hasSeenWelcome: true,
+            signedIn: false,
+            location: route,
+          ),
+          isNull,
+          reason: '$route 應允許 Guest 存取',
+        );
+      }
+    });
+
+    test('已登入的使用者停在 /login 不會被 router 導走（避免與 LoginPage 導航競爭）', () {
+      expect(
+        resolveAuthRedirect(
+          hasSeenWelcome: true,
+          signedIn: true,
+          location: '/login',
+        ),
+        isNull,
       );
     });
 
-    test('已登入且不在 login 時不介入', () {
+    test('Guest 訪問 protected route 時導向 login，並帶上 from', () {
+      expect(
+        resolveAuthRedirect(
+          hasSeenWelcome: true,
+          signedIn: false,
+          location: '/profile',
+          protected: const {'/profile'},
+        ),
+        '/login?from=%2Fprofile',
+      );
+    });
+
+    test('protected 子路徑同樣需要登入', () {
+      expect(
+        resolveAuthRedirect(
+          hasSeenWelcome: true,
+          signedIn: false,
+          location: '/profile/settings',
+          protected: const {'/profile'},
+        ),
+        '/login?from=%2Fprofile%2Fsettings',
+      );
+    });
+
+    test('已登入可以直接進 protected route', () {
       expect(
         resolveAuthRedirect(
           hasSeenWelcome: true,
           signedIn: true,
-          location: '/',
+          location: '/profile',
+          protected: const {'/profile'},
         ),
         isNull,
       );
-      expect(
-        resolveAuthRedirect(
-          hasSeenWelcome: true,
-          signedIn: true,
-          location: '/attractions',
-        ),
-        isNull,
+    });
+
+    test('from 保留完整 requestedLocation（含 query）', () {
+      final redirect = resolveAuthRedirect(
+        hasSeenWelcome: true,
+        signedIn: false,
+        location: '/profile',
+        requestedLocation: '/profile?tab=sync',
+        protected: const {'/profile'},
       );
+      final uri = Uri.parse(redirect!);
+      expect(uri.path, '/login');
+      expect(uri.queryParameters['from'], '/profile?tab=sync');
     });
   });
 }

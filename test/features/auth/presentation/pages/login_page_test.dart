@@ -6,9 +6,10 @@ import 'package:flutter_travel_audio_guide/features/auth/di/auth_providers.dart'
 import 'package:flutter_travel_audio_guide/features/auth/domain/entities/app_user.dart';
 import 'package:flutter_travel_audio_guide/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_travel_audio_guide/features/auth/presentation/pages/login_page.dart';
+import 'package:go_router/go_router.dart';
 
 class FakeAuthRepository implements AuthRepository {
-  FakeAuthRepository({this.signUpResult = true});
+  FakeAuthRepository({this.signUpResult = true, this.isSignedIn = false});
 
   final bool signUpResult;
   final List<String> signInEmails = [];
@@ -21,8 +22,10 @@ class FakeAuthRepository implements AuthRepository {
   @override
   AppUser? get currentUser => null;
 
+  /// Lets tests simulate the "already signed in, opened /login via deep
+  /// link" edge case that LoginPage.initState guards against.
   @override
-  bool get isSignedIn => false;
+  final bool isSignedIn;
 
   @override
   Stream<bool> get authStateChanges => const Stream.empty();
@@ -51,10 +54,27 @@ class FakeAuthRepository implements AuthRepository {
   Future<void> signOut() async {}
 }
 
-Widget buildSubject(FakeAuthRepository repository) {
+Widget buildSubject(
+  FakeAuthRepository repository, {
+  String initialLocation = '/login',
+}) {
+  final router = GoRouter(
+    initialLocation: initialLocation,
+    routes: [
+      GoRoute(path: '/login', builder: (_, _) => const LoginPage()),
+      GoRoute(
+        path: '/',
+        builder: (_, _) => const Scaffold(body: Text('HOME')),
+      ),
+      GoRoute(
+        path: '/protected',
+        builder: (_, _) => const Scaffold(body: Text('PROTECTED')),
+      ),
+    ],
+  );
   return ProviderScope(
     overrides: [authRepositoryProvider.overrideWithValue(repository)],
-    child: const MaterialApp(home: LoginPage()),
+    child: MaterialApp.router(routerConfig: router),
   );
 }
 
@@ -155,5 +175,51 @@ void main() {
     expect(button.onPressed, isNull);
     repository.signInGate!.complete();
     await tester.pumpAndSettle();
+  });
+
+  // Post-login navigation
+  // LoginPage now owns 100% of "leaving /login" navigation (see
+  // auth_redirect.dart / login_page.dart comments on avoiding a race
+  // between the router's redirect and this page's own context.go()/pop()).
+  testWidgets('登入成功且沒有 from 時導向 Home', (tester) async {
+    final repository = FakeAuthRepository();
+    await tester.pumpWidget(buildSubject(repository));
+    await tester.enterText(find.byType(TextFormField).first, 'a@b.com');
+    await tester.enterText(find.byType(TextFormField).last, '123456');
+    await tester.tap(find.widgetWithText(FilledButton, '登入'));
+    await tester.pumpAndSettle();
+    expect(find.text('HOME'), findsOneWidget);
+  });
+
+  testWidgets('登入成功且帶 from 時導向原目的地', (tester) async {
+    final repository = FakeAuthRepository();
+    await tester.pumpWidget(
+      buildSubject(repository, initialLocation: '/login?from=%2Fprotected'),
+    );
+    await tester.enterText(find.byType(TextFormField).first, 'a@b.com');
+    await tester.enterText(find.byType(TextFormField).last, '123456');
+    await tester.tap(find.widgetWithText(FilledButton, '登入'));
+    await tester.pumpAndSettle();
+    expect(find.text('PROTECTED'), findsOneWidget);
+  });
+
+  testWidgets('from 指向 /login 自己時視為不安全，忽略並回 Home', (tester) async {
+    final repository = FakeAuthRepository();
+    await tester.pumpWidget(
+      buildSubject(repository, initialLocation: '/login?from=%2Flogin'),
+    );
+    await tester.enterText(find.byType(TextFormField).first, 'a@b.com');
+    await tester.enterText(find.byType(TextFormField).last, '123456');
+    await tester.tap(find.widgetWithText(FilledButton, '登入'));
+    await tester.pumpAndSettle();
+    expect(find.text('HOME'), findsOneWidget);
+  });
+
+  testWidgets('已登入時打開 /login 會自動離開（deep link 邊界案例）', (tester) async {
+    final repository = FakeAuthRepository(isSignedIn: true);
+    await tester.pumpWidget(buildSubject(repository));
+    await tester.pumpAndSettle();
+    expect(find.text('HOME'), findsOneWidget);
+    expect(find.text('歡迎回來'), findsNothing);
   });
 }

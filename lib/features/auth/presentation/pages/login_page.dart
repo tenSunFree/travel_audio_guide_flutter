@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_travel_audio_guide/core/router/app_router.dart';
+import 'package:flutter_travel_audio_guide/features/auth/di/auth_providers.dart';
 import 'package:flutter_travel_audio_guide/features/auth/presentation/controllers/login_controller.dart';
 import 'package:flutter_travel_audio_guide/features/auth/presentation/controllers/login_state.dart';
+import 'package:go_router/go_router.dart';
 
+/// Login is an OPTIONAL feature page, not the app entrance.
+///
+/// It can be reached in two ways:
+/// 1. Pushed manually (e.g., from MyJourney's account button) — after a successful
+///    login it should pop back to the previous screen.
+/// 2. Redirected from a protected route with a `from` query — after a successful
+///    login it should go to the original destination.
+///
+/// This page is entirely responsible for navigating away from /login. The router's
+/// redirect rules intentionally do not redirect already-signed-in users away from
+/// /login to avoid both sides navigating on the same auth-state change.
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -17,6 +31,21 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _isSignUpMode = false;
 
   static const _teal = Color(0xFF007F83);
+
+  @override
+  void initState() {
+    super.initState();
+    // Deep-link edge case: the user is already signed-in but opens /login directly
+    // (bookmark, notification link, etc.). Since the router no longer continuously
+    // redirects signed-in users away from /login, check once on initial load only —
+    // no need to subscribe to the stream.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (ref.read(isSignedInProvider)) {
+        _navigateAfterAuth();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -37,28 +66,61 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     }
   }
 
+  /// Validate `from` to avoid unsafe redirects or /login loops:
+  /// - must exist and be non-empty
+  /// - must be an internal relative path (starts with '/')
+  /// - must not point back to /login itself
+  String? _safeFrom() {
+    final from = GoRouterState.of(context).uri.queryParameters['from'];
+    if (from == null || from.isEmpty) return null;
+    if (!from.startsWith('/')) return null;
+    if (from.startsWith(AppRoutes.login)) return null;
+    return from;
+  }
+
+  void _navigateAfterAuth() {
+    final from = _safeFrom();
+    if (from != null) {
+      context.go(from);
+    } else if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(AppRoutes.home);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(loginControllerProvider);
-    // When registration succeeds but email confirmation is required, Supabase
-    // does not create a session immediately.
-    // Show a simple prompt asking the user to check their email instead of
-    // forcing navigation.
-    ref.listen<LoginState?>(loginControllerProvider, (
-      previous,
-      next,
-    ) {
-      if (next != null &&
-          next.isSuccess &&
-          !next.isLoading &&
-          next.needsEmailConfirmation) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('註冊成功，請至信箱完成驗證後登入')),
-        );
+    ref.listen<LoginState?>(loginControllerProvider, (previous, next) {
+      if (next == null || next.isLoading || !next.isSuccess) return;
+      if (next.needsEmailConfirmation) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('註冊成功，請至信箱完成驗證後登入')));
+        return;
       }
+      _navigateAfterAuth();
     });
     return Scaffold(
       backgroundColor: const Color(0xFFF4FBFB),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        // Guest-first: whether pushed or redirected (no pop history), allow
+        // leaving the login page to browse the app.
+        actions: [
+          TextButton(
+            onPressed: state.isLoading
+                ? null
+                : () => context.canPop()
+                      ? context.pop()
+                      : context.go(AppRoutes.home),
+            child: const Text('先逛逛'),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
