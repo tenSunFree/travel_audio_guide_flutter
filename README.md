@@ -142,17 +142,29 @@ below for how the two sides fit together.
 
 ### Authentication & Profile
 
+- Guest-first: attractions, activities, audio guides, offline playback, nearby recommendations, and
+  the local journey/reminder list all work without signing in — the app's default route is Home, not
+  Login
+- Login is an optional feature, reachable from the account icon on the "My Journey" tab (or
+  automatically when a route explicitly requires an account); it is never the app's forced entrance
 - Email/password authentication via Supabase Auth, with sign-up and sign-in flows
 - Session persistence across app restarts through the Supabase Flutter SDK; no manual token refresh
   logic required
 - A dedicated `backendDioProvider` automatically attaches the current Supabase session's JWT as an
   `Authorization: Bearer` header on every request to the Go backend, kept as a separate Dio client
-  from the one used for the Taipei Travel Open API
-- Auth-aware GoRouter redirect: signed-out users are routed to the login page and signed-in users are
-  routed away from it, layered on top of the existing onboarding redirect logic
+  from the one used for the Taipei Travel Open API; when signed out, requests are simply sent without
+  the header instead of being blocked
+- GoRouter redirect rules are whitelist-based: only routes explicitly listed in `protectedPaths`
+  (`lib/core/router/auth_redirect.dart`) require a signed-in user — currently empty, reserved for
+  future cloud-sync / personalization features. A signed-out user hitting a protected route is sent
+  to `/login?from=<original path>` so they land back where they started after signing in
+- Post-login navigation is owned entirely by `LoginPage`, not the router: it `pop`s back when pushed
+  manually, or `go`s to the `from` route when redirected from a protected page. The router
+  intentionally does not also redirect a signed-in user away from `/login`, to avoid both sides
+  navigating on the same auth-state change
 - User profile (`display_name`, `avatar_url`, `preferred_language`) is fetched from and updated
-  through the Go backend's `GET`/`PUT /api/v1/me` endpoints; the backend auto-creates a profile on
-  first sign-in
+  through the Go backend's `GET`/`PUT /api/v1/me` endpoints only when signed in; the backend
+  auto-creates a profile on first sign-in
 - The Flutter client never sends `user_id` directly — it is derived server-side from the verified
   JWT's `claims.sub`
 
@@ -415,9 +427,10 @@ retry.
 - Animated splash screen with staggered logo drop, text fade, and map-themed background
 - First-launch welcome page introducing core features with sequential entry animations
 - Persist onboarding completion state locally via SharedPreferences
-- GoRouter `refreshListenable` integration for declarative redirect after onboarding, extended to
-  also react to Supabase sign-in state (see [Authentication & Profile](#authentication--profile))
-- Returning, signed-in users skip onboarding and navigate directly to the home screen
+- GoRouter `refreshListenable` integration for declarative redirect after onboarding; auth state is
+  only consulted for explicitly protected routes (see [Authentication & Profile](#authentication--profile))
+- Returning users — signed in or as a guest — skip onboarding and navigate directly to the home
+  screen; authentication is never required to reach it
 
 ### Nearby Recommendations
 
@@ -467,8 +480,8 @@ retry.
   caching, and offline browsing support)
 - go_router  
   Declarative routing solution (Centralizes navigation logic, manages detail page routing via
-  `extra` object passing, drives auth- and onboarding-aware redirects, and improves maintainability
-  across feature modules)
+  `extra` object passing, drives onboarding-aware and whitelist-based auth redirects, and improves
+  maintainability across feature modules)
 - sentry_flutter  
   Error and performance monitoring SDK (Captures unhandled exceptions, breadcrumbs, app start
   metrics, slow and frozen frames, and custom transactions for key business flows)
@@ -819,7 +832,8 @@ travel-audio-guide-flutter
 │  │  ├─ nearby                     # Location controller, nearby models/utils
 │  │  ├─ network                    # Dio clients, Supabase JWT auth interceptor, log filter
 │  │  ├─ preferences                # SharedPreferences provider
-│  │  ├─ router                     # GoRouter config + route loaders (onboarding- and auth-aware redirect)
+│  │  ├─ router                     # GoRouter config + route loaders (onboarding redirect; guest-first,
+│  │  │                             # whitelist-based auth redirect via protectedPaths)
 │  │  ├─ sync                       # Cross-feature Drift sync service
 │  │  ├─ theme                      # AppTheme
 │  │  ├─ utils                      # AppLogger, in-app log viewer
@@ -846,15 +860,15 @@ travel-audio-guide-flutter
 │     │  ├─ data
 │     │  │  ├─ datasources          # SupabaseAuthDataSource
 │     │  │  └─ repositories
-│     │  ├─ di                      # authRepositoryProvider, authStateChangesProvider
+│     │  ├─ di                      # authRepositoryProvider, authStateChangesProvider, isSignedInProvider
 │     │  ├─ domain
 │     │  │  ├─ entities             # AppUser
 │     │  │  └─ repositories
 │     │  └─ presentation
 │     │     ├─ controllers          # LoginController
-│     │     └─ pages                # LoginPage
+│     │     └─ pages                # LoginPage (optional feature page, not the app entrance)
 │     ├─ home                       # Full layering: home feed + nearby recommendations
-│     ├─ onboarding                 # Splash → welcome → login/home redirect flow
+│     ├─ onboarding                 # Splash → welcome → home (guest-first) flow
 │     ├─ profile                    # Calls Go backend GET/PUT /api/v1/me
 │     │  ├─ data
 │     │  │  ├─ datasources
@@ -866,7 +880,8 @@ travel-audio-guide-flutter
 │     │  │  └─ repositories
 │     │  └─ presentation
 │     │     └─ controllers          # ProfileController (AsyncNotifier)
-│     ├─ reminder                   # Journey reminders, local notifications
+│     ├─ reminder                   # Journey reminders, local notifications; MyJourney also hosts
+│     │                             # the optional account entry point into LoginPage
 │     ├─ splash                     # Animated splash screen widgets
 │     └─ step_tracking              # Android step sensor integration (Pigeon-based)
 ├─ packages

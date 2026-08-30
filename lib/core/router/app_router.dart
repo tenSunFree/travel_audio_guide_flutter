@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_travel_audio_guide/core/analytics/analytics_service.dart';
+import 'package:flutter_travel_audio_guide/core/router/auth_redirect.dart';
 import 'package:flutter_travel_audio_guide/core/router/loaders/activity_detail_loader.dart';
 import 'package:flutter_travel_audio_guide/core/router/loaders/attraction_detail_loader.dart';
 import 'package:flutter_travel_audio_guide/core/router/loaders/audio_guide_detail_loader.dart';
@@ -100,30 +101,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
     observers: [SentryNavigatorObserver(), AnalyticsService.observer],
     refreshListenable: Listenable.merge([hasSeenNotifier, signedInNotifier]),
     redirect: (context, state) {
-      final hasSeen = hasSeenNotifier.value;
-      final signedIn = signedInNotifier.value;
-      final location = state.matchedLocation;
-      // The Splash page controls its own navigation timing; redirect should not intervene.
-      if (location == AppRoutes.splash) {
-        return null;
-      }
-      // If the welcome page hasn't been seen: redirect to welcome for all routes except welcome itself.
-      if (!hasSeen && location != AppRoutes.welcome) {
-        return AppRoutes.welcome;
-      }
-      // If welcome has been seen but the user is still on the welcome page: route based on sign-in state.
-      if (hasSeen && location == AppRoutes.welcome) {
-        return signedIn ? AppRoutes.home : AppRoutes.login;
-      }
-      // If welcome has been seen, user is not signed in, and not on the login page: redirect to login.
-      if (hasSeen && !signedIn && location != AppRoutes.login) {
-        return AppRoutes.login;
-      }
-      // If signed in but still on the login page: redirect to home.
-      if (signedIn && location == AppRoutes.login) {
-        return AppRoutes.home;
-      }
-      return null;
+      return resolveAuthRedirect(
+        hasSeenWelcome: hasSeenNotifier.value,
+        signedIn: signedInNotifier.value,
+        location: state.matchedLocation,
+        requestedLocation: state.uri.toString(),
+      );
     },
     routes: [
       // Splash / Onboarding
