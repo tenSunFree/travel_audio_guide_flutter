@@ -331,7 +331,12 @@ retry.
 - Code generation script (`scripts/codegen.sh`) runs `build_runner` for Drift, Freezed, and Riverpod
   Generator in a single command
 - Development runner (`scripts/run_dev.sh`) injects environment config via `--dart-define-from-file`
-  and supports optional device targeting
+  using the `staging` flavor (`lib/main_staging.dart`) by default, matching how the Android project
+  declares product flavors, and supports optional device targeting
+- CI-only runtime configuration script (`scripts/create_runtime_env.sh`) combines GitHub Actions
+  Environment Variables/Secrets into a transient `env/ci.json`, so the three deployment workflows
+  build with `--dart-define-from-file` instead of scattered per-flag `--dart-define` values, keeping
+  local and CI configuration on the same mechanism
 - Release build script (`scripts/build_release.sh`) validates that `env/release.json` exists before
   producing the release APK, with clear setup instructions on failure
 - Optional Flutter version pinning via [FVM](https://fvm.app/): a shared helper (`scripts/_fvm.sh`)
@@ -377,6 +382,10 @@ retry.
   produced them
 - Restored per-flavor Firebase configuration files, service account credentials, and the Android
   signing keystore from GitHub Secrets in CI, keeping sensitive files out of the repository
+- Client-safe runtime configuration (`SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `BACKEND_BASE_URL`)
+  is sourced from GitHub Environment Variables (`staging` / `production`) rather than Secrets, since
+  these values are embedded in the shipped APK and are not confidential; only genuinely sensitive
+  values (`SENTRY_DSN`, keystore credentials, Firebase service account) remain in Secrets
 - Organized per-flavor Firebase Dart configuration files under `lib/config/firebase/` for a cleaner
   project structure
 
@@ -407,8 +416,9 @@ retry.
   metadata
 - Firebase configuration files are restored in CI via GitHub Secrets to avoid exposing app
   configuration files in the public repository
-- Sentry DSN is injected at build time via `--dart-define-from-file`; local environment files are
-  excluded from version control
+- All runtime configuration, including the Sentry DSN, is injected at build time via
+  `--dart-define-from-file` (`env/dev.json` / `env/release.json` locally, a CI-generated `env/ci.json`
+  in GitHub Actions); local environment files are excluded from version control
 
 ### Journey Reminder
 
@@ -550,7 +560,7 @@ time:
 |-----------------------------|----------|------------------------------------------------------------------------------------------------------------|
 | `SUPABASE_URL`              | Yes      | Your Supabase project URL                                                                                 |
 | `SUPABASE_PUBLISHABLE_KEY`  | Yes      | Supabase publishable key. Safe to expose client-side by design — it is not a secret and relies on Supabase Row Level Security, not obscurity |
-| `BACKEND_BASE_URL`          | No       | Defaults to `http://localhost:8080`. Use `http://10.0.2.2:8080` on the Android emulator to reach the host machine's backend; use your machine's LAN IP for physical device testing |
+| `BACKEND_BASE_URL`          | Yes in CI / optional locally | CI (`scripts/create_runtime_env.sh`) requires this to be explicitly set — no silent fallback for staging/RC/production builds. Local `flutter run` without this key in `env/dev.json` falls back to `http://localhost:8080`. Use `http://10.0.2.2:8080` on the Android emulator to reach the host machine's backend; use your machine's LAN IP for physical device testing |
 | `SENTRY_DSN`                | No       | Existing Sentry configuration                                                                              |
 
 Values that must **never** be embedded in the Flutter app: the Supabase `service_role` / `secret`
@@ -560,6 +570,12 @@ key, and any backend-only JWT signing material. Those stay server-side in the
 If you use `env/dev.json` (see [Local Development](#local-development)), add the variables above to
 your local copy; `env/example.json` should list them (without real values) so new contributors know
 what to fill in.
+
+In CI, the same variables are sourced from GitHub Environment **Variables** (`staging` and
+`production` environments) — not Secrets, since `SUPABASE_URL` / `SUPABASE_PUBLISHABLE_KEY` /
+`BACKEND_BASE_URL` are all client-exposed by design. `scripts/create_runtime_env.sh` combines them
+into a transient `env/ci.json`, consumed the same way as local `env/dev.json` / `env/release.json`
+via `--dart-define-from-file`, so local and CI runtime configuration share one mechanism.
 
 ---
 
@@ -908,6 +924,7 @@ travel-audio-guide-flutter
 │  ├─ build_release.sh
 │  ├─ check.sh
 │  ├─ codegen.sh
+│  ├─ create_runtime_env.sh             # CI-only: builds env/ci.json from GitHub vars/secrets
 │  ├─ doctor.sh
 │  ├─ format.sh
 │  ├─ release.sh
